@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Page1 = () => {
+const Page2: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Página 1</Text>
+      <Text style={styles.text}>Página 2</Text>
     </View>
   );
 };
@@ -20,4 +20,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Page1;
+export default Page2;

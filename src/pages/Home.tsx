@@ -1,9 +1,7 @@
-// Importación de módulos necesarios
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-// Componente de la Página de Inicio
-const Home = () => {
+const Home: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bienvenido a AppServis</Text>
@@ -12,7 +10,6 @@ const Home = () => {
   );
 };
 
-// Definición de estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -26,5 +23,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Exportación del componente
 export default Home;

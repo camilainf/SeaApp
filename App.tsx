@@ -11,7 +11,7 @@ type TabNavigatorParams = {
   Home: undefined,
   Page1: undefined,
   Page2: undefined,
-  Page3: undefined,
+  Profile: undefined,
 };
 
 const Tab = createBottomTabNavigator<TabNavigatorParams>();
@@ -23,7 +23,7 @@ const App: React.FC = () => {
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Page1" component={Page1} />
         <Tab.Screen name="Page2" component={Page2} />
-        <Tab.Screen name="Page3" component={Page3} />
+        <Tab.Screen name="Profile" component={Page3} />
       </Tab.Navigator>
     </NavigationContainer>
   );
