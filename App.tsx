@@ -1,20 +1,32 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-export default function App() {
+import Home from './src/pages/Home';
+import Page1 from './src/pages/Page1';
+import Page2 from './src/pages/Page2';
+import Page3 from './src/pages/Page3';
+
+type TabNavigatorParams = {
+  Home: undefined,
+  Page1: undefined,
+  Page2: undefined,
+  Page3: undefined,
+};
+
+const Tab = createBottomTabNavigator<TabNavigatorParams>();
+
+const App: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={Home} />
+        <Tab.Screen name="Page1" component={Page1} />
+        <Tab.Screen name="Page2" component={Page2} />
+        <Tab.Screen name="Page3" component={Page3} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
