@@ -4,8 +4,8 @@ import { View, Text, StyleSheet } from 'react-native';
 const Home: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenido a AppServis</Text>
-      <Text style={styles.title}>Esta es una prueba</Text>
+      <Text style={styles.title}>Bienvenido a SeaJob</Text>
+      <Text style={styles.title}>Este es el HOME</Text>
     </View>
   );
 };
