@@ -1,9 +1,8 @@
 import React from 'react';
-import Navigation from './src/routes/Navigation';
+import AppNavigator from './src/routes/AppNavigator';
 
 const App: React.FC = () => {
-  return <Navigation/>
-
+    return <AppNavigator />;
 };
 
 export default App;

@@ -1,16 +1,15 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
+import { MainTabParamList } from './types';
 import Home from '../screens/Home';
 import SearchJobs from '../screens/SearchJobs';
 import Profile from '../screens/Profile';
+import Login from '../screens/Login';
 
-// Tab Bottom
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TabGroup = () => {
+const TabGroup: React.FC = () => {
     return (
         <Tab.Navigator
             screenOptions={({route, navigation}) => ({
@@ -20,7 +19,7 @@ const TabGroup = () => {
                         case "Home":
                             iconName = "home";
                             break;
-                        case "Search":
+                        case "Explorar":
                             iconName = "search";
                             break;
                         case "Perfil":
@@ -30,22 +29,15 @@ const TabGroup = () => {
                             iconName = "emoticon-dead";
                     }
                     return <Ionicons name={iconName as any} size={size} color={color}/>
-                }
+                },
+                headerShown: false,
             })}
         >
             <Tab.Screen name="Home" component={Home}/>
-            <Tab.Screen name="Search" component={SearchJobs}/>
+            <Tab.Screen name="Explorar" component={SearchJobs}/>
             <Tab.Screen name="Perfil" component={Profile}/>
         </Tab.Navigator>
-    )
-}
-
-const Navigation: React.FC = () => {
-  return (
-    <NavigationContainer>
-      <TabGroup />
-    </NavigationContainer>
-  );
+    );
 };
 
-export default Navigation;
+export default TabGroup;

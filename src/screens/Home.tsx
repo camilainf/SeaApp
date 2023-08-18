@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import CustomNavbar from '../components/CustomNavbar';
 
 const Home: React.FC = () => {
   return (

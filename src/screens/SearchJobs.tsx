@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const SearchJobs: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Pagina para buscar trabajos</Text>
+      <Text style={styles.text}>Explorar</Text>
     </View>
   );
 };
