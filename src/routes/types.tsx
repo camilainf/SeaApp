@@ -8,5 +8,6 @@ export type MainTabParamList = {
     Home: undefined;
     Explorar: undefined;
     Perfil: undefined;
+    Registro: undefined;
     Salir: undefined;
 };

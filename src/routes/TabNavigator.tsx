@@ -6,6 +6,7 @@ import Home from '../screens/Home';
 import SearchJobs from '../screens/SearchJobs';
 import Profile from '../screens/Profile';
 import Login from '../screens/Login';
+import Register from '../screens/Register';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -36,6 +37,7 @@ const TabGroup: React.FC = () => {
             <Tab.Screen name="Home" component={Home}/>
             <Tab.Screen name="Explorar" component={SearchJobs}/>
             <Tab.Screen name="Perfil" component={Profile}/>
+            <Tab.Screen name="Registro" component={Register}/>
         </Tab.Navigator>
     );
 };
