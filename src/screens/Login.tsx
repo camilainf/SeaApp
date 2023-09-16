@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, Alert, TouchableOpacity, StyleSheet} fro
 import * as userService from '../services/userService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../routes/types';
+import {LinearGradient} from 'expo-linear-gradient';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Auth'>;
 
@@ -26,25 +27,33 @@ const Login: React.FC<Props> = ({ navigation }) => {
     };
 
     return (
-        <View style= {styles.container } >
-            <Text style={styles.label} >Email:</Text>
-            <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+        // Vista
 
-            <Text style={styles.label} >Contraseña:</Text>
-            <TextInput style={[styles.input, styles.passwordInput]} value={password} onChangeText={setPassword} secureTextEntry={true} />
+        <LinearGradient 
+        colors={['#5ABEF6', '#2476D3', '#0F4FC2']} 
+        style={styles.container} 
+        start={{x: 0, y: 0}} 
+        end={{x: 0, y: 1}}
+    >
+        <Text style={styles.label}>Email:</Text>
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Iniciar Sesión</Text>
-            </TouchableOpacity>
-        </View>
+        <Text style={styles.label}>Contraseña:</Text>
+        <TextInput style={[styles.input, styles.passwordInput]} value={password} onChangeText={setPassword} secureTextEntry={true} />
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+    </LinearGradient>
     );
 };
 
+//Estilos
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 60,
-        marginTop: 300
+        // paddingHorizontal: 60,
+        // marginTop: 300,
     },
     label: {
         fontSize: 16,
