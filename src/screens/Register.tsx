@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Image, ScrollView  } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import * as userService from '../services/userService';
+import { LinearGradient } from "expo-linear-gradient";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../routes/types";
 
-const Register = () => {
+type LoginScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Auth"
+>;
+
+type Props = {
+  navigation: LoginScreenNavigationProp;
+};
+
+const Register: React.FC<Props> = ({ navigation }) => {
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [rut, setRut] = useState('');
@@ -40,74 +52,88 @@ const Register = () => {
         Alert.alert('Agregar foto de perfil', 'Aquí se debe implementar la funcionalidad para agregar o cambiar la foto de perfil.');
     };
 
+    const handleNavigationToLogin = () => {
+        navigation.goBack();
+    };
+
     return (
-        <ScrollView style={styles.container}>
-            <View  style={styles.centeredContainer}>
-                <View style={styles.innerContainer}>
+        <LinearGradient
+            colors={["#5ABEF6", "#2476D3", "#0F4FC2"]}
+            style={styles.background}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+        >
+            <ScrollView style={styles.container}>
+                <View style={styles.centeredContainer}>
+                    <View style={styles.innerContainer}>
 
-                    <Text style={styles.title}>Creación de cuenta</Text>
+                        <Text style={styles.title}>Creación de cuenta</Text>
 
-                    <View style={styles.profilePicContainer}>
-                        <Image
-                            source={require('../assets/images/descargar.png')} // Ruta imagen predeterminada
-                            style={styles.profilePic}
-                        />
-                        <TouchableOpacity style={styles.addIconContainer} onPress={handleAddProfilePic}>
-                            <Text style={styles.addIcon}>+</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <Text>Nombre:</Text>
-                    <TextInput value={name} onChangeText={setName} style={styles.input} />
-
-                    <Text>Apellidos:</Text>
-                    <TextInput value={surname} onChangeText={setSurname} style={styles.input} />
-
-                    <Text>RUT:</Text>
-                    <TextInput value={rut} onChangeText={setRut} style={styles.input} />
-
-                    <Text>Fecha de Nacimiento:</Text>
-                    <View style={styles.dateContainer}>
-                        <TextInput placeholder="Día" value={day} onChangeText={setDay} style={[styles.dateInput, styles.input]} />
-                        <TextInput placeholder="Mes" value={month} onChangeText={setMonth} style={[styles.dateInputMonth, styles.input]} />
-                        <TextInput placeholder="Año" value={year} onChangeText={setYear} style={[styles.dateInput, styles.input]} />
-                    </View>
-
-                    <Text>Email:</Text>
-                    <TextInput value={email} onChangeText={setEmail} style={styles.input} />
-
-                    <Text>Contraseña:</Text>
-                    <TextInput value={password} onChangeText={setPassword} secureTextEntry={true} style={styles.input} />
-
-                    <Text>Repetir Contraseña:</Text>
-                    <TextInput value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={true} style={styles.input} />
-
-                    <View style={styles.checkboxContainer}>
-                        <Checkbox value={termsAccepted} onValueChange={setTermsAccepted} />
-                        <Text style={styles.checkboxText}>Aceptar términos y condiciones</Text>
-                    </View>
-
-                    <View style={styles.buttonsContainer}>
-                        <View style={[styles.button, styles.roundedButton]}>
-                            <Button title="Volver" color="#FF5C5C" onPress={() => { /* Aquí función para volver atrás */ }} />
+                        <View style={styles.profilePicContainer}>
+                            <Image
+                                source={require('../assets/images/descargar.png')} // Ruta imagen predeterminada
+                                style={styles.profilePic}
+                            />
+                            <TouchableOpacity style={styles.addIconContainer} onPress={handleAddProfilePic}>
+                                <Text style={styles.addIcon}>+</Text>
+                            </TouchableOpacity>
                         </View>
-                        <View style={[styles.button, styles.roundedButton]}>
-                            <Button title="Crear cuenta" color="#5CB1FF" onPress={handleRegister} />
+
+                        <Text>Nombre:</Text>
+                        <TextInput value={name} onChangeText={setName} style={styles.input} />
+
+                        <Text>Apellidos:</Text>
+                        <TextInput value={surname} onChangeText={setSurname} style={styles.input} />
+
+                        <Text>RUT:</Text>
+                        <TextInput value={rut} onChangeText={setRut} style={styles.input} />
+
+                        <Text>Fecha de Nacimiento:</Text>
+                        <View style={styles.dateContainer}>
+                            <TextInput placeholder="Día" value={day} onChangeText={setDay} style={[styles.dateInput, styles.input]} />
+                            <TextInput placeholder="Mes" value={month} onChangeText={setMonth} style={[styles.dateInputMonth, styles.input]} />
+                            <TextInput placeholder="Año" value={year} onChangeText={setYear} style={[styles.dateInput, styles.input]} />
+                        </View>
+
+                        <Text>Email:</Text>
+                        <TextInput value={email} onChangeText={setEmail} style={styles.input} />
+
+                        <Text>Contraseña:</Text>
+                        <TextInput value={password} onChangeText={setPassword} secureTextEntry={true} style={styles.input} />
+
+                        <Text>Repetir Contraseña:</Text>
+                        <TextInput value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={true} style={styles.input} />
+
+                        <View style={styles.checkboxContainer}>
+                            <Checkbox value={termsAccepted} onValueChange={setTermsAccepted} />
+                            <Text style={styles.checkboxText}>Aceptar términos y condiciones</Text>
+                        </View>
+
+                        <View style={styles.buttonsContainer}>
+                            <View style={[styles.button, styles.roundedButton]}>
+                                <Button title="Volver" color="#FF5C5C" onPress={handleNavigationToLogin} />
+                            </View>
+                            <View style={[styles.button, styles.roundedButton]}>
+                                <Button title="Crear cuenta" color="#5CB1FF" onPress={handleRegister} />
+                            </View>
                         </View>
                     </View>
+                </View >
+            </ScrollView>
+        </LinearGradient>
 
-                    
-                </View>
-            </View >
-        </ScrollView>
-        
+
     );
 };
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
     container: {
         flex: 1,
-        backgroundColor: 'blue',
     },
     centeredContainer: {
         flex: 1,
@@ -194,7 +220,7 @@ const styles = StyleSheet.create({
     addIconContainer: {
         position: 'absolute',
         bottom: -3,
-        right: 100, 
+        right: 100,
         backgroundColor: 'orange',
         borderRadius: 15,
         width: 27,

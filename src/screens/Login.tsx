@@ -37,6 +37,10 @@ const Login: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const handleNavigationToRegister = () => {
+      navigation.navigate("Register");
+  };
+
   return (
     // Vista
 
@@ -72,7 +76,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.footerText}>
           No posees una cuenta?, únete a SeaJob pulsando{" "}
-          <Text style={styles.linkText} /*onPress={handleNavigation}*/>
+          <Text style={styles.linkText} onPress={handleNavigationToRegister}>
             aquí
           </Text>
           !
