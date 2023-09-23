@@ -6,7 +6,9 @@ const Profile: React.FC = () => {
   return (
     <View style={styles.container}>
                 {/* TEXTO DE PERFIL */}
-      <Text style={styles.textoPerfil}>Perfil</Text>
+      <View >
+        <Text style={styles.textoPerfil}>Perfil</Text>
+      </View>
                 {/* INFORMACION USUARIO */}
       <View style={styles.profileSection}>
         <Image
@@ -27,15 +29,14 @@ const Profile: React.FC = () => {
         style={styles.rating}
       />
               
-        <View style={styles.tarjeta}>
+              <View style={styles.tarjeta}>
           <View style={styles.fila}>
-            <Text>
-              Resumen
-            </Text>
+            <Text>Hola que tal !</Text>
           </View>
           <View style={styles.fila}>
             <Text>
-              hola
+              Bienvenido al sistema de gestión de usuarios de la Universidad
+              de La Laguna.uw 
             </Text>
             <View>
               <Text>Ganancias de dinero</Text>
@@ -52,8 +53,9 @@ const Profile: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#fff",
+    padding: 16,
+    paddingVertical: 30,
   },
   textoPerfil: {
     fontSize: 30,
@@ -91,13 +93,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   tarjeta: {
-    width: '90%',
     padding: 16,
     backgroundColor: '#FFF',
-    borderRadius: 8,
+    borderRadius: 15,
     marginBottom: 16,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#322E61',
+    
   },
   fila: {
     flexDirection: 'row',
