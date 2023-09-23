@@ -34,7 +34,7 @@ const Profile: React.FC = () => {
             <Text>Hola que tal !</Text>
           </View>
           <View style={styles.fila}>
-            <Text>
+            <Text numberOfLines={1} ellipsizeMode="tail">
               Bienvenido al sistema de gestión de usuarios de la Universidad
               de La Laguna.uw 
             </Text>
@@ -99,7 +99,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#322E61',
-    
+    //flexDirection: "row",
+
   },
   fila: {
     flexDirection: 'row',
