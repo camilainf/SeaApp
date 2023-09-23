@@ -3,26 +3,25 @@ import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, Touchab
 
 const HomeScreen: React.FC = () => {
   const usuario = {
-    nombre: 'Juan',
-    foto: 'URL_DE_LA_FOTO',
+    nombre: 'User',
+    foto: require('../../assets/iconos/usericon.png'),
   };
 
   const trabajosDestacados = [
-    { id: '1', titulo: 'Trabajo 1', imagen: 'URL_IMAGEN_1' },
-    { id: '2', titulo: 'Trabajo 2', imagen: 'URL_IMAGEN_2' },
-    { id: '3', titulo: 'Trabajo 3', imagen: 'URL_IMAGEN_3' },
-    { id: '4', titulo: 'Trabajo 4', imagen: 'URL_IMAGEN_4' },
-    { id: '5', titulo: 'Trabajo 5', imagen: 'URL_IMAGEN_5' },
-    { id: '6', titulo: 'Trabajo 6', imagen: 'URL_IMAGEN_6' },
-    { id: '7', titulo: 'Trabajo 7', imagen: 'URL_IMAGEN_7' },
+    { id: '1', titulo: 'Trabajo 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '2', titulo: 'Trabajo 2', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '3', titulo: 'Trabajo 3', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '4', titulo: 'Trabajo 4', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '5', titulo: 'Trabajo 5', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '6', titulo: 'Trabajo 6', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '7', titulo: 'Trabajo 7', imagen: require('../../assets/iconos/ImageReferencia.png') },
   ];
 
   const categoriasDestacadas = [
-    { id: '1', titulo: 'Categoría 1', imagen: 'URL_CATEGORIA_1' },
-    { id: '2', titulo: 'Categoría 2', imagen: 'URL_CATEGORIA_2' },
-    { id: '3', titulo: 'Categoría 3', imagen: 'URL_CATEGORIA_3' },
-    { id: '4', titulo: 'Categoría 4', imagen: 'URL_CATEGORIA_4' },
-
+    { id: '1', titulo: 'Categoría 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '2', titulo: 'Categoría 2', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '3', titulo: 'Categoría 3', imagen: require('../../assets/iconos/ImageReferencia.png') },
+    { id: '4', titulo: 'Categoría 4', imagen: require('../../assets/iconos/ImageReferencia.png') },
   ];
 
   return (
@@ -32,11 +31,11 @@ const HomeScreen: React.FC = () => {
         {/* Tarjeta superior */}
         <View style={styles.tarjeta}>
           <View style={styles.fila}>
-            <Image source={{ uri: 'URL_DEL_LOGO' }} style={styles.logo} />
+            <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
             <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
           </View>
           <View style={styles.fila}>
-            <Image source={{ uri: usuario.foto }} style={styles.fotoPerfil} />
+          <Image source={usuario.foto} style={styles.fotoPerfil} />
             <View>
               <Text>Ganancias de dinero</Text>
               <Text>39.000 CLP</Text>
@@ -59,7 +58,7 @@ const HomeScreen: React.FC = () => {
             data={trabajosDestacados}
             renderItem={({ item }) => (
               <View style={styles.tarjetaTrabajo}>
-                <Image source={{ uri: item.imagen }} style={styles.imagenTrabajo} />
+                <Image source={item.imagen} style={styles.imagenTrabajo} />
                 <Text>{item.titulo}</Text>
               </View>
             )}
@@ -74,7 +73,7 @@ const HomeScreen: React.FC = () => {
             data={categoriasDestacadas}
             renderItem={({ item }) => (
               <View style={styles.tarjetaCategoria}>
-                <Image source={{ uri: item.imagen }} style={styles.imagenCategoria} />
+                <Image source={item.imagen} style={styles.imagenCategoria} />
                 <Text style={styles.tituloCategoria}>{item.titulo}</Text>
               </View>
             )}
@@ -101,7 +100,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingVertical: 30
+    paddingVertical: 40
   },
   tarjeta: {
     padding: 16,
@@ -116,17 +115,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 150,
+    height: 30,
+    resizeMode: 'contain',
   },
   saludo: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   fotoPerfil: {
-    width: 50,
-    height: 50,
+    width: 100,
+    height: 100,
     borderRadius: 25,
+    resizeMode: 'contain',
   },
   buscadorContainer: {
     flexDirection: 'row',
