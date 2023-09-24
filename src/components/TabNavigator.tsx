@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MainTabParamList } from './types';
+import { MainTabParamList } from '../routes/types';
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 import { Image } from 'react-native';

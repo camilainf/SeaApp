@@ -2,7 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from './types';
 import Login from '../screens/Login';
-import TabGroup from './TabNavigator';
+import TabGroup from '../components/TabNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import Register from '../screens/Register';
 
