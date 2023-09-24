@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { LinearGradient } from "expo-linear-gradient";
+import { Dimensions } from 'react-native';
+
 
 const HomeScreen: React.FC = () => {
 
@@ -7,6 +10,9 @@ const HomeScreen: React.FC = () => {
     nombre: 'User',
     foto: require('../../assets/iconos/UserProfile.png'),
   };
+
+  const screenHeight = Dimensions.get('window').height;
+
 
   const trabajosDestacados = [
     { id: '1', titulo: 'Trabajo 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
@@ -29,7 +35,6 @@ const HomeScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.container}>
-
         {/* Tarjeta superior */}
         <View style={styles.tarjetaSuperior}>
           <View style={styles.fila}>
@@ -47,12 +52,16 @@ const HomeScreen: React.FC = () => {
 
         {/* Buscador */}
         <View style={styles.buscadorContainer}>
-          <TextInput 
-            placeholder="¿Qué buscas?" 
-            style={styles.buscadorTexto} 
+          <TextInput
+            placeholder="¿Qué buscas?"
+            style={styles.buscadorTexto}
             placeholderTextColor="#AEBFFB"
           />
-          <Image source={searchIcon} style={styles.iconoLupa} />
+          <TouchableOpacity onPress={() => {
+            console.log('Ícono de búsqueda clickeado');
+          }}>
+            <Image source={searchIcon} style={styles.iconoLupa} />
+          </TouchableOpacity>
         </View>
 
         {/* Trabajos destacados */}
@@ -61,14 +70,17 @@ const HomeScreen: React.FC = () => {
           <FlatList
             data={trabajosDestacados}
             renderItem={({ item }) => (
-              <View style={styles.tarjetaTrabajo}>
+              <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+                console.log('Tarjeta Trabajo clickeada:', item.titulo);
+              }}>
                 <Image source={item.imagen} style={styles.imagenTrabajo} />
                 <Text>{item.titulo}</Text>
-              </View>
+              </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}
-            scrollEnabled={false} // Para deshabilitar el scroll
+            scrollEnabled={false}
           />
+
         </View>
 
         {/* Categorias destacadas */}
@@ -77,14 +89,16 @@ const HomeScreen: React.FC = () => {
           <FlatList
             data={categoriasDestacadas}
             renderItem={({ item }) => (
-              <View style={styles.tarjetaCategoria}>
+              <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
+                console.log('Tarjeta Categoría clickeada:', item.titulo);
+              }}>
                 <Image source={item.imagen} style={styles.imagenCategoria} />
                 <Text style={styles.tituloCategoria}>{item.titulo}</Text>
-              </View>
+              </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}
-            numColumns={2} // Mostrar en 2 columnas
-            scrollEnabled={false} // Para deshabilitar el scroll
+            numColumns={2}
+            scrollEnabled={false}
           />
         </View>
 
@@ -99,7 +113,6 @@ const HomeScreen: React.FC = () => {
           </Text>
           <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
         </TouchableOpacity>
-
 
       </View>
     </ScrollView>
