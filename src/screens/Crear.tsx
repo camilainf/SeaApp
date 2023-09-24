@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const SearchJobs: React.FC = () => {
+const Crear: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Explorar</Text>
+      <Text style={styles.text}>Crear servicio</Text>
     </View>
   );
 };
@@ -20,4 +20,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchJobs;
+export default Crear;
