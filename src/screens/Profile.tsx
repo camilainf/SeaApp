@@ -28,15 +28,18 @@ const Profile: React.FC = () => {
         startingValue={3.3} // valor inicial
         style={styles.rating}
       />
-              
+              {/* TARJETA RESUMEN  */}
               <View style={styles.tarjeta}>
           <View style={styles.fila}>
             <Text>Hola que tal !</Text>
           </View>
           <View style={styles.fila}>
             <Text numberOfLines={1} ellipsizeMode="tail">
-              Bienvenido al sistema de gestión de usuarios de la Universidad
+              holaBienvenido al sistema de gestión de usuarios de la Universidad
               de La Laguna.uw 
+            </Text>
+            <Text numberOfLines={1} ellipsizeMode="tail">
+              Esta es la pagina de perfil de usuario.
             </Text>
             <View>
               <Text>Ganancias de dinero</Text>
