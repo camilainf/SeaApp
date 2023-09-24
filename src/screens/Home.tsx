@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   // ESTILOS GENERALES
 
   container: {
-    paddingVertical: 40,
+    paddingVertical: 0,
     backgroundColor: '#FFFFFF',
   },
 
@@ -146,13 +146,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: '13%',
+    height: '15%',
     zIndex: 1,
   },
 
   contentContainer: {
     zIndex: 2,
-    paddingTop: 16,
+    paddingTop: 70,
     paddingBottom: 40,
     paddingHorizontal: 20,
   },
