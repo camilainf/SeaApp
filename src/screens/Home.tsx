@@ -1,8 +1,6 @@
 import React from 'react';
-import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions } from 'react-native';
-
 
 const HomeScreen: React.FC = () => {
 
@@ -10,9 +8,6 @@ const HomeScreen: React.FC = () => {
     nombre: 'User',
     foto: require('../../assets/iconos/UserProfile.png'),
   };
-
-  const screenHeight = Dimensions.get('window').height;
-
 
   const trabajosDestacados = [
     { id: '1', titulo: 'Trabajo 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
@@ -34,86 +29,96 @@ const HomeScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.container}>
-        {/* Tarjeta superior */}
-        <View style={styles.tarjetaSuperior}>
-          <View style={styles.fila}>
-            <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
-            <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
-          </View>
-          <View style={styles.fila}>
-            <Image source={usuario.foto} style={styles.fotoPerfil} />
-            <View style={styles.gananciasContainer}>
-              <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
-              <Text style={styles.gananciaNumero}>39.000 CLP</Text>
+      {/* Primera view */}
+      <View style={{ flex: 1 }}>
+        <LinearGradient
+          colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
+          style={styles.gradientBackground}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
+        <View style={styles.contentContainer}>
+          {/* Tarjeta superior */}
+          <View style={styles.tarjetaSuperior}>
+            <View style={styles.fila}>
+              <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
+              <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
+            </View>
+            <View style={styles.fila}>
+              <Image source={usuario.foto} style={styles.fotoPerfil} />
+              <View style={styles.gananciasContainer}>
+                <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
+                <Text style={styles.gananciaNumero}>39.000 CLP</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Buscador */}
-        <View style={styles.buscadorContainer}>
-          <TextInput
-            placeholder="¿Qué buscas?"
-            style={styles.buscadorTexto}
-            placeholderTextColor="#AEBFFB"
-          />
-          <TouchableOpacity onPress={() => {
-            console.log('Ícono de búsqueda clickeado');
+          {/* Buscador */}
+          <View style={styles.buscadorContainer}>
+            <TextInput
+              placeholder="¿Qué buscas?"
+              style={styles.buscadorTexto}
+              placeholderTextColor="#AEBFFB"
+            />
+            <TouchableOpacity onPress={() => {
+              console.log('Ícono de búsqueda clickeado');
+            }}>
+              <Image source={searchIcon} style={styles.iconoLupa} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Trabajos destacados */}
+          <View style={styles.tarjeta}>
+            <Text style={styles.tituloTrabajos}>Trabajos destacados</Text>
+            <FlatList
+              data={trabajosDestacados}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+                  console.log('Tarjeta Trabajo clickeada:', item.titulo);
+                }}>
+                  <Image source={item.imagen} style={styles.imagenTrabajo} />
+                  <Text>{item.titulo}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
+
+          </View>
+
+          {/* Categorias destacadas */}
+          <View style={styles.tarjeta}>
+            <Text style={styles.tituloTrabajos}>Categorías destacadas</Text>
+            <FlatList
+              data={categoriasDestacadas}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
+                  console.log('Tarjeta Categoría clickeada:', item.titulo);
+                }}>
+                  <Image source={item.imagen} style={styles.imagenCategoria} />
+                  <Text style={styles.tituloCategoria}>{item.titulo}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+              scrollEnabled={false}
+            />
+          </View>
+
+          {/* Ve los ultimos trabajos */}
+          <TouchableNativeFeedback onPress={() => {
+            console.log('Tarjeta clickeada');
           }}>
-            <Image source={searchIcon} style={styles.iconoLupa} />
-          </TouchableOpacity>
+            <View style={styles.tarjetaUltimosTrabajos}>
+              <Text style={styles.saludoUltimosTrabajos}>
+                ¡Ve los últimos {"\n"}
+                servicios {"\n"}
+                publicados!
+              </Text>
+              <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
+            </View>
+          </TouchableNativeFeedback>
         </View>
-
-        {/* Trabajos destacados */}
-        <View style={styles.tarjeta}>
-          <Text style={styles.tituloTrabajos}>Trabajos destacados</Text>
-          <FlatList
-            data={trabajosDestacados}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                console.log('Tarjeta Trabajo clickeada:', item.titulo);
-              }}>
-                <Image source={item.imagen} style={styles.imagenTrabajo} />
-                <Text>{item.titulo}</Text>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-
-        </View>
-
-        {/* Categorias destacadas */}
-        <View style={styles.tarjeta}>
-          <Text style={styles.tituloTrabajos}>Categorías destacadas</Text>
-          <FlatList
-            data={categoriasDestacadas}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
-                console.log('Tarjeta Categoría clickeada:', item.titulo);
-              }}>
-                <Image source={item.imagen} style={styles.imagenCategoria} />
-                <Text style={styles.tituloCategoria}>{item.titulo}</Text>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-          />
-        </View>
-
-        {/* Ve los ultimos trabajos */}
-        <TouchableOpacity style={styles.tarjetaUltimosTrabajos} onPress={() => {
-          console.log('Tarjeta clickeada');
-        }}>
-          <Text style={styles.saludoUltimosTrabajos}>
-            ¡Ve los últimos {"\n"}
-            servicios {"\n"}
-            publicados!
-          </Text>
-          <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
-        </TouchableOpacity>
-
       </View>
     </ScrollView>
 
@@ -125,15 +130,31 @@ const styles = StyleSheet.create({
   // ESTILOS GENERALES
 
   container: {
-    padding: 16,
     paddingVertical: 40,
     backgroundColor: '#FFFFFF',
   },
+
   tarjeta: {
     padding: 16,
     backgroundColor: '#F3F6FF',
     borderRadius: 8,
     marginBottom: 16,
+  },
+
+  gradientBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '13%',
+    zIndex: 1,
+  },
+
+  contentContainer: {
+    zIndex: 2,
+    paddingTop: 16,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
   },
 
   // TARJETA SUPERIOR
@@ -238,6 +259,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 4,
   },
+  
   imagenTrabajo: {
     width: 50,
     height: 50,
@@ -255,12 +277,14 @@ const styles = StyleSheet.create({
     margin: 8,
     elevation: 4,
   },
+
   imagenCategoria: {
     width: '100%',
     height: 100,
     borderRadius: 8,
     marginBottom: 8,
   },
+
   tituloCategoria: {
     textAlign: 'center',
     fontWeight: 'bold',
