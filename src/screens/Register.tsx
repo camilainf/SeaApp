@@ -71,7 +71,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
 
                         <View style={styles.profilePicContainer}>
                             <Image
-                                source={require('../assets/images/descargar.png')} // Ruta imagen predeterminada
+                                source={require('../../assets/iconos/UserProfileRegistro.png')} // Ruta imagen predeterminada
                                 style={styles.profilePic}
                             />
                             <TouchableOpacity style={styles.addIconContainer} onPress={handleAddProfilePic}>
