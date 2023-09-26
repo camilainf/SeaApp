@@ -3,13 +3,17 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { Rating, Card } from "react-native-elements";
 
 const Profile: React.FC = () => {
+  const esPerfilPersonal = true;
+  const numeroSolicitudesCreadas = 23; //Valor de solicitudes creadas
+  const numeroSolicitudesAceptadas = 1; //Valor de solicitudes recibidas
+  const gananciaDinero = 2000; ///
   return (
     <View style={styles.container}>
-                {/* TEXTO DE PERFIL */}
-      <View >
+      {/* TEXTO DE PERFIL */}
+      <View>
         <Text style={styles.textoPerfil}>Perfil</Text>
       </View>
-                {/* INFORMACION USUARIO */}
+      {/* INFORMACION USUARIO */}
       <View style={styles.profileSection}>
         <Image
           source={require("../../assets/iconos/usericon.png")}
@@ -21,34 +25,70 @@ const Profile: React.FC = () => {
           <Text style={styles.datosUser}>20.123.321-k</Text>
         </View>
       </View>
-              {/* ESTRELLAS DE VALORACION */}
+      {/* ESTRELLAS DE VALORACION */}
       <Rating
         imageSize={20}
         readonly
         startingValue={3.3} // valor inicial
         style={styles.rating}
       />
-              {/* TARJETA RESUMEN  */}
-              <View style={styles.tarjeta}>
-          <View style={styles.fila}>
-            <Text>Hola que tal !</Text>
-          </View>
-          <View style={styles.fila}>
-            <Text numberOfLines={1} ellipsizeMode="tail">
-              holaBienvenido al sistema de gestión de usuarios de la Universidad
-              de La Laguna.uw 
-            </Text>
-            <Text numberOfLines={1} ellipsizeMode="tail">
-              Esta es la pagina de perfil de usuario.
-            </Text>
-            <View>
-              <Text>Ganancias de dinero</Text>
-              <Text>39.000 CLP</Text>
+      {/* TARJETA RESUMEN  */}
+      <View style={styles.tarjetaResumen}>
+        <View>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: "#4E479A",
+              paddingLeft:15
+            }}
+          >
+            Resumen
+          </Text>
+        </View>
+        <View style={styles.fila}>
+          {/*Izquierda*/}
+          <View style={styles.columnaIzquierda}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
+              <View style={styles.numberContainer}>
+                <Text style={styles.numberText}>
+                  {numeroSolicitudesCreadas > 99 ? "+99" : numeroSolicitudesCreadas}
+                </Text>
+              </View>
+              <Text style={styles.textoSolicitudes}>Solicitudes creadas</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={styles.numberContainer}>
+                <Text style={styles.numberText}>
+                  {numeroSolicitudesAceptadas > 99 ? "+99" : numeroSolicitudesAceptadas}
+                </Text>
+              </View>
+              <Text style={styles.textoSolicitudes}>Solicitudes Agendadas</Text>
             </View>
           </View>
+          {/*Derecha*/}
+          <View style={styles.columnaDerecha}>
+            <Text style={styles.gananciaDineroTexto}>
+              Ganancias de dinero 💰
+            </Text>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={styles.gananciaNumero}
+            >
+              {gananciaDinero} CLP
+            </Text>
+          </View>
         </View>
-              {/* LISTADO DE SOLICITUDES CREADAS */}
-              {/* LISTADO DE SOLICITUDES REALIZADAS */}
+      </View>
+      {/* LISTADO DE SOLICITUDES CREADAS */}
+      {/* LISTADO DE SOLICITUDES REALIZADAS */}
     </View>
   );
 };
@@ -60,6 +100,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingVertical: 30,
   },
+  // Informacion de usuario
   textoPerfil: {
     fontSize: 30,
     fontWeight: "bold",
@@ -95,22 +136,60 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontWeight: "bold",
   },
-  tarjeta: {
-    padding: 16,
-    backgroundColor: '#FFF',
+  // Tarjeta Resunen
+  tarjetaResumen: {
+    paddingRight: 16,
+    paddingTop: 5,
+    marginTop: 20,
+    backgroundColor: "#FFF",
     borderRadius: 15,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#322E61',
-    //flexDirection: "row",
-
+    borderWidth: 3,
+    borderColor: "#F3F6FF",
   },
   fila: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
-  
+  resumenTexto: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4E479A",
+  },
+  columnaIzquierda: {
+    flex: 0.3,
+    paddingRight: 8, // Espacio entre las dos columnas
+  },
+  columnaDerecha: {
+    flex: 0.5,
+    paddingLeft: 8, // Espacio entre las dos columnas
+  },
+  textoSolicitudes: {
+    color: "#4E479A",
+    fontSize: 17,
+  },
+  numberText: {
+    color: "#4E479A",
+    fontWeight: "bold",
+    fontSize: 30,
+    paddingHorizontal: 10,
+  },
+  gananciaDineroTexto: {
+    color: "#4E479A",
+    fontWeight: "500",
+    fontSize: 15,
+  },
+  gananciaNumero: {
+    fontSize: 20,
+    fontWeight: "500",
+    textAlign: "center",
+    color: "#47AE64", // Puedes ajustar el tono de verde según prefieras
+  },
+  numberContainer: {
+    width: 75, // Puedes ajustar este valor según la cantidad máxima de dígitos que esperas
+    alignItems: "flex-end", // Alinea el texto a la derecha
+  },
 });
 export default Profile;
