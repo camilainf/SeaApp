@@ -9,19 +9,30 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableNativeFeedback,
+  Alert,
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../services/randomService";
+import { Usuario } from "../resources/user";
 
 const Profile: React.FC = () => {
-  const esPerfilPersonal = true;
-  const numeroSolicitudesCreadas = 24; //Valor de solicitudes creadas
-  const numeroSolicitudesAceptadas = 7; //Valor de solicitudes recibidas
-  const gananciaDinero = 4300; ///
-  const nombreUsuario = "Juan"; //Nombre del usuario
-  const apellidoUsuario = "Pérez Sandoval"; //Apellido del usuario
-  const rutUsuario = "123456789"; //Rut del usuario
-  const valoracionUsuario = 3.5; //Valoracion del usuario
+  const UsuarioPerfil: Usuario = {
+    id: 1,
+    nombre: "Juan",
+    apellidos: "Pérez",
+    rut: "12345678-9",
+    contraseña: "1234",
+    email: "sebastian.moyano.r@mail.pucv.cl",
+    fechaDeNacimiento: "23/45/1980",
+
+    calificacion: 4.5,
+  };
+  const mostrarTextoCompleto = (texto: string) => {
+    Alert.alert("Email completo", texto);
+  };
+  const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
+  
+  const gananciaDinero = 4300; //
   const solicitudesCreadass = [
     {
       id: "1",
@@ -40,9 +51,9 @@ const Profile: React.FC = () => {
     id: string;
     titulo: string;
     fecha: string;
-    imagen: any;  // Considera especificar un tipo más preciso para 'imagen'
-};
-  const solicitudesCreadas :FechaObjeto[] = [];
+    imagen: any; // Considera especificar un tipo más preciso para 'imagen'
+  };
+  const solicitudesCreadas: FechaObjeto[] = [];
   const solicitudesAceptadas = [
     {
       id: "1",
@@ -69,6 +80,8 @@ const Profile: React.FC = () => {
       imagen: require("../../assets/iconos/ImageReferencia.png"),
     },
   ];
+  const numeroSolicitudesCreadas = solicitudesCreadas.length; //Valor de solicitudes creadas
+  const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
 
   const SinSolicitudes = () => (
     <View
@@ -101,7 +114,7 @@ const Profile: React.FC = () => {
           color: "#4E479A",
         }}
       >
-        Aun no hay solicitudes en este momento. 
+        Aun no hay solicitudes en este momento.
       </Text>
     </View>
   );
@@ -114,21 +127,62 @@ const Profile: React.FC = () => {
       </View>
       {/* INFORMACION USUARIO */}
       <View style={styles.profileSection}>
-        <Image
-          source={require("../../assets/iconos/usericon.png")}
-          style={styles.profileImage}
-        />
+        <View style={styles.profileSection}>
+          {UsuarioPerfil.imagenDePerfil ? (
+            <Image
+              source={{ uri: UsuarioPerfil.imagenDePerfil }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <Image
+              source={require("../../assets/iconos/usericon.png")}
+              style={styles.profileImage}
+            />
+          )}
+        </View>
         <View style={styles.userInfo}>
-          <Text style={styles.datosUser}>{nombreUsuario}</Text>
-          <Text style={styles.datosUser}>{apellidoUsuario}</Text>
-          <Text style={styles.datosUser}>{rutUsuario}</Text>
+          <View style={styles.infoLine}>
+            <Text style={styles.textoDatosUser}>Nombre: </Text>
+            <Text style={styles.datosUser}>{UsuarioPerfil.nombre}</Text>
+          </View>
+
+          <View style={styles.infoLine}>
+            <Text style={styles.textoDatosUser}>Apellido: </Text>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={styles.datosUser}
+            >
+              {UsuarioPerfil.apellidos}
+            </Text>
+          </View>
+
+          <View style={styles.infoLine}>
+            <Text style={styles.textoDatosUser}>Rut: </Text>
+            <Text style={styles.datosUser}>{UsuarioPerfil.rut}</Text>
+          </View>
+
+          <View style={styles.infoLine}>
+            <Text style={styles.textoDatosUser}>Email: </Text>
+            <TouchableOpacity
+              onLongPress={() => mostrarTextoCompleto(UsuarioPerfil.email)}
+            >
+              <Text
+                style={styles.datosUser}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {UsuarioPerfil.email}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       {/* ESTRELLAS DE VALORACION */}
       <Rating
         imageSize={20}
         readonly
-        startingValue={valoracionUsuario} // valor inicial
+        startingValue={UsuarioPerfil.calificacion} // valor inicial
         style={styles.rating}
       />
       {/* TARJETA RESUMEN  */}
@@ -195,7 +249,7 @@ const Profile: React.FC = () => {
         </View>
       )}
 
-                        {/* LISTADO DE SOLICITUDES CREADAS */}
+      {/* LISTADO DE SOLICITUDES CREADAS */}
       <View
         style={{
           height: 2,
@@ -248,7 +302,7 @@ const Profile: React.FC = () => {
           />
         )}
       </View>
-                            {/* LISTADO DE SOLICITUDES REALIZADAS */}
+      {/* LISTADO DE SOLICITUDES REALIZADAS */}
       <View
         style={{
           height: 2,
@@ -272,33 +326,34 @@ const Profile: React.FC = () => {
         {solicitudesAceptadas.length === 0 ? (
           <SinSolicitudes />
         ) : (
-        <FlatList
-          data={solicitudesAceptadas}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.tarjetaTrabajo}
-              onPress={() => {
-                console.log("Tarjeta Trabajo clickeada:", item.titulo);
-              }}
-            >
-              <Image source={item.imagen} style={styles.imagenTrabajo} />
-              <View style={{ marginEnd: 90 }}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ color: "#4E479A", fontWeight: "bold" }}
-                >
-                  {item.titulo}
-                </Text>
-                <Text style={{ color: "#4E479A" }}>
-                  {convertirFecha(item.fecha)}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-        />)}
+          <FlatList
+            data={solicitudesAceptadas}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.tarjetaTrabajo}
+                onPress={() => {
+                  console.log("Tarjeta Trabajo clickeada:", item.titulo);
+                }}
+              >
+                <Image source={item.imagen} style={styles.imagenTrabajo} />
+                <View style={{ marginEnd: 90 }}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{ color: "#4E479A", fontWeight: "bold" }}
+                  >
+                    {item.titulo}
+                  </Text>
+                  <Text style={{ color: "#4E479A" }}>
+                    {convertirFecha(item.fecha)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -318,6 +373,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingTop: 2,
     color: "#322E61",
+
+  },
+  infoLine: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8, // Puedes ajustar este valor para dar espacio entre las líneas
   },
   profileSection: {
     flexDirection: "row",
@@ -330,10 +391,17 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     marginLeft: 20,
+    paddingEnd: 30,
+    paddingTop:20,
   },
   datosUser: {
-    fontSize: 20,
+    fontSize: 16,
     color: "#322E61",
+  },
+  textoDatosUser: {
+    fontSize: 16,
+    color: "#322E61",
+    fontWeight: "bold",
   },
   rating: {
     alignSelf: "flex-start",
