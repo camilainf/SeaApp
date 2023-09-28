@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
-import { convertirFecha } from "../services/randomService";
+import { convertirFecha } from "../utils/randomService";
 import { Usuario } from "../resources/user";
 
 const Profile: React.FC = () => {
