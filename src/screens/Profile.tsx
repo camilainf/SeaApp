@@ -121,10 +121,6 @@ const Profile: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* TEXTO DE PERFIL */}
-      <View>
-        <Text style={styles.textoPerfil}>Perfil</Text>
-      </View>
       {/* INFORMACION USUARIO */}
       <View style={styles.profileSection}>
         <View style={styles.profileSection}>
@@ -297,7 +293,7 @@ const Profile: React.FC = () => {
           width: "100%",
         }}
       ></View>
-      <View>
+      <View style={{marginBottom: 20}}>
         <Text
           style={{
             fontSize: 20,
@@ -357,9 +353,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    paddingTop: 2,
+    paddingTop: 30,
     color: "#322E61",
-
   },
   infoLine: {
     flexDirection: "row",
@@ -370,6 +365,7 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop:15,
   },
   profileImage: {
     width: 130,
