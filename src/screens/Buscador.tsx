@@ -23,15 +23,17 @@ const BuscadorScreen: React.FC = () => {
     ];
 
     const servicios = [
-        { id: '1', nombre: 'Servicio 1' },
-        { id: '2', nombre: 'Servicio 2' },
-        { id: '3', nombre: 'Servicio 3' },
+        { id: '1', nombre: 'Jardineria en verano' },
+        { id: '2', nombre: 'Pasear perro puddle' },
+        { id: '3', nombre: 'Cuidar niño chico' },
+        { id: '4', nombre: 'Programar pagina web' },
     ];
 
     const categorias = [
-        { id: '1', nombre: 'Categoría 1' },
-        { id: '2', nombre: 'Categoría 2' },
-        { id: '3', nombre: 'Categoría 3' },
+        { id: '1', nombre: 'Jardineria' },
+        { id: '2', nombre: 'Paseador de perro' },
+        { id: '3', nombre: 'Cocinero' },
+        { id: '4', nombre: 'Programación' },
     ];
 
     const allData = [...usuarios, ...servicios, ...categorias];
