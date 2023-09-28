@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
   const mostrarTextoCompleto = (texto: string) => {
     Alert.alert("Email completo", texto);
   };
-  const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
+  const esPerfilPersonal = false; // Crear funcion que valide que este es el usuario de este perfil
   
   const gananciaDinero = 4300; //
   const solicitudesCreadass = [
@@ -142,28 +142,14 @@ const Profile: React.FC = () => {
         </View>
         <View style={styles.userInfo}>
           <View style={styles.infoLine}>
-            <Text style={styles.textoDatosUser}>Nombre: </Text>
-            <Text style={styles.datosUser}>{UsuarioPerfil.nombre}</Text>
+            <Text style={styles.datosUser}>{UsuarioPerfil.nombre} {UsuarioPerfil.apellidos}</Text>
           </View>
 
-          <View style={styles.infoLine}>
-            <Text style={styles.textoDatosUser}>Apellido: </Text>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={styles.datosUser}
-            >
-              {UsuarioPerfil.apellidos}
-            </Text>
-          </View>
-
-          <View style={styles.infoLine}>
-            <Text style={styles.textoDatosUser}>Rut: </Text>
+          {esPerfilPersonal && <View style={styles.infoLine}>
             <Text style={styles.datosUser}>{UsuarioPerfil.rut}</Text>
-          </View>
+          </View>}
 
           <View style={styles.infoLine}>
-            <Text style={styles.textoDatosUser}>Email: </Text>
             <TouchableOpacity
               onLongPress={() => mostrarTextoCompleto(UsuarioPerfil.email)}
             >
@@ -379,6 +365,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8, // Puedes ajustar este valor para dar espacio entre las líneas
+    paddingRight:100,
   },
   profileSection: {
     flexDirection: "row",
@@ -397,6 +384,7 @@ const styles = StyleSheet.create({
   datosUser: {
     fontSize: 16,
     color: "#322E61",
+    fontWeight:"500"
   },
   textoDatosUser: {
     fontSize: 16,
