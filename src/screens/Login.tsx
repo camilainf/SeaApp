@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as userService from "../services/userService";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../routes/types";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
 
 type LoginScreenNavigationProp = StackNavigationProp<

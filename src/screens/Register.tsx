@@ -4,7 +4,7 @@ import Checkbox from 'expo-checkbox';
 import * as userService from '../services/userService';
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../routes/types";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,

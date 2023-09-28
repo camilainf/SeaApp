@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableNativeFeedback } from 'react-native';
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../routes/types";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;

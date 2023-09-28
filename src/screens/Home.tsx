@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 
-const HomeScreen: React.FC = () => {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList>;
+};
+
+const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const usuario = {
     nombre: 'User',
@@ -26,6 +32,8 @@ const HomeScreen: React.FC = () => {
 
   const serviceIcon = require('../../assets/iconos/Work.png');
   const searchIcon = require('../../assets/iconos/Search.png');
+
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <ScrollView style={styles.container}>
@@ -59,9 +67,12 @@ const HomeScreen: React.FC = () => {
               placeholder="¿Qué buscas?"
               style={styles.buscadorTexto}
               placeholderTextColor="#AEBFFB"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
             />
             <TouchableOpacity onPress={() => {
               console.log('Ícono de búsqueda clickeado');
+              navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
             }}>
               <Image source={searchIcon} style={styles.iconoLupa} />
             </TouchableOpacity>
@@ -259,7 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 4,
   },
-  
+
   imagenTrabajo: {
     width: 50,
     height: 50,
