@@ -14,12 +14,30 @@ import {
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
 import { Usuario } from "../resources/user";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../routes/NavigatorTypes";
+import { ServicioData } from "../resources/service";
 
-const Profile: React.FC = () => {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList>;
+};
+
+
+const Profile: React.FC<Props> = ({ navigation }) => {
+  const servicioCargado : ServicioData= {
+    nombreServicio: "Servicio inicial",
+    categoria: "Fotografia",
+    descripcion: "Descripcion muy bonita",
+    fechaSolicitud: "23/01/22",
+    direccion: "Viña del mar",
+    monto: 4000,
+    imagen: "https://via.placeholder.com/150" // Esta es una imagen de placeholder.
+  };
   const UsuarioPerfil: Usuario = {
     id: 1,
-    nombre: "Juan",
-    apellidos: "Pérez",
+    nombre: "Francisco",
+    apellidos: "Fuensalida Fuente alba",
     rut: "12345678-9",
     contraseña: "1234",
     email: "sebastian.moyano.r@mail.pucv.cl",
@@ -30,8 +48,8 @@ const Profile: React.FC = () => {
   const mostrarTextoCompleto = (texto: string) => {
     Alert.alert("Email completo", texto);
   };
-  const esPerfilPersonal = false; // Crear funcion que valide que este es el usuario de este perfil
-  
+  const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
+
   const gananciaDinero = 4300; //
   const solicitudesCreadass = [
     {
@@ -138,22 +156,46 @@ const Profile: React.FC = () => {
         </View>
         <View style={styles.userInfo}>
           <View style={styles.infoLine}>
-            <Text style={styles.datosUser}>{UsuarioPerfil.nombre} {UsuarioPerfil.apellidos}</Text>
+            <Text style={styles.datosUser}>
+              <FontAwesome
+                name="user"
+                size={15}
+                color="#4E479A"
+                style={{ paddingRight: 5 }}
+              />{"  "}
+              {/* Espacio de 5 unidades */}
+              {UsuarioPerfil.nombre} {UsuarioPerfil.apellidos}
+            </Text>
           </View>
 
-          {esPerfilPersonal && <View style={styles.infoLine}>
-            <Text style={styles.datosUser}>{UsuarioPerfil.rut}</Text>
-          </View>}
-
+          {esPerfilPersonal && (
+            <View style={styles.infoLine}>
+              <Text style={styles.datosUser}>
+                
+                <FontAwesome
+                  name="id-card"
+                  size={15}
+                  color="#4E479A"
+                  style={{ paddingRight: 5 }}
+                />{"  "}
+                {UsuarioPerfil.rut}
+              </Text>
+            </View>
+          )}
           <View style={styles.infoLine}>
             <TouchableOpacity
               onLongPress={() => mostrarTextoCompleto(UsuarioPerfil.email)}
             >
               <Text
                 style={styles.datosUser}
-                numberOfLines={1}
+                numberOfLines={2}
                 ellipsizeMode="tail"
-              >
+              ><FontAwesome
+              name="envelope"
+              size={15}
+              color="#4E479A"
+              style={{ paddingRight: 5 }}
+            />{"  "}
                 {UsuarioPerfil.email}
               </Text>
             </TouchableOpacity>
@@ -231,7 +273,7 @@ const Profile: React.FC = () => {
         </View>
       )}
 
-      {/* LISTADO DE SOLICITUDES CREADAS */}
+                                        {/* LISTADO DE SOLICITUDES CREADAS */}
       <View
         style={{
           height: 2,
@@ -262,6 +304,8 @@ const Profile: React.FC = () => {
                 style={styles.tarjetaTrabajo}
                 onPress={() => {
                   console.log("Tarjeta Trabajo clickeada:", item.titulo);
+                  navigation.navigate('Servicio', servicioCargado);
+
                 }}
               >
                 <Image source={item.imagen} style={styles.imagenTrabajo} />
@@ -284,7 +328,7 @@ const Profile: React.FC = () => {
           />
         )}
       </View>
-      {/* LISTADO DE SOLICITUDES REALIZADAS */}
+                                      {/* LISTADO DE SOLICITUDES REALIZADAS */}
       <View
         style={{
           height: 2,
@@ -293,7 +337,7 @@ const Profile: React.FC = () => {
           width: "100%",
         }}
       ></View>
-      <View style={{marginBottom: 20}}>
+      <View style={{ marginBottom: 20 }}>
         <Text
           style={{
             fontSize: 20,
@@ -315,6 +359,8 @@ const Profile: React.FC = () => {
                 style={styles.tarjetaTrabajo}
                 onPress={() => {
                   console.log("Tarjeta Trabajo clickeada:", item.titulo);
+                  navigation.navigate('Servicio', servicioCargado);
+
                 }}
               >
                 <Image source={item.imagen} style={styles.imagenTrabajo} />
@@ -359,13 +405,16 @@ const styles = StyleSheet.create({
   infoLine: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8, // Puedes ajustar este valor para dar espacio entre las líneas
-    paddingRight:100,
+    marginBottom: 8,
+    paddingRight: 110,
+  },
+  icon: {
+    marginRight: 8, // Espacio entre el ícono y el texto
   },
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop:15,
+    marginTop: 15,
   },
   profileImage: {
     width: 130,
@@ -375,12 +424,11 @@ const styles = StyleSheet.create({
   userInfo: {
     marginLeft: 20,
     paddingEnd: 30,
-    paddingTop:20,
+    paddingTop: 20,
   },
   datosUser: {
     fontSize: 16,
     color: "#322E61",
-    fontWeight:"500"
   },
   textoDatosUser: {
     fontSize: 16,

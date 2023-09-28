@@ -1,9 +1,11 @@
+import {ServicioData} from '../resources/service'
 export type RootStackParamList = {
     Auth: undefined;
     Register: undefined;
     Buscador: {
         keyword: string;
     };
+    Servicio:ServicioData;
     Main: { screen: keyof MainTabParamList };
 };
 
