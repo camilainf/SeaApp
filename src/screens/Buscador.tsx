@@ -36,7 +36,12 @@ const BuscadorScreen: React.FC = () => {
         { id: '4', nombre: 'Programación' },
     ];
 
-    const allData = [...usuarios, ...servicios, ...categorias];
+    const usuariosModificados = usuarios.map(u => ({ ...u, id: `usuario-${u.id}` }));
+    const serviciosModificados = servicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
+    const categoriasModificadas = categorias.map(c => ({ ...c, id: `categoria-${c.id}` }));
+
+    const allData = [...usuariosModificados, ...serviciosModificados, ...categoriasModificadas];
+
 
     const searchResults = allData.filter(item => item.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
 
