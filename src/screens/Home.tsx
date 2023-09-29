@@ -72,7 +72,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             />
             <TouchableOpacity onPress={() => {
               console.log('Ícono de búsqueda clickeado');
-              navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
+              if (searchTerm.trim() !== '') {  // Verifica que searchTerm no esté vacío o solo contenga espacios en blanco
+                navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
+              } else {
+                console.log('Por favor, ingresa una palabra en el buscador.');
+                // Puedes mostrar un mensaje al usuario indicando que debe ingresar una palabra en el buscador
+              }
             }}>
               <Image source={searchIcon} style={styles.iconoLupa} />
             </TouchableOpacity>

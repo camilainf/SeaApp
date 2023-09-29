@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/NavigatorTypes';
+import { listaCategorias, listaServicios, listaUsuarios } from '../resources/Listas';
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type Props = {
+    navigation: StackNavigationProp<RootStackParamList>;
+};
 
 type BuscadorRouteProp = RouteProp<RootStackParamList, 'Buscador'>;
 
-const BuscadorScreen: React.FC = () => {
+const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
 
     const route = useRoute<BuscadorRouteProp>();
 
@@ -14,36 +20,19 @@ const BuscadorScreen: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const searchIcon = require('../../assets/iconos/Search.png');
+    const serviceIcon = require('../../assets/iconos/ImageReferencia.png')
 
-    // Ejemplo de arreglos de datos para búsqueda
-    const usuarios = [
-        { id: '1', nombre: 'Camila Escobedo' },
-        { id: '2', nombre: 'Sebastian Moyano' },
-        { id: '3', nombre: 'CaSe Escoyano' },
-    ];
-
-    const servicios = [
-        { id: '1', nombre: 'Jardineria en verano' },
-        { id: '2', nombre: 'Pasear perro puddle' },
-        { id: '3', nombre: 'Cuidar niño chico' },
-        { id: '4', nombre: 'Programar pagina web' },
-    ];
-
-    const categorias = [
-        { id: '1', nombre: 'Jardineria' },
-        { id: '2', nombre: 'Paseador de perro' },
-        { id: '3', nombre: 'Cocinero' },
-        { id: '4', nombre: 'Programación' },
-    ];
-
-    const usuariosModificados = usuarios.map(u => ({ ...u, id: `usuario-${u.id}` }));
-    const serviciosModificados = servicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
-    const categoriasModificadas = categorias.map(c => ({ ...c, id: `categoria-${c.id}` }));
+    const usuariosModificados = listaUsuarios.map(u => ({ ...u, id: `usuario-${u.id}` }));
+    const serviciosModificados = listaServicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
+    const categoriasModificadas = listaCategorias.map(c => ({ ...c, id: `categoria-${c.id}` }));
 
     const allData = [...usuariosModificados, ...serviciosModificados, ...categoriasModificadas];
+    const searchResults = searchTerm.trim() !== '' ? allData.filter(item => item.nombre.toLowerCase().includes(searchTerm.toLowerCase())) : [];
 
-
-    const searchResults = allData.filter(item => item.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+    const handleNavigationToResult = () => {
+        console.log("Navegado a la cosa seleccionada")
+        // navigation.navigate('screen');
+    };
 
     return (
         <View style={styles.container}>
@@ -68,15 +57,23 @@ const BuscadorScreen: React.FC = () => {
                 <FlatList
                     data={searchResults}
                     renderItem={({ item }) => (
-                        <View style={styles.resultItem}>
+                        <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+                            console.log('Resultado clickeado:', item.nombre);
+                            handleNavigationToResult(); // AQUI SE DEBE IMPLEMENTAR EL NAVIGATOR A LA VISTA ESPECIFICA DEPENDIENDO DEL TIPO DE ENTIDAD DEL RESULTADO QUE SE CLICKEE
+                        }}>
+                            {/* Puedes agregar una imagen si la tienes, de lo contrario omite esta línea */}
+                            <Image source={serviceIcon} style={styles.imagenTrabajo} />
                             <Text>{item.nombre}</Text>
-                        </View>
+                        </TouchableOpacity>
                     )}
                     keyExtractor={(item) => item.id}
                 />
             ) : (
-                <Text style={styles.noResultsText}>No hay resultados</Text>
+                <View>
+                    <Text style={styles.noResultsText}>No hay resultados</Text>
+                </View>
             )}
+
         </View>
     );
 };
@@ -84,7 +81,7 @@ const BuscadorScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        paddingHorizontal: 20,
         backgroundColor: '#FFFFFF',
     },
 
@@ -96,7 +93,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         paddingHorizontal: 30,
         paddingVertical: 10,
-        marginVertical: 30,
+        marginVertical: 5,
     },
 
     buscadorTexto: {
@@ -120,6 +117,22 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 18,
         color: '#888',
+    },
+    tarjetaTrabajo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        padding: 16,
+        marginBottom: 20,
+        elevation: 4,
+        borderRadius: 8,
+    },
+
+    imagenTrabajo: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        marginRight: 16,
     },
 });
 

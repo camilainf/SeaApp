@@ -16,8 +16,16 @@ const AppNavigator: React.FC = () => {
             <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Auth" component={Login} />
                 <Stack.Screen name="Register" component={Register} />
-                <Stack.Screen name="Buscador" component={BuscadorScreen} />
-                <Stack.Screen name="Main" component={TabGroup}/>
+                <Stack.Screen
+                    name="Buscador"
+                    component={BuscadorScreen}
+                    options={{
+                        headerShown: true, // Muestra la barra superior
+                        headerBackTitleVisible: false, // Oculta el título de volver atrás
+                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                    }}
+                />
+                <Stack.Screen name="Main" component={TabGroup} />
                 <Stack.Screen name="Servicio" component={ServicioScreen} />
 
             </Stack.Navigator>
