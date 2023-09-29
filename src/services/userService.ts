@@ -1,4 +1,5 @@
-const BASE_URL = 'http://10.0.2.2:9000/api/users';
+// const BASE_URL = 'http://10.0.2.2:9000/api/users';
+const BASE_URL = 'http://localhost:9000/api/users';
 
 export const getAllUsers = async () => {
   const response = await fetch(BASE_URL);
