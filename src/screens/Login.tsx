@@ -12,6 +12,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
 import * as authService from "../services/authService";
+import { getToken } from "../services/storageService";
+import { decodeToken } from "../services/tokenService";
+import { DecodedToken } from "../types/auth";
 
 
 type LoginScreenNavigationProp = StackNavigationProp<
@@ -27,10 +30,20 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+
   const handleLogin = async () => {
     try {
       const data = await authService.login({ email, password });
+      const user_token = await getToken();
+
+      if (user_token) {
+        const decodedInfo = decodeToken(user_token) as DecodedToken;
+        if (decodedInfo) {
+          console.log("ID del usuario:", decodedInfo.id);
+        }
+      }
       console.log(data);
+      
       Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
       navigation.navigate("Main", { screen: "Home" });
     } catch (error) {
