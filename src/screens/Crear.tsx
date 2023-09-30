@@ -38,13 +38,24 @@ const Crear: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        placeholder="Nombre del servicio"
-        value={nombreServicio}
-        onChangeText={setNombreServicio}
-        style={styles.input}
-      />
-      <Picker
+        <Text style={styles.header}>Creación de solicitud 💼</Text>
+        <View style={styles.infoBox}>
+            <Text style={styles.infoText}>
+              En este apartado podrás crear una solicitud de servicio que necesites, tal como una petición de gasfitería, pasear a tu mascota, una sesión de fotos, entre muchas otras!
+            </Text>
+        </View>
+        <View style={styles.separator} />
+
+        <Text style={styles.label}>Nombre del servicio</Text>
+        <TextInput
+            placeholder="Ejemplo: Corte de pasto"
+            value={nombreServicio}
+            onChangeText={setNombreServicio}
+            style={styles.input}
+        />
+
+        <Text style={styles.label}>Categoría</Text>
+        <Picker
         selectedValue={categoria}
         onValueChange={(itemValue) => setCategoria(itemValue.toString())}
         style={styles.picker}
@@ -53,7 +64,9 @@ const Crear: React.FC = () => {
         <Picker.Item label="Categoria 2" value="cat2" />
         {/* Agrega más categorías según lo necesites */}
       </Picker>
-      <TextInput
+
+        <Text style={styles.label}>Descripción</Text>
+        <TextInput
         placeholder="Descripción del servicio"
         value={descripcion}
         onChangeText={setDescripcion}
@@ -61,76 +74,128 @@ const Crear: React.FC = () => {
         numberOfLines={4}
         style={styles.input}
       />
-      <TextInput
-        placeholder="Fecha de solicitud (DD/MM/YY)"
-        value={fechaSolicitud}
-        onChangeText={setFechaSolicitud}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Hora de la solicitud (HH:MM)"
-        value={horaSolicitud}
-        onChangeText={setHoraSolicitud}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Dirección del servicio"
-        value={direccion}
-        onChangeText={setDireccion}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Monto del servicio"
-        value={monto}
-        onChangeText={setMonto}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <Button title="Agregar Imagen" onPress={() => {}} />
-      <View style={styles.buttonContainer}>
-        <Button title="Guardar" onPress={guardar} color="#4E479A" />
-        <Button title="Cancelar" onPress={cancelar} color="#FF6B6B" />
-      </View>
-      <Modal isVisible={isModalVisible}>
-        <View style={styles.modalContent}>
-          <Text>Operación exitosa</Text>
-          <Button title="Ok" onPress={() => toggleModal('')} />
+
+        <View style={styles.row}>
+            <View style={styles.column}>
+                <Text style={styles.label}>Fecha</Text>
+                <TextInput
+                    placeholder="DD/MM/YY"
+                    value={fechaSolicitud}
+                    onChangeText={setFechaSolicitud}
+                    style={styles.input}
+                />
+            </View>
+            <View style={styles.column}>
+                <Text style={styles.label}>Hora</Text>
+                <TextInput
+                    placeholder="HH:MM"
+                    value={horaSolicitud}
+                    onChangeText={setHoraSolicitud}
+                    style={styles.input}
+                />
+            </View>
         </View>
-      </Modal>
+
+        <Text style={styles.label}>Dirección del servicio</Text>
+        <TextInput
+            placeholder="Ejemplo: Calle Falsa 123"
+            value={direccion}
+            onChangeText={setDireccion}
+            style={styles.input}
+        />
+
+        <Text style={styles.label}>Monto del servicio</Text>
+        <TextInput
+            placeholder="$0.00"
+            value={monto}
+            onChangeText={setMonto}
+            keyboardType="numeric"
+            style={styles.input}
+        />
+
+        <Button title="Agregar Imagen" onPress={() => console.log("Se presionó botón de imagen")} />
+
+        <View style={styles.buttonContainer}>
+            <Button title="Cancelar" onPress={cancelar} color="#FF6B6B" />
+            <Button title="Guardar" onPress={guardar} color="#4E479A" />
+        </View>
+
+        <Modal isVisible={isModalVisible}>
+            // ... [Contenido del Modal]
+        </Modal>
     </View>
-  );
+);
 };
 
 const styles = StyleSheet.create({
-  container: {
+container: {
     flex: 1,
     padding: 20,
     backgroundColor: 'white',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
+},
+header: {
+    fontSize: 24,
+    color: '#66638C',
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center', // Centramos el título
+},
+infoBox: {
+    backgroundColor: '#F3F6FF',
+    padding: 15,
+    borderRadius: 10,  // Bordes más redondeados para un mejor UX
+    marginBottom: 20,
+},
+infoText: {
+    color: '#5A5966',
+    fontSize: 16,  // Aumentamos un poco el tamaño para mejorar legibilidad
+    textAlign: 'justify',
+},
+separator: {
+    height: 1,
+    backgroundColor: '#7D7B8C',
+    marginVertical: 20,
+},
+label: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+    fontSize: 16,
+},
+input: {
+    height: 45,  // Un poco más alto para mejor sensación al tocar
+    borderColor: '#DDD',
     borderWidth: 1,
-    marginTop: 10,
     paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  picker: {
+    borderRadius: 10,  // Bordes más redondeados para un mejor UX
+    marginBottom: 20,
+},
+picker: {
     height: 50,
-    marginTop: 10,
-  },
-  buttonContainer: {
+    borderColor: '#DDD',
+    borderWidth: 1,
+    borderRadius: 10,  // Bordes más redondeados para un mejor UX
+    marginBottom: 20,
+},
+row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+},
+column: {
+    flex: 1,
+    marginRight: 10,
+},
+buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
-  },
-  modalContent: {
+},
+modalContent: {
     backgroundColor: 'white',
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5,
-  },
+    borderRadius: 10,  // Bordes más redondeados para un mejor UX
+},
 });
 
 export default Crear;

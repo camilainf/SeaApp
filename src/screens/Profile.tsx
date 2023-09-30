@@ -130,6 +130,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           marginVertical: 5,
           fontSize: 18,
           color: "#4E479A",
+          fontWeight: "300",
+
         }}
       >
         Aun no hay solicitudes en este momento.
@@ -414,7 +416,7 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 15,
+    marginTop: 30,
   },
   profileImage: {
     width: 130,
