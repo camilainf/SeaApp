@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   userInfo: {
     marginLeft: 20,
     paddingEnd: 30,
-    paddingTop: 20,
+    paddingTop: 30,
   },
   datosUser: {
     fontSize: 16,
