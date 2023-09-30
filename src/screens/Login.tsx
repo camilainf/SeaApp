@@ -3,16 +3,16 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Alert,
   TouchableOpacity,
   StyleSheet,
   Image,
 } from "react-native";
-import * as userService from "../services/userService";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
+import * as authService from "../services/authService";
+
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -29,7 +29,8 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const user = await userService.loginUser({ email, password });
+      const data = await authService.login({ email, password });
+      console.log(data);
       Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
       navigation.navigate("Main", { screen: "Home" });
     } catch (error) {
@@ -37,13 +38,12 @@ const Login: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+
   const handleNavigationToRegister = () => {
-      navigation.navigate("Register");
+    navigation.navigate("Register");
   };
 
   return (
-    // Vista
-
     <LinearGradient
       colors={["#5ABEF6", "#2476D3", "#0F4FC2"]}
       style={styles.background}
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoImagen:{
-     // Esto hace que el contenedor ocupe todo el espacio disponible en la pantalla
+  logoImagen: {
+    // Esto hace que el contenedor ocupe todo el espacio disponible en la pantalla
     justifyContent: 'center', // Centra verticalmente
     alignItems: 'center', // Centra horizontalmente
   },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 16,
-    backgroundColor:"#F3F6FF"
+    backgroundColor: "#F3F6FF"
   },
   passwordInput: {
     marginTop: 8,
