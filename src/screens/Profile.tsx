@@ -25,15 +25,7 @@ type Props = {
 
 
 const Profile: React.FC<Props> = ({ navigation }) => {
-  const servicioCargado : ServicioData= {
-    nombreServicio: "Servicio inicial",
-    categoria: "Fotografia",
-    descripcion: "Descripcion muy bonita",
-    fechaSolicitud: "23/01/22",
-    direccion: "Viña del mar",
-    monto: 4000,
-    imagen: "https://via.placeholder.com/150" // Esta es una imagen de placeholder.
-  };
+  
   const UsuarioPerfil: Usuario = {
     id: 1,
     nombre: "Francisco",
@@ -45,24 +37,53 @@ const Profile: React.FC<Props> = ({ navigation }) => {
 
     calificacion: 4.5,
   };
+
+
   const mostrarTextoCompleto = (texto: string) => {
     Alert.alert("Email completo", texto);
   };
   const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
 
   const gananciaDinero = 4300; //
-  const solicitudesCreadass = [
+  const solicitudesCreadas: ServicioData[] = [
     {
-      id: "1",
-      titulo: "Promotor de departamentos",
-      fecha: "22/06/24",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 1,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Promotor de departamentos  ",
+      descripcion: "Se necesita trabajador en el area de promotor de departamentos",
+      categoria: "Promotor",
+      fechaSolicitud: "23/01/23",
+      horaSolicitud: "12:00",
+      direccion: "Viña del mar, San alfonso #343",
+      monto: 40000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 1,
     },
     {
-      id: "2",
-      titulo: "Quiropraxia a domicilio",
-      fecha: "04/12/21",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 2,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Paseo de perros",
+      descripcion: "Necesito que alguien pasee a mi perro este dia viernes a las ",
+      categoria: "Miscelanea",
+      fechaSolicitud: "09/10/23",
+      horaSolicitud: "12:00",
+      direccion: "Viña del mar, San alfonso #343",
+      monto: 40000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 3
+    },
+    {
+      id: 3,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Quiropraxia a domicilio",
+      descripcion: "Se necesita persona con conocimientos en quiropraxia para atender a adulto de 30 años con problemas lumbares",
+      categoria: "Kinesiologia",
+      fechaSolicitud: "01/12/23",
+      horaSolicitud: "12:00",
+      direccion: "Valparaiso, Juan gomez con calle Quebrada #23",
+      monto: 89000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 2
     },
   ];
   type FechaObjeto = {
@@ -71,31 +92,59 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     fecha: string;
     imagen: any; // Considera especificar un tipo más preciso para 'imagen'
   };
-  const solicitudesCreadas: FechaObjeto[] = [];
-  const solicitudesAceptadas = [
+  //const solicitudesCreadas: FechaObjeto[] = [];
+  const solicitudesAceptadas : ServicioData[]= [
     {
-      id: "1",
-      titulo: "Profesor particular de matematicas",
-      fecha: "22/06/24",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 4,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Profesor particular de matematicas",
+      descripcion: "Se necesita profesor que ayude a mi hijo que es medio porro en matematicas",
+      categoria: "Pedagogia",
+      fechaSolicitud: "03/11/23",
+      horaSolicitud: "12:00",
+      direccion: "La qubrada del aji #333",
+      monto: 40000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 3
     },
     {
-      id: "2",
-      titulo: "TENGO MIEDOOOOOAODJOIASDOAJDOIASIJDAOSJDIOADOAJSDOAJSDAOS",
-      fecha: "04/12/21",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 5,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Diseñador para pagina web",
+      descripcion: "Necesito un diseñador que sepa de como estructurar una pagina web, para el diseño de una",
+      categoria: "Diseñador grafico",
+      fechaSolicitud: "23/01/22",
+      horaSolicitud: "12:00",
+      direccion: "Remoto",
+      monto: 49832,
+      imagen: "https://via.placeholder.com/150",
+      estado: 2
     },
     {
-      id: "3",
-      titulo: "Quiropraxia a domicilio",
-      fecha: "04/12/21",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 6,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Conductor privado para gala",
+      descripcion: "Necesito urgente alguien que pueda de hace de conductor privado para llevar a mi hija a sus XV",
+      categoria: "Conductor",
+      fechaSolicitud: "01/01/23",
+      horaSolicitud: "12:00",
+      direccion: "Gomez carreño, los trigos, #450",
+      monto: 15000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 1
     },
     {
-      id: "4",
-      titulo: "Quiropraxia a domicilio",
-      fecha: "04/12/21",
-      imagen: require("../../assets/iconos/ImageReferencia.png"),
+      id: 7,
+      idCreador: UsuarioPerfil.id,
+      nombreServicio: "Ayudante sobre ramo de anatomia y farmacos",
+      descripcion: "Necesito a alguien que sepa sobre la asignatura de anatomia y farmacos para mi examen de este ramo",
+      categoria: "Ayudantia",
+      fechaSolicitud: "23/09/23",
+      horaSolicitud: "12:00",
+      direccion: "Quilpue, huechuraba, macul, las condes, cerca del patio italiano #44",
+      monto: 9000,
+      imagen: "https://via.placeholder.com/150",
+      estado: 2
     },
   ];
   const numeroSolicitudesCreadas = solicitudesCreadas.length; //Valor de solicitudes creadas
@@ -305,27 +354,27 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.tarjetaTrabajo}
                 onPress={() => {
-                  console.log("Tarjeta Trabajo clickeada:", item.titulo);
-                  navigation.navigate('Servicio', servicioCargado);
+                  console.log("Tarjeta Trabajo clickeada:", item.nombreServicio);
+                  navigation.navigate('Servicio', item);
 
                 }}
               >
-                <Image source={item.imagen} style={styles.imagenTrabajo} />
+                <Image source={{uri:item.imagen}} style={styles.imagenTrabajo} />
                 <View style={{ marginEnd: 90 }}>
                   <Text
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     style={{ color: "#4E479A", fontWeight: "bold" }}
                   >
-                    {item.titulo}
+                    {item.nombreServicio}
                   </Text>
                   <Text style={{ color: "#4E479A" }}>
-                    {convertirFecha(item.fecha)}
+                    {convertirFecha(item.fechaSolicitud)}
                   </Text>
                 </View>
               </TouchableOpacity>
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             scrollEnabled={false}
           />
         )}
@@ -360,27 +409,27 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.tarjetaTrabajo}
                 onPress={() => {
-                  console.log("Tarjeta Trabajo clickeada:", item.titulo);
-                  navigation.navigate('Servicio', servicioCargado);
+                  console.log("Tarjeta Trabajo clickeada:", item.nombreServicio);
+                  navigation.navigate('Servicio', item);
 
                 }}
               >
-                <Image source={item.imagen} style={styles.imagenTrabajo} />
+                <Image source={{uri:item.imagen}} style={styles.imagenTrabajo} />
                 <View style={{ marginEnd: 90 }}>
                   <Text
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     style={{ color: "#4E479A", fontWeight: "bold" }}
                   >
-                    {item.titulo}
+                    {item.nombreServicio}
                   </Text>
                   <Text style={{ color: "#4E479A" }}>
-                    {convertirFecha(item.fecha)}
+                    {convertirFecha(item.fechaSolicitud)}
                   </Text>
                 </View>
               </TouchableOpacity>
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             scrollEnabled={false}
           />
         )}
