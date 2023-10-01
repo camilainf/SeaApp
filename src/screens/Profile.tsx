@@ -34,7 +34,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     contraseña: "1234",
     email: "sebastian.moyano.r@mail.pucv.cl",
     fechaDeNacimiento: "23/45/1980",
-
+    imagenDePerfil:"https://dims.apnews.com/dims4/default/cd0d974/2147483647/strip/false/crop/2700x2700+0+0/resize/1486x1486!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F52%2F07%2F94c79693022fc6811604e443c418%2Fb73a1555afe8488ea0a6938a6b177eba",
     calificacion: 4.5,
   };
 
@@ -56,7 +56,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       horaSolicitud: "12:00",
       direccion: "Viña del mar, San alfonso #343",
       monto: 40000,
-      imagen: "https://via.placeholder.com/150",
+      imagen: "http://html-color.org/AEBEED.jpg",
       estado: 1,
     },
     {
@@ -69,7 +69,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       horaSolicitud: "12:00",
       direccion: "Viña del mar, San alfonso #343",
       monto: 40000,
-      imagen: "https://via.placeholder.com/150",
+      imagen: "https://www.fanaticosdelasmascotas.cl/wp-content/uploads/2021/03/portada-1.png",
       estado: 3
     },
     {
@@ -82,7 +82,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       horaSolicitud: "12:00",
       direccion: "Valparaiso, Juan gomez con calle Quebrada #23",
       monto: 89000,
-      imagen: "https://via.placeholder.com/150",
+      imagen: "https://img.europapress.es/fotoweb/fotonoticia_20200329075935_1200.jpg",
       estado: 2
     },
   ];
@@ -192,7 +192,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {/* INFORMACION USUARIO */}
       <View style={styles.profileSection}>
-        <View style={styles.profileSection}>
+        <View >
           {UsuarioPerfil.imagenDePerfil ? (
             <Image
               source={{ uri: UsuarioPerfil.imagenDePerfil }}
@@ -433,12 +433,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             scrollEnabled={false}
           />
         )}
+ 
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -466,11 +468,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 30,
+    marginBottom: 5,
   },
   profileImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 40,
+    width: 120,
+    height: 120,
+    borderRadius: 70,
+    
+    
   },
   userInfo: {
     marginLeft: 20,

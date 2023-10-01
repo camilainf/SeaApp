@@ -26,7 +26,8 @@ const ServicioScreen: React.FC = () => {
   const userCargado = {
     nombre: "Hector Lopez Valenzuela",
     email: "efpyi@example.com",
-    telefono: "+569123456789"};
+    telefono: "+569123456789",
+    imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Joe_Biden_presidential_portrait.jpg/640px-Joe_Biden_presidential_portrait.jpg"};
   return ( 
     <ScrollView style={styles.container}>
       {/* Boton para ir pa atras*/}
@@ -35,14 +36,14 @@ const ServicioScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <FontAwesome name="arrow-left" size={24} color="#476D9A" />
+          <FontAwesome name="close" size={24} color="#476D9A" />
         </TouchableOpacity>
         
       </View>
       {/* Barra de Usuario */}
       {!esDueno && (
         <View style={styles.userBar}>
-        <Image source={{ uri: "user_image_url" }} style={styles.userImage} />
+        <Image source={{ uri: userCargado.imagen }} style={styles.userImage} />
         <View style={styles.userNameContainer}>
           <Text numberOfLines={2}
                 ellipsizeMode="tail" style={styles.userName}>{userCargado.nombre}</Text>
@@ -141,9 +142,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop:20
   },
   backButton: {
     marginTop: 10,
+    marginBottom:15,
   },
   title: {
     fontSize: 28,
@@ -255,8 +258,8 @@ const styles = StyleSheet.create({
   },
 
   userImage: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
     marginRight: 10,
   },
