@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  TextInput,
+  Slider
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -21,13 +23,24 @@ const ServicioScreen: React.FC = () => {
   const route = useRoute<BuscadorRouteProp>();
   const servicioCargado = route.params || {};
   const navigation = useNavigation();
+  const [estadoSolicitud, setEstadoSolicitud] = useState(servicioCargado.estado); // Puedes cambiar esto según el estado real
+  const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
+  const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
-  const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
+  const esDueno = true; // Aquí deberías determinar si esDueño es verdadero o falso
   const userCargado = {
     nombre: "Hector Lopez Valenzuela",
     email: "efpyi@example.com",
     telefono: "+569123456789",
     imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Joe_Biden_presidential_portrait.jpg/640px-Joe_Biden_presidential_portrait.jpg"};
+    const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
+    const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
+    const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
+  
+    const ofertas = [
+      { Nombre: "hola", valor: 3 },
+      { Nombre: "que tal", valor: 10 },
+    ];
   return ( 
     <ScrollView style={styles.container}>
       {/* Boton para ir pa atras*/}
@@ -53,7 +66,7 @@ const ServicioScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
       )}
-      {/* Modal de informacion */}
+      {/* Modal de informacion de contacto */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -62,7 +75,6 @@ const ServicioScreen: React.FC = () => {
           setModalVisible(!modalVisible);
         }}
       >
-        
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Los datos del usuario son:</Text>
@@ -91,7 +103,7 @@ const ServicioScreen: React.FC = () => {
         <Image source={{ uri: servicioCargado.imagen }} style={styles.image} />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
-          <Text style={styles.estadoText}>Estado: 1</Text>
+          <Text style={styles.estadoText}>Estado: {servicioCargado.estado}</Text>
           <Text style={styles.categoriaText}>{servicioCargado.categoria}</Text>
         </View>
       </View>
@@ -103,31 +115,168 @@ const ServicioScreen: React.FC = () => {
         </Text>
       </View>
       <View>
+        {/*Fecha de solicitud */}
         <Text style={styles.date}>
           <FontAwesome name="calendar" size={16} color="#476D9A" />
           {"  "}
           {convertirFecha(servicioCargado.fechaSolicitud)}
         </Text>
+        {/* Hora de solicitud*/}
         <Text style={styles.date}>
           <FontAwesome name="clock-o" size={16} color="#476D9A" />
           {"  "}
           {servicioCargado.horaSolicitud}
         </Text>
       </View>
+      {/*Direccion de solicitud */}
       <Text style={styles.address}>
         <FontAwesome name="map-marker" size={16} color="#476D9A" />
         {"  "}
         {servicioCargado.direccion}
       </Text>
+      {/*Texto de mongo, y el valor */}
       <Text style={styles.amount}>Monto: ${servicioCargado.monto}</Text>
+      {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>
-            {esDueno ? "Ver ofertas" : "Ofertar"}
-          </Text>
-        </TouchableOpacity>
+        {estadoSolicitud === 1 || estadoSolicitud === 2 ? (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              if (esDueno) {
+                setVerOfertasModalVisible(true);
+              } else {
+                setCrearOfertaModalVisible(true);
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {esDueno ? "Ver ofertas" : "Ofertar"}
+            </Text>
+          </TouchableOpacity>
+        ) : estadoSolicitud === 3 ? (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setValorarModalVisible(true);
+            }}
+          >
+            <Text style={styles.buttonText}>Valorar</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
-      {/* Sección de Servicios Relacionados */}
+      {/*Modal de Creacion de oferta*/}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={crearOfertaModalVisible}
+        onRequestClose={() => {
+          setCrearOfertaModalVisible(false);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Crear oferta</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese el valor de la oferta"
+              onChangeText={(text) => setOfertaValue(text)}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => {
+                  setCrearOfertaModalVisible(false);
+                  setOfertaValue(""); // Limpia el valor del input
+                }}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={() => {
+                  console.log("Oferta creada:", ofertaValue);
+                  setCrearOfertaModalVisible(false);
+                  setOfertaValue(""); // Limpia el valor del input
+                }}
+              >
+                <Text style={styles.createButtonText}>Crear</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/*Modal de ver ofertas*/}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={verOfertasModalVisible}
+        onRequestClose={() => {
+          setVerOfertasModalVisible(false);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Ofertas disponibles:</Text>
+            {ofertas.map((oferta, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.ofertaItem}
+                onPress={() => {
+                  console.log("Oferta seleccionada:", oferta.Nombre);
+                  setVerOfertasModalVisible(false);
+                }}
+              >
+                <Text>{oferta.Nombre}</Text>
+                <Text>${oferta.valor}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setVerOfertasModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Modal de valoración */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={valorarModalVisible}
+        onRequestClose={() => {
+          setValorarModalVisible(false);
+        }}
+      >
+        <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Calificar Usuario</Text>
+            <Text>Valoración:</Text>
+            <Slider
+              minimumValue={1.0}
+              maximumValue={5.0}
+              step={0.1}
+              value={valoracion}
+              onValueChange={(value) => setValoracion(value)}
+              style={{ width: 300, marginBottom: 20 }} // Ajusta la longitud de la barra
+            />
+            <Text>{valoracion.toFixed(1)}</Text>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={() => {
+                // Aquí puedes realizar la lógica para enviar la valoración
+                // Por ejemplo, enviarla al servidor
+                // Luego, cierra el modal
+                setValorarModalVisible(false);
+              }}
+            >
+              <Text style={styles.createButtonText}>
+                Enviar Valoración
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -332,6 +481,52 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
+  },
+  //Estilos para modal 
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    borderRadius: 8,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#FF6B6B",
+    padding: 10,
+    borderRadius: 8,
+    marginRight: 5,
+  },
+  cancelButtonText: {
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  createButton: {
+    flex: 1,
+    backgroundColor: "#44B1EE",
+    padding: 20,
+    borderRadius: 8,
+    marginLeft: 5,
+  },
+  createButtonText: {
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+
+  // Estilos para el modal de ver ofertas
+  ofertaItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8,
   },
 });
 

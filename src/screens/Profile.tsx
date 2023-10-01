@@ -493,8 +493,7 @@ const styles = StyleSheet.create({
   },
   rating: {
     alignSelf: "flex-start",
-
-    marginLeft: 20,
+    marginLeft: 15,
   },
   summaryCard: {
     marginTop: 20,
