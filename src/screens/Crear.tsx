@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Agrega espacio entre el texto y el icono
   },
   infoBox: {
-    backgroundColor: "#F0F0F0", // Cambia esto al color de fondo deseado
+    backgroundColor: "#F3F6FF", // Cambia esto al color de fondo deseado
     padding: 10,
     borderRadius: 5,
   },

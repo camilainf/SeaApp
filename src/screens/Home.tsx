@@ -11,8 +11,8 @@ type Props = {
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const usuario = {
-    nombre: 'User',
-    foto: require('../../assets/iconos/UserProfile.png'),
+    nombre: 'Case',
+    foto:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_i2_vJN5rUWFIs3kXNqiy2EyzgYXwKUFvJg&usqp=CAU'),
   };
 
   const trabajosDestacados = [
@@ -53,7 +53,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
             </View>
             <View style={styles.fila}>
-              <Image source={usuario.foto} style={styles.fotoPerfil} />
+              <Image source={{uri:usuario.foto}} style={styles.fotoPerfil} />
               <View style={styles.gananciasContainer}>
                 <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
                 <Text style={styles.gananciaNumero}>39.000 CLP</Text>
@@ -85,7 +85,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Trabajos destacados */}
           <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Trabajos destacados</Text>
+            <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
             <FlatList
               data={trabajosDestacados}
               renderItem={({ item }) => (
@@ -104,7 +104,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Categorias destacadas */}
           <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Categorías destacadas</Text>
+            <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
             <FlatList
               data={categoriasDestacadas}
               renderItem={({ item }) => (
@@ -206,11 +206,13 @@ const styles = StyleSheet.create({
   saludo: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#66638C',
   },
 
   fotoPerfil: {
     width: 110,
     height: 110,
+    borderRadius:60,
     resizeMode: 'cover',
   },
 
@@ -265,6 +267,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#66638C',
   },
 
   tarjetaTrabajo: {
@@ -304,6 +307,7 @@ const styles = StyleSheet.create({
   tituloCategoria: {
     textAlign: 'center',
     fontWeight: 'bold',
+    color: '#66638C',
   },
 
   // VER ULTIMOS TRABAJOS
