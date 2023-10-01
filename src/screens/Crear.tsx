@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import Modal from 'react-native-modal';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import Modal from "react-native-modal";
+import { TextInputMask } from "react-native-masked-text"; // Importamos la biblioteca
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const Crear: React.FC = () => {
-  const [nombreServicio, setNombreServicio] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [fechaSolicitud, setFechaSolicitud] = useState('');
-  const [horaSolicitud, setHoraSolicitud] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [monto, setMonto] = useState('');
+  const [nombreServicio, setNombreServicio] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [fechaSolicitud, setFechaSolicitud] = useState("");
+  const [horaSolicitud, setHoraSolicitud] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [monto, setMonto] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  const toggleInfo = () => {
+    setShowInfo(!showInfo);
+  };
 
   const toggleModal = (message: string) => {
     Alert.alert(message);
@@ -26,36 +42,60 @@ const Crear: React.FC = () => {
       fechaSolicitud: `${fechaSolicitud} ${horaSolicitud}`,
       direccion,
       monto,
-      // La imagen será agregada posteriormente
     };
     console.log(servicio);
-    toggleModal('Servicio creado con éxito');
+    toggleModal("Servicio creado con éxito");
   };
 
   const cancelar = () => {
-    toggleModal('Creación del servicio cancelada');
+    toggleModal("Creación del servicio cancelada");
   };
 
   return (
-    <View style={styles.container}>
-        <Text style={styles.header}>Creación de solicitud 💼</Text>
+    <ScrollView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Creación de solicitud</Text>
+        <TouchableOpacity onPress={toggleInfo} style={styles.infoIcon}>
+          <FontAwesome name="info-circle" size={24} color="#44B1EE" />
+        </TouchableOpacity>
+      </View>
+
+      {showInfo && (
         <View style={styles.infoBox}>
-            <Text style={styles.infoText}>
-              En este apartado podrás crear una solicitud de servicio que necesites, tal como una petición de gasfitería, pasear a tu mascota, una sesión de fotos, entre muchas otras!
-            </Text>
+          <Text style={styles.infoText}>
+            En este apartado podrás crear una solicitud de servicio que
+            necesites, en donde es necesario que agregues el{" "}
+            <Text style={styles.bold}>nombre del servicio</Text>, la{" "}
+            <Text style={styles.bold}>categoría</Text> de este, para poder
+            identificarlo mejor, su <Text style={styles.bold}>descripción</Text>
+            , donde es importante que se especifiquen todos los puntos, la{" "}
+            <Text style={styles.bold}>fecha y hora</Text> del servicio, la{" "}
+            <Text style={styles.bold}>dirección</Text> de donde quieres que se
+            ejecute (en caso de no ser presencial, puedes escribirlo aquí
+            mismo), por último, agregar el{" "}
+            <Text style={styles.bold}>monto</Text> que propones y una{" "}
+            <Text style={styles.bold}>imagen del servicio</Text> referente. ⭐️
+          </Text>
         </View>
-        <View style={styles.separator} />
+      )}
+      <View style={styles.separator} />
 
-        <Text style={styles.label}>Nombre del servicio</Text>
-        <TextInput
-            placeholder="Ejemplo: Corte de pasto"
-            value={nombreServicio}
-            onChangeText={setNombreServicio}
-            style={styles.input}
-        />
+      <Text style={styles.label}>
+        Nombre del servicio{"  "}
+        <FontAwesome name="briefcase" size={16} color="#4E479A" />
+      </Text>
+      <TextInput
+        placeholder="Ejemplo: Corte de pasto"
+        value={nombreServicio}
+        onChangeText={setNombreServicio}
+        style={styles.input}
+      />
 
-        <Text style={styles.label}>Categoría</Text>
-        <Picker
+      <Text style={styles.label}>
+        Categoría{"  "}
+        <FontAwesome name="tag" size={16} color="#4E479A" />
+      </Text>
+      <Picker
         selectedValue={categoria}
         onValueChange={(itemValue) => setCategoria(itemValue.toString())}
         style={styles.picker}
@@ -65,8 +105,11 @@ const Crear: React.FC = () => {
         {/* Agrega más categorías según lo necesites */}
       </Picker>
 
-        <Text style={styles.label}>Descripción</Text>
-        <TextInput
+      <Text style={styles.label}>
+        Descripción{"  "}
+        <FontAwesome name="pencil-square-o" size={16} color="#4E479A" />
+      </Text>
+      <TextInput
         placeholder="Descripción del servicio"
         value={descripcion}
         onChangeText={setDescripcion}
@@ -75,127 +118,193 @@ const Crear: React.FC = () => {
         style={styles.input}
       />
 
-        <View style={styles.row}>
-            <View style={styles.column}>
-                <Text style={styles.label}>Fecha</Text>
-                <TextInput
-                    placeholder="DD/MM/YY"
-                    value={fechaSolicitud}
-                    onChangeText={setFechaSolicitud}
-                    style={styles.input}
-                />
-            </View>
-            <View style={styles.column}>
-                <Text style={styles.label}>Hora</Text>
-                <TextInput
-                    placeholder="HH:MM"
-                    value={horaSolicitud}
-                    onChangeText={setHoraSolicitud}
-                    style={styles.input}
-                />
-            </View>
-        </View>
-
-        <Text style={styles.label}>Dirección del servicio</Text>
-        <TextInput
-            placeholder="Ejemplo: Calle Falsa 123"
-            value={direccion}
-            onChangeText={setDireccion}
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <Text style={styles.label}>
+            Fecha{"  "}
+            <FontAwesome name="calendar" size={16} color="#4E479A" />
+          </Text>
+          <TextInputMask
+            type={"datetime"}
+            options={{
+              format: "DD/MM/YY",
+            }}
+            placeholder="DD/MM/YY"
+            value={fechaSolicitud}
+            onChangeText={setFechaSolicitud}
             style={styles.input}
-        />
-
-        <Text style={styles.label}>Monto del servicio</Text>
-        <TextInput
-            placeholder="$0.00"
-            value={monto}
-            onChangeText={setMonto}
-            keyboardType="numeric"
-            style={styles.input}
-        />
-
-        <Button title="Agregar Imagen" onPress={() => console.log("Se presionó botón de imagen")} />
-
-        <View style={styles.buttonContainer}>
-            <Button title="Cancelar" onPress={cancelar} color="#FF6B6B" />
-            <Button title="Guardar" onPress={guardar} color="#4E479A" />
+          />
         </View>
+        <View style={styles.column}>
+          <Text style={styles.label}>
+            Hora{"  "}
+            <FontAwesome name="clock-o" size={16} color="#4E479A" />
+          </Text>
+          <TextInputMask
+            type={"datetime"}
+            options={{
+              format: "HH:MM",
+            }}
+            placeholder="HH:MM"
+            value={horaSolicitud}
+            onChangeText={setHoraSolicitud}
+            style={styles.input}
+          />
+        </View>
+      </View>
 
-        <Modal isVisible={isModalVisible}>
-            // ... [Contenido del Modal]
-        </Modal>
-    </View>
-);
+      <Text style={styles.label}>
+        Dirección del servicio{"  "}
+        <FontAwesome name="map-marker" size={16} color="#4E479A" />
+      </Text>
+      <TextInput
+        placeholder="Ejemplo: Calle Falsa 123"
+        value={direccion}
+        onChangeText={setDireccion}
+        style={styles.input}
+      />
+
+      <Text style={styles.label}>
+        Monto del servicio{"  "}
+        <FontAwesome name="money" size={16} color="#4E479A" />
+      </Text>
+      <TextInput
+        placeholder="0$"
+        value={monto}
+        onChangeText={setMonto}
+        keyboardType="numeric"
+        style={styles.input}
+      />
+      <Text style={styles.label}>
+        Imagen de servicio{"  "}
+        <FontAwesome name="image" size={16} color="#4E479A" />
+      </Text>
+      <TouchableOpacity
+        onPress={() => console.log("Se presionó botón de imagen")}
+        style={{
+          backgroundColor: "#80AAD4",
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 10,
+        }}
+      >
+        <Text style={{ color: "white" }}>Selecciona una imagen</Text>
+      </TouchableOpacity>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={cancelar}
+          style={{
+            backgroundColor: "#FF6B6B",
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 20,
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>CANCELAR</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={guardar}
+          style={{
+            backgroundColor: "#44B1EE",
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 20,
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>GUARDAR</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: 'white',
-},
-header: {
-    fontSize: 24,
-    color: '#66638C',
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center', // Centramos el título
-},
-infoBox: {
-    backgroundColor: '#F3F6FF',
-    padding: 15,
-    borderRadius: 10,  // Bordes más redondeados para un mejor UX
-    marginBottom: 20,
-},
-infoText: {
-    color: '#5A5966',
-    fontSize: 16,  // Aumentamos un poco el tamaño para mejorar legibilidad
-    textAlign: 'justify',
-},
-separator: {
-    height: 1,
-    backgroundColor: '#7D7B8C',
-    marginVertical: 20,
-},
-label: {
-    fontWeight: 'bold',
-    marginBottom: 5,
+    padding: 25,
+    backgroundColor: "white",
+  },
+  headerContainer: {
+    flexDirection: "row", // Alinea los elementos en una fila horizontal
+    alignItems: "center", // Centra verticalmente los elementos
+    justifyContent: 'space-between', // Alinea los elementos en el espacio disponible
+
+  },
+  header: { // Permite que el texto ocupe todo el espacio disponible
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#4E479A",
+    //marginStart:50
+  },
+  infoIcon: {
+    marginLeft: 10, // Agrega espacio entre el texto y el icono
+  },
+  infoBox: {
+    backgroundColor: "#F0F0F0", // Cambia esto al color de fondo deseado
+    padding: 10,
+    borderRadius: 5,
+  },
+  infoText: {
     fontSize: 16,
-},
-input: {
-    height: 45,  // Un poco más alto para mejor sensación al tocar
-    borderColor: '#DDD',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 10,  // Bordes más redondeados para un mejor UX
-    marginBottom: 20,
-},
-picker: {
+    color: "#5F5C7D",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#D3D3D8", // Color más sutil para el separador.
+    marginVertical: 20,
+  },
+  label: {
+    fontWeight: "600",
+    marginBottom: 10, // Un poco menos de espacio entre el label y el input.
+    fontSize: 16,
+    color: "#4E479A", // Color más oscuro para los labels.
+  },
+  input: {
     height: 50,
-    borderColor: '#DDD',
+    borderColor: "#E1E1E6", // Borde más sutil.
     borderWidth: 1,
-    borderRadius: 10,  // Bordes más redondeados para un mejor UX
+    paddingHorizontal: 12, // Un poco más de padding horizontal.
+    borderRadius: 10,
     marginBottom: 20,
-},
-row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-},
-column: {
+    backgroundColor: "#F3F6FF",
+    color: "#6B6B7D", // Color para el texto dentro de los inputs.
+  },
+  picker: {
+    height: 50,
+    borderColor: "#E1E1E6",
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 20,
+    color: "#6B6B7D", // Color para el texto dentro del picker.
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  column: {
     flex: 1,
     marginRight: 10,
-},
-buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
-},
-modalContent: {
-    backgroundColor: 'white',
+    marginBottom: 40,
+  },
+  modalContent: {
+    backgroundColor: "white",
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,  // Bordes más redondeados para un mejor UX
-},
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  roundedButton: {
+    borderRadius: 10, // Ajusta el valor según la cantidad de redondeo deseada
+  },
+  bold: {
+    fontWeight: "bold",
+  },
 });
 
 export default Crear;
