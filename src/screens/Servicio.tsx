@@ -8,8 +8,9 @@ import {
   ScrollView,
   Modal,
   TextInput,
-  Slider
 } from "react-native";
+import Slider from '@react-native-community/slider';
+
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { convertirFecha } from "../utils/randomService";
