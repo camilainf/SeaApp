@@ -4,7 +4,7 @@ type Usuario = {
     id: number;
     nombre: string;
     apellidos: string;
-    rut: string;
+    rut: string; //
     fechaDeNacimiento: string; // Puedes usar una cadena si prefieres, como "string"
     email: string;
     contraseña: string;
@@ -12,5 +12,17 @@ type Usuario = {
     calificacion: number;
   };
 
+  type NuevoUsuario = {
+    id: number;
+    nombre: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    fechaDeNacimiento: string; // Puedes usar una cadena si prefieres, como "string"
+    email: string;
+    telefono: string;
+    contraseña: string;
+    imagenDePerfil?: string; // El '?' indica que es opcional. Si todas las veces vas a tener la imagen, puedes quitar el '?'
+    calificacion: number;
+  };
 
 export {Usuario};
