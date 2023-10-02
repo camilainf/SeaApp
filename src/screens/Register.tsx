@@ -7,18 +7,19 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 
 type LoginScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Auth"
+    RootStackParamList,
+    "Auth"
 >;
 
 type Props = {
-  navigation: LoginScreenNavigationProp;
+    navigation: LoginScreenNavigationProp;
 };
 
 const Register: React.FC<Props> = ({ navigation }) => {
     const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
-    const [rut, setRut] = useState('');
+    const [apellidoMaterno, setApellidoMaterno] = useState('');
+    const [apellidoPaterno, setApellidoPaterno] = useState('');
+    const [telefono, setTelefono] = useState('');
     const [birthDate, setBirthDate] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -40,10 +41,16 @@ const Register: React.FC<Props> = ({ navigation }) => {
         }
 
         try {
-            const newUser = await userService.createUser({ name, email, password });
+            const newUser = await userService.createUser({ name, apellidoPaterno, apellidoMaterno, email, password, telefono, confirmPassword });
+            console.log('User creado:', newUser);
             Alert.alert('Registro exitoso', 'Usuario creado con éxito.');
         } catch (error) {
-            Alert.alert('Error', 'Hubo un problema al crear el usuario.');
+            let errorMessage = 'Hubo un problema al crear el usuario.';
+            if (error instanceof Error) {
+                // Si el error es una instancia de la clase Error, entonces podemos acceder a la propiedad message
+                errorMessage = error.message;
+            }
+            Alert.alert('Error', errorMessage);
         }
     };
 
@@ -82,11 +89,14 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         <Text>Nombre:</Text>
                         <TextInput value={name} onChangeText={setName} style={styles.input} />
 
-                        <Text>Apellidos:</Text>
-                        <TextInput value={surname} onChangeText={setSurname} style={styles.input} />
+                        <Text>Apellido paterno:</Text>
+                        <TextInput value={apellidoPaterno} onChangeText={setApellidoPaterno} style={styles.input} />
 
-                        <Text>RUT:</Text>
-                        <TextInput value={rut} onChangeText={setRut} style={styles.input} />
+                        <Text>Apellido materno:</Text>
+                        <TextInput value={apellidoMaterno} onChangeText={setApellidoMaterno} style={styles.input} />
+
+                        <Text>Teléfono:</Text>
+                        <TextInput value={telefono} onChangeText={setTelefono} style={styles.input} />
 
                         <Text>Fecha de Nacimiento:</Text>
                         <View style={styles.dateContainer}>

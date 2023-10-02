@@ -14,24 +14,32 @@ export const createUser = async (user: any) => {
     },
     body: JSON.stringify(user),
   });
-  return await response.json();
+
+  const data = await response.json();
+
+  // Si la respuesta tiene un código de estado de error, lanza un error
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al crear el usuario.');
+  }
+
+  return data;
 };
 
 export const loginUser = async (credentials: any) => {
-    const response = await fetch(BASE_URL + '/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-    });
-    
-    if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message);
-    }
-    
-    return await response.json();
+  const response = await fetch(BASE_URL + '/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message);
+  }
+
+  return await response.json();
 };
 
 export const logout = () => {
