@@ -15,12 +15,4 @@ export type ServicioData = {
   estado:number
 };
 
-export type RootStackParamList = {
-  Servicio: { servicioCargado: ServicioData };
-  // Puedes agregar otras rutas aquí si las tienes
-};
-
-export type ServicioProps = {
-  route: RouteProp<RootStackParamList, 'Servicio'>;
-};
 

@@ -14,9 +14,9 @@ import Slider from '@react-native-community/slider';
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { convertirFecha } from "../utils/randomService";
-import { ServicioProps } from "../resources/service";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/NavigatorTypes";
+
 
 type BuscadorRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
@@ -28,7 +28,7 @@ const ServicioScreen: React.FC = () => {
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
-  const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
+  const esDueno = true; // Aquí deberías determinar si esDueño es verdadero o falso
   const userCargado = {
     nombre: "Hector Lopez Valenzuela",
     email: "efpyi@example.com",
@@ -46,12 +46,12 @@ const ServicioScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       {/* Boton para ir pa atras*/}
       <View style={styles.header}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <FontAwesome name="close" size={24} color="#476D9A" />
-        </TouchableOpacity>
+          <FontAwesome name="arrow-left" size={24} color="#476D9A" />
+        </TouchableOpacity> */}
         
       </View>
       {/* Barra de Usuario */}
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    padding: 20,
+    paddingHorizontal: 20,
     paddingBottom: 40, // Para añadir espacio después del botón.
   },
   header: {

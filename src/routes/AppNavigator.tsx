@@ -21,12 +21,19 @@ const AppNavigator: React.FC = () => {
                     component={BuscadorScreen}
                     options={{
                         headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                        headerBackTitleVisible: true, // Oculta el título de volver atrás
+                        headerTitle: 'Buscador', // Establece el título en una cadena vacía para ocultarlo
                     }}
                 />
                 <Stack.Screen name="Main" component={TabGroup} />
-                <Stack.Screen name="Servicio" component={ServicioScreen} />
+                <Stack.Screen name="Servicio" 
+                component={ServicioScreen} 
+                options={{
+                    headerShown: true, // Muestra la barra superior
+                    headerBackTitleVisible: false, // Oculta el título de volver atrás
+                    headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                }}
+                />
 
             </Stack.Navigator>
         </NavigationContainer>
