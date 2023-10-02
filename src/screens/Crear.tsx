@@ -54,7 +54,7 @@ const Crear: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Creación de solicitud</Text>
+        <Text style={styles.header}>Creación de servicio</Text>
         <TouchableOpacity onPress={toggleInfo} style={styles.infoIcon}>
           <FontAwesome name="info-circle" size={24} color="#44B1EE" />
         </TouchableOpacity>
