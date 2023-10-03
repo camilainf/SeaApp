@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { TextInputMask } from "react-native-masked-text"; // Importamos la biblioteca
+import { TextInputMask } from "react-native-masked-text";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { getToken } from "../services/storageService";
 import { decodeToken } from "../services/tokenService";
@@ -28,9 +28,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
 
   const [showInfo, setShowInfo] = useState(false);
   const [montoSinFormato, setMontoSinFormato] = useState<number | null>(null);
-
-  // const moneyInputRef = useRef<TextInputMask>(null);
-
 
   const formik = useFormik({
     initialValues: {
@@ -52,7 +49,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       monto: Yup.string().required("Requerido"),
     }),
     onSubmit: async (values) => {
-      console.log("Valor de montoSinFormato:", montoSinFormato);
       try {
         const token = await getToken();
         if (token) {
@@ -108,6 +104,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       ]
     );
   };
+  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
