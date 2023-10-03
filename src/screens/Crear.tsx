@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   View,
   Text,
@@ -23,110 +25,81 @@ type Props = {
 };
 
 const Crear: React.FC<Props> = ({ navigation }) => {
-  const [nombreServicio, setNombreServicio] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [fechaSolicitud, setFechaSolicitud] = useState("");
-  const [horaSolicitud, setHoraSolicitud] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [monto, setMonto] = useState("");
-  const [isModalVisible, setModalVisible] = useState(false);
+
   const [showInfo, setShowInfo] = useState(false);
 
-  const handleResetInputs = () => {
-    setNombreServicio("");
-    setCategoria("");
-    setDescripcion("");
-    setFechaSolicitud("");
-    setHoraSolicitud("");
-    setDireccion("");
-    setMonto("");
-  }
+  const formik = useFormik({
+    initialValues: {
+      nombreServicio: "",
+      categoria: "",
+      descripcion: "",
+      fechaSolicitud: "",
+      horaSolicitud: "",
+      direccion: "",
+      monto: "",
+    },
+    validationSchema: Yup.object({
+      nombreServicio: Yup.string().required("Requerido"),
+      categoria: Yup.string().required("Requerido"),
+      descripcion: Yup.string().required("Requerido"),
+      fechaSolicitud: Yup.string().required("Requerido"),
+      horaSolicitud: Yup.string().required("Requerido"),
+      direccion: Yup.string().required("Requerido"),
+      monto: Yup.string().required("Requerido"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const token = await getToken();
+        if (token) {
+          const decodedToken = decodeToken(token) as DecodedToken;
+          const idCreador = decodedToken.id;
+          const servicio = {
+            idCreador,
+            ...values,
+            estado: 0,
+          };
+          const newService = await createService(servicio);
+          console.log('Servicio creado:', newService);
+          Alert.alert(
+            "Servicio creado con éxito.",
+            "",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.navigate("Main", { screen: "Home" });
+                },
+              },
+            ]
+          );
+        }
+      } catch (error) {
+        console.error("Error al enviar la solicitud:", error);
+        Alert.alert("Error al crear el servicio.");
+      }
+    },
+  });
 
   const toggleInfo = () => {
     setShowInfo(!showInfo);
   };
 
-  const toggleModal = (message: string, onDismiss?: () => void) => {
+  const handleCancelar = () => {
     Alert.alert(
-      message,
-      "", // Subtítulo del alerta. Puedes dejarlo vacío o eliminarlo si no lo necesitas.
+      "Creación del servicio cancelada",
+      "",
       [
         {
           text: "OK",
           onPress: () => {
-            if (onDismiss) {
-              onDismiss();
-            }
-          }
-        }
-      ]
-    );
-    setModalVisible(!isModalVisible);
-  };
-
-  const confirmarCreacion = () => {
-    Alert.alert(
-      "Confirmación", // Título del alerta
-      "¿Estás seguro de que deseas crear el servicio?", // Mensaje del alerta
-      [
-        {
-          text: "Cancelar",
-          onPress: () => {
-            console.log("Creación cancelada");
+            formik.resetForm();
+            setShowInfo(false);
+            navigation.goBack();
           },
-          style: "cancel"
         },
-        {
-          text: "Continuar",
-          onPress: () => {
-            handleCrearServicio();
-          }
-        }
       ]
     );
   };
-
-  const handleCrearServicio = async () => {
-    try {
-      const token = await getToken();
-
-      if (token) {
-
-        const decodedToken = decodeToken(token) as DecodedToken;
-        const idCreador = decodedToken.id;
-
-        const servicio = {
-          idCreador,
-          nombreServicio,
-          categoria,
-          descripcion,
-          fechaSolicitud,
-          horaSolicitud,
-          direccion,
-          monto,
-          estado: 0
-        };
-        const newService = await createService(servicio);
-        console.log('Servicio creado:', newService);
-        toggleModal("Servicio creado con éxito.", () => {
-          handleResetInputs();
-          navigation.navigate("Main", { screen: "Home" });
-        });
-      }
-    } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
-      toggleModal("Error al crear el servicio.");
-    }
-  };
-
-  const handleCancelar = () => {
-    toggleModal("Creación del servicio cancelada", () => {
-      handleResetInputs();
-      navigation.goBack();
-    });
-  };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -162,24 +135,34 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       </Text>
       <TextInput
         placeholder="Ejemplo: Corte de pasto"
-        value={nombreServicio}
-        onChangeText={setNombreServicio}
-        style={styles.input}
+        value={formik.values.nombreServicio}
+        onChangeText={formik.handleChange('nombreServicio')}
+        onBlur={formik.handleBlur('nombreServicio')}
+        maxLength={40}
+        style={[
+          styles.input,
+          formik.touched.nombreServicio && formik.errors.nombreServicio ? styles.inputError : null
+        ]}
       />
 
       <Text style={styles.label}>
         Categoría{"  "}
         <FontAwesome name="tag" size={16} color="#4E479A" />
       </Text>
-      <Picker
-        selectedValue={categoria}
-        onValueChange={(itemValue) => setCategoria(itemValue.toString())}
-        style={styles.picker}
-      >
-        <Picker.Item label="Categoria 1" value="cat1" />
-        <Picker.Item label="Categoria 2" value="cat2" />
-        {/* Agrega más categorías según lo necesites */}
-      </Picker>
+      <View style={[
+        styles.pickerContainer,
+        formik.touched.categoria && formik.errors.categoria ? styles.inputError : null
+      ]}>
+        <Picker
+          selectedValue={formik.values.categoria}
+          onValueChange={(itemValue) => formik.setFieldValue("categoria", itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Categoria 1" value="cat1" />
+          <Picker.Item label="Categoria 2" value="cat2" />
+          {/* Agrega más categorías según lo necesites */}
+        </Picker>
+      </View>
 
       <Text style={styles.label}>
         Descripción{"  "}
@@ -187,11 +170,16 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       </Text>
       <TextInput
         placeholder="Descripción del servicio"
-        value={descripcion}
-        onChangeText={setDescripcion}
+        value={formik.values.descripcion}
+        onChangeText={formik.handleChange("descripcion")}
+        onBlur={formik.handleBlur("descripcion")}
         multiline
         numberOfLines={4}
-        style={styles.input}
+        maxLength={120}
+        style={[
+          styles.input,
+          formik.touched.descripcion && formik.errors.descripcion ? styles.inputError : null
+        ]}
       />
 
       <View style={styles.row}>
@@ -206,9 +194,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               format: "DD/MM/YY",
             }}
             placeholder="DD/MM/YY"
-            value={fechaSolicitud}
-            onChangeText={setFechaSolicitud}
-            style={styles.input}
+            value={formik.values.fechaSolicitud}
+            onChangeText={(value) => formik.setFieldValue("fechaSolicitud", value)}
+            onBlur={formik.handleBlur("fechaSolicitud")}
+            style={[
+              styles.input,
+              formik.touched.fechaSolicitud && formik.errors.fechaSolicitud ? styles.inputError : null
+            ]}
           />
         </View>
         <View style={styles.column}>
@@ -222,9 +214,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               format: "HH:MM",
             }}
             placeholder="HH:MM"
-            value={horaSolicitud}
-            onChangeText={setHoraSolicitud}
-            style={styles.input}
+            value={formik.values.horaSolicitud}
+            onChangeText={(value) => formik.setFieldValue("horaSolicitud", value)}
+            onBlur={formik.handleBlur("horaSolicitud")}
+            style={[
+              styles.input,
+              formik.touched.horaSolicitud && formik.errors.horaSolicitud ? styles.inputError : null
+            ]}
           />
         </View>
       </View>
@@ -235,9 +231,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       </Text>
       <TextInput
         placeholder="Ejemplo: Calle Falsa 123"
-        value={direccion}
-        onChangeText={setDireccion}
-        style={styles.input}
+        value={formik.values.direccion}
+        onChangeText={formik.handleChange("direccion")}
+        onBlur={formik.handleBlur("direccion")}
+        style={[
+          styles.input,
+          formik.touched.direccion && formik.errors.direccion ? styles.inputError : null
+        ]}
       />
 
       <Text style={styles.label}>
@@ -246,10 +246,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       </Text>
       <TextInput
         placeholder="0$"
-        value={monto}
-        onChangeText={setMonto}
-        keyboardType="numeric"
-        style={styles.input}
+        value={formik.values.monto}
+        onChangeText={formik.handleChange("monto")}
+        onBlur={formik.handleBlur("monto")}
+        style={[
+          styles.input,
+          formik.touched.monto && formik.errors.monto ? styles.inputError : null
+        ]}
       />
       <Text style={styles.label}>
         Imagen de servicio{"  "}
@@ -280,7 +283,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           <Text style={{ color: "white", fontWeight: "bold" }}>CANCELAR</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={confirmarCreacion}
+          onPress={() => formik.handleSubmit()}
           style={{
             backgroundColor: "#44B1EE",
             paddingVertical: 10,
@@ -314,8 +317,10 @@ const styles = StyleSheet.create({
     //marginStart:50
   },
   infoIcon: {
-    marginLeft: 10, // Agrega espacio entre el texto y el icono
+    marginLeft: 10,
+    padding: 10, // Añade un padding
   },
+
   infoBox: {
     backgroundColor: "#F3F6FF", // Cambia esto al color de fondo deseado
     padding: 10,
@@ -347,11 +352,7 @@ const styles = StyleSheet.create({
     color: "#6B6B7D", // Color para el texto dentro de los inputs.
   },
   picker: {
-    height: 50,
-    borderColor: "#E1E1E6",
-    borderWidth: 1,
-    borderRadius: 10,
-    marginBottom: 20,
+    flex: 1, // Ocupa todo el espacio vertical disponible
     color: "#6B6B7D", // Color para el texto dentro del picker.
   },
   row: {
@@ -381,6 +382,21 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: "bold",
   },
+  inputError: {
+    borderColor: 'red',
+  },
+  pickerContainer: {
+    height: 50,
+    borderColor: "#E1E1E6", // Borde más sutil.
+    borderWidth: 1,
+    paddingHorizontal: 12, // Un poco más de padding horizontal.
+    borderRadius: 10,
+    marginBottom: 20,
+    backgroundColor: "#F3F6FF",
+    color: "#6B6B7D", // Asegúrate de que tenga los mismos estilos que los TextInput
+    justifyContent: 'center', // Para centrar el contenido verticalmente
+  },
+
 });
 
 export default Crear;
