@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -27,6 +27,10 @@ type Props = {
 const Crear: React.FC<Props> = ({ navigation }) => {
 
   const [showInfo, setShowInfo] = useState(false);
+  const [montoSinFormato, setMontoSinFormato] = useState<number | null>(null);
+
+  // const moneyInputRef = useRef<TextInputMask>(null);
+
 
   const formik = useFormik({
     initialValues: {
@@ -48,6 +52,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       monto: Yup.string().required("Requerido"),
     }),
     onSubmit: async (values) => {
+      console.log("Valor de montoSinFormato:", montoSinFormato);
       try {
         const token = await getToken();
         if (token) {
@@ -56,7 +61,8 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           const servicio = {
             idCreador,
             ...values,
-            estado: 0,
+            monto: montoSinFormato,
+            estado: 1,
           };
           const newService = await createService(servicio);
           console.log('Servicio creado:', newService);
@@ -67,6 +73,8 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               {
                 text: "OK",
                 onPress: () => {
+                  formik.resetForm();
+                  setShowInfo(false);
                   navigation.navigate("Main", { screen: "Home" });
                 },
               },
@@ -244,16 +252,29 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         Monto del servicio{"  "}
         <FontAwesome name="money" size={16} color="#4E479A" />
       </Text>
-      <TextInput
-        placeholder="0$"
+      <TextInputMask
+        type={"money"}
+        options={{
+          precision: 0, // Sin decimales
+          separator: '.', // Separador de miles
+          delimiter: '.', // Separador decimal (no se usará debido a precision: 0)
+          unit: '$',
+          suffixUnit: ''
+        }}
+        maxLength={18}
+        placeholder="$0"
         value={formik.values.monto}
-        onChangeText={formik.handleChange("monto")}
-        onBlur={formik.handleBlur("monto")}
+        onChangeText={(text, rawText) => {
+          formik.setFieldValue("monto", text);
+          setMontoSinFormato(Number(rawText));
+        }}
         style={[
           styles.input,
           formik.touched.monto && formik.errors.monto ? styles.inputError : null
         ]}
       />
+
+
       <Text style={styles.label}>
         Imagen de servicio{"  "}
         <FontAwesome name="image" size={16} color="#4E479A" />
