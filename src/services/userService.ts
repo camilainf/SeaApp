@@ -15,15 +15,15 @@ export const createUser = async (user: any) => {
     body: JSON.stringify(user),
   });
 
-  const data = await response.json();
-
-  // Si la respuesta tiene un código de estado de error, lanza un error
+  // Verificar si la respuesta es exitosa
   if (!response.ok) {
-    throw new Error(data.message || 'Error al crear el usuario.');
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Hubo un problema al crear el usuario.');
   }
 
-  return data;
+  return await response.json();
 };
+
 
 export const loginUser = async (credentials: any) => {
   const response = await fetch(BASE_URL + '/login', {
