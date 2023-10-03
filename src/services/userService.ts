@@ -17,7 +17,6 @@ export const createUser = async (user: any) => {
 
   const data = await response.json();
 
-  // Si la respuesta tiene un código de estado de error, lanza un error
   if (!response.ok) {
     throw new Error(data.message || 'Error al crear el usuario.');
   }
