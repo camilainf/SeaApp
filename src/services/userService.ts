@@ -14,16 +14,8 @@ export const createUser = async (user: any) => {
     },
     body: JSON.stringify(user),
   });
-
-  // Verificar si la respuesta es exitosa
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Hubo un problema al crear el usuario.');
-  }
-
   return await response.json();
 };
-
 
 export const loginUser = async (credentials: any) => {
   const response = await fetch(BASE_URL + '/login', {
