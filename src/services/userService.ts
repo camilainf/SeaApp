@@ -14,7 +14,14 @@ export const createUser = async (user: any) => {
     },
     body: JSON.stringify(user),
   });
-  return await response.json();
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al crear el usuario.');
+  }
+
+  return data;
 };
 
 export const loginUser = async (credentials: any) => {

@@ -3,18 +3,26 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Alert,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import Modal from "react-native-modal";
 import { TextInputMask } from "react-native-masked-text"; // Importamos la biblioteca
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { getToken } from "../services/storageService";
+import { decodeToken } from "../services/tokenService";
+import { DecodedToken } from "../types/auth";
+import { createService } from "../services/serviceService";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 
-const Crear: React.FC = () => {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList>;
+};
+
+const Crear: React.FC<Props> = ({ navigation }) => {
   const [nombreServicio, setNombreServicio] = useState("");
   const [categoria, setCategoria] = useState("");
   const [descripcion, setDescripcion] = useState("");
@@ -25,30 +33,98 @@ const Crear: React.FC = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
+  const handleResetInputs = () => {
+    setNombreServicio("");
+    setCategoria("");
+    setDescripcion("");
+    setFechaSolicitud("");
+    setHoraSolicitud("");
+    setDireccion("");
+    setMonto("");
+  }
+
   const toggleInfo = () => {
     setShowInfo(!showInfo);
   };
 
-  const toggleModal = (message: string) => {
-    Alert.alert(message);
+  const toggleModal = (message: string, onDismiss?: () => void) => {
+    Alert.alert(
+      message,
+      "", // Subtítulo del alerta. Puedes dejarlo vacío o eliminarlo si no lo necesitas.
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            if (onDismiss) {
+              onDismiss();
+            }
+          }
+        }
+      ]
+    );
     setModalVisible(!isModalVisible);
   };
 
-  const guardar = () => {
-    const servicio = {
-      nombreServicio,
-      categoria,
-      descripcion,
-      fechaSolicitud: `${fechaSolicitud} ${horaSolicitud}`,
-      direccion,
-      monto,
-    };
-    console.log(servicio);
-    toggleModal("Servicio creado con éxito");
+  const confirmarCreacion = () => {
+    Alert.alert(
+      "Confirmación", // Título del alerta
+      "¿Estás seguro de que deseas crear el servicio?", // Mensaje del alerta
+      [
+        {
+          text: "Cancelar",
+          onPress: () => {
+            console.log("Creación cancelada");
+          },
+          style: "cancel"
+        },
+        {
+          text: "Continuar",
+          onPress: () => {
+            handleCrearServicio();
+          }
+        }
+      ]
+    );
   };
 
-  const cancelar = () => {
-    toggleModal("Creación del servicio cancelada");
+  const handleCrearServicio = async () => {
+    try {
+      const token = await getToken();
+
+      if (token) {
+
+        const decodedToken = decodeToken(token) as DecodedToken;
+        const idCreador = decodedToken.id;
+
+        const servicio = {
+          idCreador,
+          nombreServicio,
+          categoria,
+          descripcion,
+          fechaSolicitud,
+          horaSolicitud,
+          direccion,
+          monto,
+          estado: 0
+        };
+        const newService = await createService(servicio);
+        console.log('Servicio creado:', newService);
+        toggleModal("Servicio creado con éxito.", () => {
+          handleResetInputs();
+          navigation.navigate("Main", { screen: "Home" });
+        });
+      }
+    } catch (error) {
+      console.error("Error al enviar la solicitud:", error);
+      toggleModal("Error al crear el servicio.");
+    }
+  };
+
+  const handleCancelar = () => {
+    toggleModal("Creación del servicio cancelada", () => {
+      handleResetInputs();
+      navigation.goBack();
+    });
   };
 
   return (
@@ -193,7 +269,7 @@ const Crear: React.FC = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={cancelar}
+          onPress={handleCancelar}
           style={{
             backgroundColor: "#FF6B6B",
             paddingVertical: 10,
@@ -204,7 +280,7 @@ const Crear: React.FC = () => {
           <Text style={{ color: "white", fontWeight: "bold" }}>CANCELAR</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={guardar}
+          onPress={confirmarCreacion}
           style={{
             backgroundColor: "#44B1EE",
             paddingVertical: 10,
