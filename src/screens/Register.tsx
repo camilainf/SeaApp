@@ -58,7 +58,8 @@ const Register: React.FC<Props> = ({ navigation }) => {
             try {
                 const user = {
                     ...values,
-                    telefono: `+56${values.telefono}`
+                    telefono: `+56${values.telefono}`,
+                    calificacions: 0,
                 };
                 const newUser = await createUser(user);
                 console.log('Usuario creado:', newUser);

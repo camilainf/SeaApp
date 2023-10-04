@@ -32,7 +32,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const UsuarioPerfil: Usuario = UsuarioP;
   //const userPrueba: Usuario = getUserById('651d745476cf17f354f5aeb4');
   const mostrarTextoCompleto = async (texto: string) => {
-    const userPruebaa: NuevoUsuario = await getUserById('651d745476cf17f354f5aeb4');
+    const userPruebaa: NuevoUsuario = await getUserById('651dd0b46cc06527a6b8c435');
     console.log('Respuesta de la funcion final ',userPruebaa); 
     Alert.alert("Email completo", texto);
     
