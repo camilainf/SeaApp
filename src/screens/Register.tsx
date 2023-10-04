@@ -83,6 +83,10 @@ const Register: React.FC<Props> = ({ navigation }) => {
         },
     });
 
+    const handleNavigationToRegister = () => {
+        navigation.navigate("TerminosCondiciones");
+      };
+
     const handleAddProfilePic = () => {
         // Función que se llama al tocar el icono "más"
         Alert.alert('Agregar foto de perfil', 'Aquí se debe implementar la funcionalidad para agregar o cambiar la foto de perfil.');
@@ -221,7 +225,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                                     value={formik.values.termsAccepted}
                                     onValueChange={(value) => formik.setFieldValue('termsAccepted', value)}
                                 />
-                                <Text style={styles.checkboxText}>Aceptar términos y condiciones</Text>
+                                <Text style={[styles.checkboxText, styles.linkText]} onPress={handleNavigationToRegister}>Aceptar términos y condiciones</Text>
                             </View>
                             {formik.touched.termsAccepted && formik.errors.termsAccepted ? (
                                 <Text style={{
@@ -378,6 +382,10 @@ const styles = StyleSheet.create({
     },
     inputError: {
         borderColor: 'red',
+    },
+    linkText: {
+        color: "blue",
+        textDecorationLine: "underline",
     },
 });
 

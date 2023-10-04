@@ -5,8 +5,9 @@ export type RootStackParamList = {
     Buscador: {
         keyword: string;
     };
-    Servicio:ServicioData;
+    Servicio: ServicioData;
     Main: { screen: keyof MainTabParamList };
+    TerminosCondiciones: undefined;
 };
 
 export type MainTabParamList = {

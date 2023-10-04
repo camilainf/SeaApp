@@ -7,6 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Register from '../screens/Register';
 import BuscadorScreen from '../screens/Buscador';
 import ServicioScreen from '../screens/Servicio';
+import TerminosCondiciones from '../screens/TerminosCondiciones';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -25,6 +26,7 @@ const AppNavigator: React.FC = () => {
                         headerTitle: 'Buscador', // Establece el título en una cadena vacía para ocultarlo
                     }}
                 />
+                <Stack.Screen name="TerminosCondiciones" component={TerminosCondiciones} />
                 <Stack.Screen name="Main" component={TabGroup} />
                 <Stack.Screen name="Servicio" 
                 component={ServicioScreen} 
