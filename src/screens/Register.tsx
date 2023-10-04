@@ -58,7 +58,8 @@ const Register: React.FC<Props> = ({ navigation }) => {
             try {
                 const user = {
                     ...values,
-                    telefono: `+56${values.telefono}`
+                    telefono: `+56${values.telefono}`,
+                    calificacion: 0,
                 };
                 const newUser = await createUser(user);
                 console.log('Usuario creado:', newUser);
@@ -123,7 +124,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         <TextInput
                             value={formik.values.name}
                             onChangeText={formik.handleChange('name')}
-                            maxLength={25}
+                            maxLength={40}
                             style={[
                                 styles.input,
                                 formik.touched.name && formik.errors.name ? styles.inputError : null

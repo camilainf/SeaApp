@@ -19,10 +19,10 @@ import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 
 
-type BuscadorRouteProp = RouteProp<RootStackParamList, "Servicio">;
+type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
 const ServicioScreen: React.FC = () => {
-  const route = useRoute<BuscadorRouteProp>();
+  const route = useRoute<ServicioRouteProp>();
   const servicioCargado = route.params || {};
   const navigation = useNavigation();
   const [estadoSolicitud, setEstadoSolicitud] = useState(servicioCargado.estado); // Puedes cambiar esto según el estado real
