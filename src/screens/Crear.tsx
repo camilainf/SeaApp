@@ -31,7 +31,9 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     const fetchCategorias = async () => {
       try {
         const data = await getAllCategories();
-        setCategorias(data);
+        // Ordenar las categorías en orden alfabético decreciente
+        const sortedData = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        setCategorias(sortedData);
       } catch (error) {
         console.error("Error al obtener las categorías:", error);
       }
