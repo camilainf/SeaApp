@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity} from "react-native";
+import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInputMask } from "react-native-masked-text";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -11,6 +11,8 @@ import { DecodedToken } from "../types/auth";
 import { createService } from "../services/serviceService";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
+import { Categoria } from "../resources/categoria";
+import { getAllCategories } from "../services/categoryService";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -20,6 +22,23 @@ const Crear: React.FC<Props> = ({ navigation }) => {
 
   const [showInfo, setShowInfo] = useState(false);
   const [montoSinFormato, setMontoSinFormato] = useState<number | null>(null);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  const montoInputRef = useRef<TextInputMask>(null);
+
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategorias(data);
+      } catch (error) {
+        console.error("Error al obtener las categorías:", error);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -33,7 +52,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     },
     validationSchema: Yup.object({
       nombreServicio: Yup.string().required("Requerido"),
-      categoria: Yup.string().required("Requerido"),
+      categoria: Yup.string().notOneOf([""], "Requerido").required("Requerido"),
       descripcion: Yup.string().required("Requerido"),
       fechaSolicitud: Yup.string().required("Requerido"),
       horaSolicitud: Yup.string().required("Requerido"),
@@ -43,32 +62,37 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     onSubmit: async (values) => {
       try {
         const token = await getToken();
-        if (token) {
-          const decodedToken = decodeToken(token) as DecodedToken;
-          const idCreador = decodedToken.id;
-          const servicio = {
-            idCreador,
-            ...values,
-            monto: montoSinFormato,
-            estado: 1,
-          };
-          const newService = await createService(servicio);
-          console.log('Servicio creado:', newService);
-          Alert.alert(
-            "Servicio creado con éxito.",
-            "",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  formik.resetForm();
-                  setShowInfo(false);
-                  navigation.navigate("Main", { screen: "Home" });
-                },
-              },
-            ]
-          );
+
+        if (!token) {
+          // Estrategia 1: Redirigir al usuario a la pantalla de inicio de sesión
+          navigation.navigate("Auth");
+          return; // Termina la ejecución aquí si no hay token
         }
+        const decodedToken = decodeToken(token) as DecodedToken;
+        const idCreador = decodedToken.id;
+        console.log("monto sin formato: ", montoSinFormato);
+        const servicio = {
+          idCreador,
+          ...values,
+          monto: montoSinFormato,
+          estado: 1,
+        };
+        const newService = await createService(servicio);
+        console.log('Servicio creado:', newService);
+        Alert.alert(
+          "Servicio creado con éxito.",
+          "",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                formik.resetForm();
+                setShowInfo(false);
+                navigation.navigate("Main", { screen: "Home" });
+              },
+            },
+          ]
+        );
       } catch (error) {
         console.error("Error al enviar la solicitud:", error);
         Alert.alert("Error al crear el servicio.");
@@ -96,7 +120,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       ]
     );
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -106,6 +130,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      {/* Más Información */}
       {showInfo && (
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
@@ -126,6 +151,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       )}
       <View style={styles.separator} />
 
+      {/* Nombre */}
       <Text style={styles.label}>
         Nombre del servicio{"  "}
         <FontAwesome name="briefcase" size={16} color="#4E479A" />
@@ -142,6 +168,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         ]}
       />
 
+      {/* Categoría */}
       <Text style={styles.label}>
         Categoría{"  "}
         <FontAwesome name="tag" size={16} color="#4E479A" />
@@ -155,12 +182,16 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           onValueChange={(itemValue) => formik.setFieldValue("categoria", itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="Categoria 1" value="cat1" />
-          <Picker.Item label="Categoria 2" value="cat2" />
-          {/* Agrega más categorías según lo necesites */}
+          <Picker.Item label="Seleccione categoría" value="" />
+          {categorias.map((categoria) => (
+            <Picker.Item key={categoria.id} label={categoria.nombre} value={categoria.nombre} />
+          ))}
         </Picker>
+
+
       </View>
 
+      {/* Descripcion */}
       <Text style={styles.label}>
         Descripción{"  "}
         <FontAwesome name="pencil-square-o" size={16} color="#4E479A" />
@@ -179,6 +210,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         ]}
       />
 
+      {/* Horario */}
       <View style={styles.row}>
         <View style={styles.column}>
           <Text style={styles.label}>
@@ -222,6 +254,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Dirección */}
       <Text style={styles.label}>
         Dirección del servicio{"  "}
         <FontAwesome name="map-marker" size={16} color="#4E479A" />
@@ -237,32 +270,38 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         ]}
       />
 
+      {/* Monto */}
       <Text style={styles.label}>
         Monto del servicio{"  "}
         <FontAwesome name="money" size={16} color="#4E479A" />
       </Text>
       <TextInputMask
+        ref={montoInputRef}
         type={"money"}
         options={{
           precision: 0, // Sin decimales
           separator: '.', // Separador de miles
-          delimiter: '.', // Separador decimal (no se usará debido a precision: 0)
           unit: '$',
           suffixUnit: ''
         }}
-        maxLength={18}
+        maxLength={19}
         placeholder="$0"
         value={formik.values.monto}
-        onChangeText={(text, rawText) => {
+        onChangeText={(text) => {
           formik.setFieldValue("monto", text);
-          setMontoSinFormato(Number(rawText));
+          const rawValue = text.replace(/[^0-9]/g, ''); // Esto elimina todos los caracteres que no sean dígitos
+          const numericValue = parseFloat(rawValue);
+          if (!isNaN(numericValue)) {
+            setMontoSinFormato(numericValue);
+          } else {
+            console.log("Error al convertir el monto a un número:", rawValue);
+          }
         }}
         style={[
           styles.input,
           formik.touched.monto && formik.errors.monto ? styles.inputError : null
         ]}
       />
-
 
       <Text style={styles.label}>
         Imagen de servicio{"  "}
@@ -399,7 +438,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: "#E1E1E6", // Borde más sutil.
     borderWidth: 1,
-    paddingHorizontal: 12, // Un poco más de padding horizontal.
+    paddingHorizontal: 0, // Un poco más de padding horizontal.
     borderRadius: 10,
     marginBottom: 20,
     backgroundColor: "#F3F6FF",
