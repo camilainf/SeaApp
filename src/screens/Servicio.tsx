@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 import Slider from '@react-native-community/slider';
 
@@ -28,7 +29,7 @@ const ServicioScreen: React.FC = () => {
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
-  const esDueno = true; // Aquí deberías determinar si esDueño es verdadero o falso
+  const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
   const userCargado = {
     nombre: "Hector Lopez Valenzuela",
     email: "efpyi@example.com",
@@ -139,32 +140,69 @@ const ServicioScreen: React.FC = () => {
       <Text style={styles.amount}>Monto: ${servicioCargado.monto}</Text>
       {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
-        {estadoSolicitud === 1 || estadoSolicitud === 2 ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              if (esDueno) {
-                setVerOfertasModalVisible(true);
-              } else {
-                setCrearOfertaModalVisible(true);
-              }
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {esDueno ? "Ver ofertas" : "Ofertar"}
-            </Text>
-          </TouchableOpacity>
-        ) : estadoSolicitud === 3 ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setValorarModalVisible(true);
-            }}
-          >
-            <Text style={styles.buttonText}>Valorar</Text>
-          </TouchableOpacity>
-        ) : null}
-      </View>
+  {estadoSolicitud === 1 && (
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => {
+        if (esDueno) {
+          setVerOfertasModalVisible(true);
+        } else {
+          setCrearOfertaModalVisible(true);
+        }
+      }}
+    >
+      <Text style={styles.buttonText}>
+        {esDueno ? "Ver ofertas" : "Ofertar"}
+      </Text>
+    </TouchableOpacity>
+  )}
+
+  {estadoSolicitud === 2 && (
+    <TouchableOpacity
+      style={esDueno ? styles.buttonYellow : styles.button}
+      onPress={() => {
+        if (esDueno) {
+          Alert.alert("Por iniciar", "Debes esperar que el trabajador inicie el servicio");
+        } else {
+          Alert.alert("Comenzar", "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
+        }
+      }}
+    >
+      <Text style={styles.buttonText}>
+        {esDueno ? "Por iniciar" : "Comenzar"}
+      </Text>
+    </TouchableOpacity>
+  )}
+
+  {estadoSolicitud === 3 && (
+    <TouchableOpacity
+      style={esDueno ? styles.buttonGray : styles.button}
+      onPress={() => {
+        if (esDueno) {
+          Alert.alert("En proceso", "El trabajador sigue en proceso con este servicio, espera a que este termine");
+        } else {
+          Alert.alert("Terminar", "Se ha terminado el servicio, comunicate con el contratador para avisarle");
+        }
+      }}
+    >
+      <Text style={styles.buttonText}>
+        {esDueno ? "En proceso" : "Terminar"}
+      </Text>
+    </TouchableOpacity>
+  )}
+
+  {estadoSolicitud === 4 && (
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => {
+        setValorarModalVisible(true);
+      }}
+    >
+      <Text style={styles.buttonText}>Valorar</Text>
+    </TouchableOpacity>
+  )}
+</View>
+
       {/*Modal de Creacion de oferta*/}
       <Modal
         animationType="slide"
@@ -529,6 +567,31 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 8,
   },
+  buttonYellow: {
+    backgroundColor: "#FFC700",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  buttonGray: {
+    backgroundColor: "gray",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  
 });
 
 export default ServicioScreen;
