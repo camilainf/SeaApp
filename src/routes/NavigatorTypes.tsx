@@ -16,3 +16,14 @@ export type MainTabParamList = {
     Perfil: undefined;
     Mas: undefined;
 };
+
+// Ejemplo
+// export type MainTabParamList = {
+//     Home: undefined;
+//     Crear: undefined;
+//     Perfil: {
+//         id: string;
+//         nombre: string;
+//     };
+//     Mas: undefined;
+// };

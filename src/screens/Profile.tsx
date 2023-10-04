@@ -25,11 +25,9 @@ type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
 
-
 const Profile: React.FC<Props> = ({ navigation }) => {
   
   const UsuarioPerfil: Usuario = UsuarioP;
-
 
   const mostrarTextoCompleto = (texto: string) => {
     Alert.alert("Email completo", texto);
