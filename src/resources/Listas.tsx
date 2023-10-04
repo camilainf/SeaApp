@@ -106,7 +106,7 @@ export const solicitudesTerminadas: ServicioData[] = [
     monto: 40000,
     imagen:
       "https://www.65ymas.com/uploads/s1/85/00/69/calos-maxi-profesor-matematicas-tiktok.jpeg",
-    estado: 3,
+    estado: 4,
   },
   {
     id: 5,
@@ -136,7 +136,7 @@ export const solicitudesTerminadas: ServicioData[] = [
     monto: 15000,
     imagen:
       "https://media.istockphoto.com/id/1182697204/es/foto/elegante-y-guapo-conductor-dando-pulgares-hacia-arriba.jpg?s=612x612&w=0&k=20&c=Ejkw989OevI0iHfssU8_yBYUuvOpCpi-bii7Vts9UQg=",
-    estado: 1,
+    estado: 3,
   },
   {
     id: 7,
@@ -179,7 +179,7 @@ export const solicitudesPropias: ServicioData[] = [
       direccion: "Viña del mar, San alfonso #343",
       monto: 40000,
       imagen: "https://www.fanaticosdelasmascotas.cl/wp-content/uploads/2021/03/portada-1.png",
-      estado: 3
+      estado: 2
     },
     {
       id: 3,
@@ -192,7 +192,7 @@ export const solicitudesPropias: ServicioData[] = [
       direccion: "Valparaiso, Juan gomez con calle Quebrada #23",
       monto: 89000,
       imagen: "https://img.europapress.es/fotoweb/fotonoticia_20200329075935_1200.jpg",
-      estado: 2
+      estado: 3
     },
   ];
 
