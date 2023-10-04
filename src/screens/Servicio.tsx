@@ -19,17 +19,17 @@ import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 
 
-type BuscadorRouteProp = RouteProp<RootStackParamList, "Servicio">;
+type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
 const ServicioScreen: React.FC = () => {
-  const route = useRoute<BuscadorRouteProp>();
+  const route = useRoute<ServicioRouteProp>();
   const servicioCargado = route.params || {};
   const navigation = useNavigation();
   const [estadoSolicitud, setEstadoSolicitud] = useState(servicioCargado.estado); // Puedes cambiar esto según el estado real
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
-  const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
+  const esDueno = true; // Aquí deberías determinar si esDueño es verdadero o falso
   const userCargado = {
     nombre: "Hector Lopez Valenzuela",
     email: "efpyi@example.com",
