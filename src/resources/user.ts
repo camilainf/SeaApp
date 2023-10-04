@@ -13,16 +13,15 @@ type Usuario = {
   };
 
   type NuevoUsuario = {
-    id: number;
-    nombre: string;
+    _id: string;
+    name: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
-    fechaDeNacimiento: string; // Puedes usar una cadena si prefieres, como "string"
     email: string;
     telefono: string;
-    contraseña: string;
-    imagenDePerfil?: string; // El '?' indica que es opcional. Si todas las veces vas a tener la imagen, puedes quitar el '?'
+    password: string;
+    imagenDePerfil?: string;
     calificacion: number;
   };
 
-export {Usuario};
+export {Usuario,NuevoUsuario};

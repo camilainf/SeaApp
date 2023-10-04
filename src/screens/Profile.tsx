@@ -13,13 +13,14 @@ import {
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
-import { Usuario } from "../resources/user";
+import { Usuario ,NuevoUsuario} from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { ServicioData } from "../resources/service";
 import {UsuarioP, solicitudesTerminadas} from "../resources/Listas";
 import {solicitudesPropias} from "../resources/Listas";
+import { getUserById } from "../services/userService";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -29,10 +30,12 @@ type Props = {
 const Profile: React.FC<Props> = ({ navigation }) => {
   
   const UsuarioPerfil: Usuario = UsuarioP;
-
-
-  const mostrarTextoCompleto = (texto: string) => {
+  //const userPrueba: Usuario = getUserById('651d745476cf17f354f5aeb4');
+  const mostrarTextoCompleto = async (texto: string) => {
+    const userPruebaa: NuevoUsuario = await getUserById('651d745476cf17f354f5aeb4');
+    console.log('Respuesta de la funcion final ',userPruebaa); 
     Alert.alert("Email completo", texto);
+    
   };
   const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
 
