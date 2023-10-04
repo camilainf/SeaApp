@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,46 +13,58 @@ import {
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
-import { Usuario ,NuevoUsuario} from "../resources/user";
+import { Usuario, NuevoUsuario } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { ServicioData } from "../resources/service";
-import {UsuarioP, solicitudesTerminadas} from "../resources/Listas";
-import {solicitudesPropias} from "../resources/Listas";
+import { UsuarioP, solicitudesTerminadas } from "../resources/Listas";
+import { solicitudesPropias } from "../resources/Listas";
 import { getUserById } from "../services/userService";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
 
-
 const Profile: React.FC<Props> = ({ navigation }) => {
-  
+  const [usuarioData, setUsuarioData] = useState<NuevoUsuario | null>(null);
+  const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
+  const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const UsuarioPerfil: Usuario = UsuarioP;
   //const userPrueba: Usuario = getUserById('651d745476cf17f354f5aeb4');
-  const mostrarTextoCompleto = async (texto: string) => {
-    const userPruebaa: NuevoUsuario = await getUserById('651dd0b46cc06527a6b8c435');
-    console.log('Respuesta de la funcion final ',userPruebaa); 
-    Alert.alert("Email completo", texto);
-    
-  };
+  
   const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
 
   const gananciaDinero = 4300; //
-  const solicitudesCreadas: ServicioData[] = solicitudesPropias
-    
-  type FechaObjeto = {
-    id: string;
-    titulo: string;
-    fecha: string;
-    imagen: any; // Considera especificar un tipo más preciso para 'imagen'
-  };
+  const solicitudesCreadas: ServicioData[] = solicitudesPropias;
+
   //const solicitudesCreadas: FechaObjeto[] = [];
-  const solicitudesAceptadas : ServicioData[]= solicitudesTerminadas;
-    
+  const solicitudesAceptadas: ServicioData[] = solicitudesTerminadas;
   const numeroSolicitudesCreadas = solicitudesCreadas.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const data = await getUserById('651df2db6cc06527a6b8c43d');
+
+            setUsuarioData(data);
+            setLoading(false);
+
+        } catch (err) {
+            const error = err as { message?: string }; // <-- Usamos una afirmación de tipo aquí
+            setError(error.message || "Ocurrió un error al cargar los datos.");
+            setLoading(false);
+        }
+    }
+
+    fetchData();
+}, []);
 
   const SinSolicitudes = () => (
     <View
@@ -84,274 +96,322 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           fontSize: 18,
           color: "#4E479A",
           fontWeight: "300",
-
         }}
       >
         Aun no hay solicitudes en este momento.
       </Text>
     </View>
   );
+  if (loading) {
+    return <Text>Cargando datos...</Text>;
+}
+
+if (error) {
+    return <Text>Error: {error}</Text>;
+}
 
   return (
     <ScrollView style={styles.container}>
       {/* INFORMACION USUARIO */}
-      <View style={styles.profileSection}>
-        <View >
-          {UsuarioPerfil.imagenDePerfil ? (
+      <View style={{ flex: 1 }}>
+        <LinearGradient
+          colors={["#0F4FC2", "#44B1EE", "rgba(68, 177, 238, 0)"]}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "20%",
+            zIndex: 1,
+          }}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
+        <View style={styles.profileCard}>
+    <View style={styles.imageContainer}>
+        {usuarioData?.imagenDePerfil ? (
             <Image
-              source={{ uri: UsuarioPerfil.imagenDePerfil }}
-              style={styles.profileImage}
+                source={{ uri: usuarioData?.imagenDePerfil }}
+                style={styles.profileImage}
             />
-          ) : (
+        ) : (
             <Image
-              source={require("../../assets/iconos/usericon.png")}
-              style={styles.profileImage}
+                source={require("../../assets/iconos/usericon.png")}
+                style={styles.profileImage}
             />
-          )}
-        </View>
-        <View style={styles.userInfo}>
-          <View style={styles.infoLine}>
-            <Text style={styles.datosUser}>
-              <FontAwesome
-                name="user"
-                size={15}
-                color="#4E479A"
-                style={{ paddingRight: 5 }}
-              />{"  "}
-              {/* Espacio de 5 unidades */}
-              {UsuarioPerfil.nombre} {UsuarioPerfil.apellidos}
-            </Text>
-          </View>
+        )}
+        <Rating
+            imageSize={20}
+            readonly
+            startingValue={usuarioData?.calificacion}
+            style={styles.rating}
+        />
+    </View>
+    <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
+        {usuarioData?.name} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
+    </Text>
+    <TouchableOpacity
+        style={styles.contactButton}
+        onPress={() => Alert.alert(
+          "Información de contacto",
+          `📧  ${usuarioData?.email}\n📞  ${usuarioData?.telefono}`,
+          [
+              { text: "OK" }
+          ]
+      )}
+    >
+        <FontAwesome name="envelope" size={15} color="white" />
+        <Text style={styles.contactButtonText}>Contacto</Text>
+    </TouchableOpacity>
+</View>
 
-          {esPerfilPersonal && (
-            <View style={styles.infoLine}>
-              <Text style={styles.datosUser}>
-                
-                <FontAwesome
-                  name="id-card"
-                  size={15}
-                  color="#4E479A"
-                  style={{ paddingRight: 5 }}
-                />{"  "}
-                {UsuarioPerfil.rut}
-              </Text>
-            </View>
-          )}
-          <View style={styles.infoLine}>
-            <TouchableOpacity
-              onLongPress={() => mostrarTextoCompleto(UsuarioPerfil.email)}
-            >
+        {/* TARJETA RESUMEN  */}
+        {esPerfilPersonal && (
+          <View style={styles.tarjetaResumen}>
+            <View>
               <Text
-                style={styles.datosUser}
-                numberOfLines={2}
-                ellipsizeMode="tail"
-              ><FontAwesome
-              name="envelope"
-              size={15}
-              color="#4E479A"
-              style={{ paddingRight: 5 }}
-            />{"  "}
-                {UsuarioPerfil.email}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-      {/* ESTRELLAS DE VALORACION */}
-      <Rating
-        imageSize={20}
-        readonly
-        startingValue={UsuarioPerfil.calificacion} // valor inicial
-        style={styles.rating}
-      />
-      {/* TARJETA RESUMEN  */}
-      {esPerfilPersonal && (
-        <View style={styles.tarjetaResumen}>
-          <View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "#4E479A",
-                paddingLeft: 15,
-              }}
-            >
-              Resumen
-            </Text>
-          </View>
-          <View style={styles.fila}>
-            {/*Izquierda*/}
-            <View style={styles.columnaIzquierda}>
-              <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 8,
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  color: "#4E479A",
+                  paddingLeft: 15,
                 }}
               >
-                <View style={styles.numberContainer}>
-                  <Text style={styles.numberText}>
-                    {numeroSolicitudesCreadas > 99
-                      ? "+99"
-                      : numeroSolicitudesCreadas}
+                Resumen
+              </Text>
+            </View>
+            <View style={styles.fila}>
+              {/*Izquierda*/}
+              <View style={styles.columnaIzquierda}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <View style={styles.numberContainer}>
+                    <Text style={styles.numberText}>
+                      {numeroSolicitudesCreadas > 99
+                        ? "+99"
+                        : numeroSolicitudesCreadas}
+                    </Text>
+                  </View>
+                  <Text style={styles.textoSolicitudes}>
+                    Solicitudes creadas
                   </Text>
                 </View>
-                <Text style={styles.textoSolicitudes}>Solicitudes creadas</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={styles.numberContainer}>
+                    <Text style={styles.numberText}>
+                      {numeroSolicitudesAceptadas > 99
+                        ? "+99"
+                        : numeroSolicitudesAceptadas}
+                    </Text>
+                  </View>
+                  <Text style={styles.textoSolicitudes}>
+                    Solicitudes Agendadas
+                  </Text>
+                </View>
               </View>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <View style={styles.numberContainer}>
-                  <Text style={styles.numberText}>
-                    {numeroSolicitudesAceptadas > 99
-                      ? "+99"
-                      : numeroSolicitudesAceptadas}
-                  </Text>
-                </View>
-                <Text style={styles.textoSolicitudes}>
-                  Solicitudes Agendadas
+              {/*Derecha*/}
+              <View style={styles.columnaDerecha}>
+                <Text style={styles.gananciaDineroTexto}>
+                  Ganancias de dinero 💰
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={styles.gananciaNumero}
+                >
+                  {gananciaDinero} CLP
                 </Text>
               </View>
             </View>
-            {/*Derecha*/}
-            <View style={styles.columnaDerecha}>
-              <Text style={styles.gananciaDineroTexto}>
-                Ganancias de dinero 💰
-              </Text>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={styles.gananciaNumero}
-              >
-                {gananciaDinero} CLP
-              </Text>
-            </View>
           </View>
+        )}
+
+        {/* LISTADO DE SOLICITUDES CREADAS */}
+        <View
+          style={{
+            height: 2,
+            backgroundColor: "#EEF2FF", // Color gris claro
+            marginVertical: 8, // Margen vertical para espacio arriba y abajo
+            marginHorizontal: 30,
+          }}
+        ></View>
+        <View style={{ marginHorizontal: 20 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "400",
+              marginBottom: 8,
+              paddingLeft: 15,
+              color: "#4E479A",
+            }}
+          >
+            Solicitudes creadas
+          </Text>
+          {solicitudesCreadas.length === 0 ? (
+            <SinSolicitudes />
+          ) : (
+            <FlatList
+              data={solicitudesCreadas}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.tarjetaTrabajo}
+                  onPress={() => {
+                    console.log(
+                      "Tarjeta Trabajo clickeada:",
+                      item.nombreServicio
+                    );
+                    navigation.navigate("Servicio", item);
+                  }}
+                >
+                  <Image
+                    source={{ uri: item.imagen }}
+                    style={styles.imagenTrabajo}
+                  />
+                  <View style={{ marginEnd: 90 }}>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ color: "#4E479A", fontWeight: "bold" }}
+                    >
+                      {item.nombreServicio}
+                    </Text>
+                    <Text style={{ color: "#4E479A" }}>
+                      {convertirFecha(item.fechaSolicitud)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => String(item.id)}
+              scrollEnabled={false}
+            />
+          )}
         </View>
-      )}
-
-                                        {/* LISTADO DE SOLICITUDES CREADAS */}
-      <View
-        style={{
-          height: 2,
-          backgroundColor: "#EEF2FF", // Color gris claro
-          marginVertical: 8, // Margen vertical para espacio arriba y abajo
-          width: "100%",
-        }}
-      ></View>
-      <View>
-        <Text
+        {/* LISTADO DE SOLICITUDES REALIZADAS */}
+        <View
           style={{
-            fontSize: 20,
-            fontWeight: "400",
-            marginBottom: 8,
-            paddingLeft: 15,
-            color: "#4E479A",
+            height: 2,
+            backgroundColor: "#EEF2FF", // Color gris claro
+            marginVertical: 8, // Margen vertical para espacio arriba y abajo
+            //width: "100%",
+            marginHorizontal: 30,
           }}
-        >
-          Solicitudes creadas
-        </Text>
-        {solicitudesCreadas.length === 0 ? (
-          <SinSolicitudes />
-        ) : (
-          <FlatList
-            data={solicitudesCreadas}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.tarjetaTrabajo}
-                onPress={() => {
-                  console.log("Tarjeta Trabajo clickeada:", item.nombreServicio);
-                  navigation.navigate('Servicio', item);
-
-                }}
-              >
-                <Image source={{uri:item.imagen}} style={styles.imagenTrabajo} />
-                <View style={{ marginEnd: 90 }}>
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={{ color: "#4E479A", fontWeight: "bold" }}
-                  >
-                    {item.nombreServicio}
-                  </Text>
-                  <Text style={{ color: "#4E479A" }}>
-                    {convertirFecha(item.fechaSolicitud)}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => String(item.id)}
-            scrollEnabled={false}
-          />
-        )}
-      </View>
-                                      {/* LISTADO DE SOLICITUDES REALIZADAS */}
-      <View
-        style={{
-          height: 2,
-          backgroundColor: "#EEF2FF", // Color gris claro
-          marginVertical: 8, // Margen vertical para espacio arriba y abajo
-          width: "100%",
-        }}
-      ></View>
-      <View style={{ marginBottom: 20 }}>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "400",
-            marginBottom: 10,
-            paddingLeft: 15,
-            color: "#4E479A",
-          }}
-        >
-          Solicitudes Aceptadas
-        </Text>
-        {solicitudesAceptadas.length === 0 ? (
-          <SinSolicitudes />
-        ) : (
-          <FlatList
-            data={solicitudesAceptadas}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.tarjetaTrabajo}
-                onPress={() => {
-                  console.log("Tarjeta Trabajo clickeada:", item.nombreServicio);
-                  navigation.navigate('Servicio', item);
-
-                }}
-              >
-                <Image source={{uri:item.imagen}} style={styles.imagenTrabajo} />
-                <View style={{ marginEnd: 90 }}>
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={{ color: "#4E479A", fontWeight: "bold" }}
-                  >
-                    {item.nombreServicio}
-                  </Text>
-                  <Text style={{ color: "#4E479A" }}>
-                    {convertirFecha(item.fechaSolicitud)}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => String(item.id)}
-            scrollEnabled={false}
-          />
-        )}
- 
+        ></View>
+        <View style={{ marginBottom: 20, marginHorizontal: 20 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "400",
+              marginBottom: 10,
+              paddingLeft: 15,
+              color: "#4E479A",
+            }}
+          >
+            Solicitudes Aceptadas
+          </Text>
+          {solicitudesAceptadas.length === 0 ? (
+            <SinSolicitudes />
+          ) : (
+            <FlatList
+              data={solicitudesAceptadas}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.tarjetaTrabajo}
+                  onPress={() => {
+                    console.log(
+                      "Tarjeta Trabajo clickeada:",
+                      item.nombreServicio
+                    );
+                    navigation.navigate("Servicio", item);
+                  }}
+                >
+                  <Image
+                    source={{ uri: item.imagen }}
+                    style={styles.imagenTrabajo}
+                  />
+                  <View style={{ marginEnd: 90 }}>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ color: "#4E479A", fontWeight: "bold" }}
+                    >
+                      {item.nombreServicio}
+                    </Text>
+                    <Text style={{ color: "#4E479A" }}>
+                      {convertirFecha(item.fechaSolicitud)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => String(item.id)}
+              scrollEnabled={false}
+            />
+          )}
+        </View>
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingTop: 15,
+    paddingVertical: 0,
+    backgroundColor: "#FFFFFF",
   },
   // Informacion de usuario
+  profileCard: {
+    margin: 30,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+    backgroundColor: "white",
+    padding: 20,
+    zIndex: 2,
+  },
+  profileHeader: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  imageContainer: {
+    marginRight: 15,
+    alignItems: "center",
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  userName: {
+    fontSize: 20,
+    color: "#4E479A",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  contactButton: {
+    marginTop: 10,
+    backgroundColor: "#4E479A",
+    padding: 5,
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  contactButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  rating: {
+    marginTop: 0,
+  },
   textoPerfil: {
     fontSize: 20,
     fontWeight: "bold",
@@ -368,19 +428,6 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8, // Espacio entre el ícono y el texto
   },
-  profileSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 30,
-    marginBottom: 5,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 70,
-    
-    
-  },
   userInfo: {
     marginLeft: 20,
     paddingEnd: 30,
@@ -395,10 +442,6 @@ const styles = StyleSheet.create({
     color: "#322E61",
     fontWeight: "bold",
   },
-  rating: {
-    alignSelf: "flex-start",
-    marginLeft: 15,
-  },
   summaryCard: {
     marginTop: 20,
   },
@@ -410,6 +453,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 5,
     marginTop: 20,
+    marginHorizontal:20,
     backgroundColor: "#FFF",
     borderRadius: 15,
     marginBottom: 16,
