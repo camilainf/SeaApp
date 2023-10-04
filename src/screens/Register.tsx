@@ -1,58 +1,79 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
-import * as userService from '../services/userService';
+import { createUser } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
-
-type LoginScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
-    "Auth"
->;
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 type Props = {
-    navigation: LoginScreenNavigationProp;
+    navigation: StackNavigationProp<RootStackParamList>;
 };
 
 const Register: React.FC<Props> = ({ navigation }) => {
-    const [name, setName] = useState('');
-    const [apellidoMaterno, setApellidoMaterno] = useState('');
-    const [apellidoPaterno, setApellidoPaterno] = useState('');
-    const [telefono, setTelefono] = useState('');
-    const [birthDate, setBirthDate] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [termsAccepted, setTermsAccepted] = useState(false);
-    const [day, setDay] = useState('');
-    const [month, setMonth] = useState('');
-    const [year, setYear] = useState('');
 
-    const handleRegister = async () => {
-        // Aquí puedes agregar validaciones adicionales si lo deseas
-        if (password !== confirmPassword) {
-            Alert.alert('Error', 'Las contraseñas no coinciden.');
-            return;
-        }
-        if (!termsAccepted) {
-            Alert.alert('Error', 'Debes aceptar los términos y condiciones.');
-            return;
-        }
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            apellidoPaterno: "",
+            apellidoMaterno: "",
+            telefono: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            termsAccepted: false,
+            day: "",
+            month: "",
+            year: "",
+        },
+        validationSchema: Yup.object({
+            name: Yup.string().required("Requerido"),
+            apellidoPaterno: Yup.string().required("Requerido"),
+            apellidoMaterno: Yup.string().required("Requerido"),
+            telefono: Yup.string().required("Requerido"),
+            email: Yup.string()
+                .email("Ingrese un email válido")
+                .required("Debe ingresar un email."),
+            password: Yup.string().required("Requerido"),
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir') // Validación de coincidencia de contraseñas
+                .required("Debe ingresar su contraseña."),
+            termsAccepted: Yup.boolean()
+                .oneOf([true], 'Debe aceptar los términos.')
+                .required("Requerido"),
+            day: Yup.string().required("Requerido"),
+            month: Yup.string().required("Requerido"),
+            year: Yup.string().required("Requerido"),
+        }),
+        onSubmit: async (values) => {
+            try {
+                const user = {
+                    ...values,
+                };
+                const newUser = await createUser(user);
+                console.log('Usuario creado:', newUser);
+                Alert.alert(
+                    "Usuario creado con éxito.",
+                    "",
+                    [
+                        {
+                            text: "OK",
+                            onPress: () => {
+                                formik.resetForm();
+                                navigation.navigate("Auth");
+                            },
+                        },
+                    ]
+                );
 
-        try {
-            const newUser = await userService.createUser({ name, apellidoPaterno, apellidoMaterno, email, password, telefono, confirmPassword });
-            console.log('User creado:', newUser);
-            Alert.alert('Registro exitoso', 'Usuario creado con éxito.');
-        } catch (error) {
-            let errorMessage = 'Hubo un problema al crear el usuario.';
-            if (error instanceof Error) {
-                // Si el error es una instancia de la clase Error, entonces podemos acceder a la propiedad message
-                errorMessage = error.message;
+            } catch (error) {
+                console.error("Error al enviar la solicitud:", error);
+                Alert.alert("Error al crear el servicio.");
             }
-            Alert.alert('Error', errorMessage);
-        }
-    };
+        },
+    });
 
     const handleAddProfilePic = () => {
         // Función que se llama al tocar el icono "más"
@@ -87,44 +108,156 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         </View>
 
                         <Text>Nombre:</Text>
-                        <TextInput value={name} onChangeText={setName} style={styles.input} />
+                        <TextInput
+                            value={formik.values.name}
+                            onChangeText={formik.handleChange('name')}
+                            style={[
+                                styles.input,
+                                formik.touched.name && formik.errors.name ? styles.inputError : null
+                            ]}
+                        />
 
                         <Text>Apellido paterno:</Text>
-                        <TextInput value={apellidoPaterno} onChangeText={setApellidoPaterno} style={styles.input} />
+                        <TextInput
+                            value={formik.values.apellidoPaterno}
+                            onChangeText={formik.handleChange('apellidoPaterno')}
+                            style={[
+                                styles.input,
+                                formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? styles.inputError : null
+                            ]}
+                        />
 
                         <Text>Apellido materno:</Text>
-                        <TextInput value={apellidoMaterno} onChangeText={setApellidoMaterno} style={styles.input} />
+                        <TextInput
+                            value={formik.values.apellidoMaterno}
+                            onChangeText={formik.handleChange('apellidoMaterno')}
+                            style={[
+                                styles.input,
+                                formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? styles.inputError : null
+                            ]}
+                        />
 
                         <Text>Teléfono:</Text>
-                        <TextInput value={telefono} onChangeText={setTelefono} style={styles.input} />
+                        <TextInput
+                            value={formik.values.telefono}
+                            onChangeText={formik.handleChange('telefono')}
+                            style={[
+                                styles.input,
+                                formik.touched.telefono && formik.errors.telefono ? styles.inputError : null
+                            ]}
+                        />
 
-                        <Text>Fecha de Nacimiento:</Text>
+                        {/* <Text>Teléfono:</Text>
                         <View style={styles.dateContainer}>
-                            <TextInput placeholder="Día" value={day} onChangeText={setDay} style={[styles.dateInput, styles.input]} />
-                            <TextInput placeholder="Mes" value={month} onChangeText={setMonth} style={[styles.dateInputMonth, styles.input]} />
-                            <TextInput placeholder="Año" value={year} onChangeText={setYear} style={[styles.dateInput, styles.input]} />
-                        </View>
+                            <View style={styles.dateInput}>
+                                <Text>+56</Text>
+                            </View>
+                            <TextInput
+                                value={formik.values.telefono}
+                                onChangeText={formik.handleChange('telefono')}
+                                style={[
+                                    styles.dateInput,
+                                    formik.touched.telefono && formik.errors.telefono ? styles.inputError : null
+                                ]}
+                            />
+                        </View> */}
+
+
+                        {/* <Text>Fecha de Nacimiento:</Text>
+                        <View style={styles.dateContainer}>
+                            <TextInput
+                                placeholder="Día"
+                                value={formik.values.day}
+                                onChangeText={formik.handleChange('day')}
+                                style={[
+                                    styles.dateInput,
+                                    styles.input,
+                                    formik.touched.day && formik.errors.day ? styles.inputError : null
+                                ]}
+                            />
+                            <TextInput
+                                placeholder="Mes"
+                                value={formik.values.month}
+                                onChangeText={formik.handleChange('month')}
+                                style={[
+                                    styles.dateInputMonth,
+                                    styles.input,
+                                    formik.touched.month && formik.errors.month ? styles.inputError : null
+                                ]}
+                            />
+                            <TextInput
+                                placeholder="Año"
+                                value={formik.values.year}
+                                onChangeText={formik.handleChange('year')}
+                                style={[
+                                    styles.dateInput,
+                                    styles.input,
+                                    formik.touched.year && formik.errors.year ? styles.inputError : null
+                                ]}
+                            />
+                        </View> */}
 
                         <Text>Email:</Text>
-                        <TextInput value={email} onChangeText={setEmail} style={styles.input} />
+                        <TextInput
+                            value={formik.values.email}
+                            onChangeText={formik.handleChange('email')}
+                            keyboardType="email-address" // Asegura que el teclado sea de tipo email
+                            style={[
+                                styles.input,
+                                formik.touched.email && formik.errors.email ? styles.inputError : null
+                            ]}
+                        />
+                        {formik.touched.email && formik.errors.email ? (
+                            <Text style={{ color: 'red', marginBottom: 10 }}>{formik.errors.email}</Text>
+                        ) : null}
 
                         <Text>Contraseña:</Text>
-                        <TextInput value={password} onChangeText={setPassword} secureTextEntry={true} style={styles.input} />
+                        <TextInput
+                            value={formik.values.password}
+                            onChangeText={formik.handleChange('password')}
+                            secureTextEntry={true}
+                            style={[
+                                styles.input,
+                                formik.touched.password && formik.errors.password ? styles.inputError : null
+                            ]}
+                        />
 
                         <Text>Repetir Contraseña:</Text>
-                        <TextInput value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={true} style={styles.input} />
+                        <TextInput
+                            value={formik.values.confirmPassword}
+                            onChangeText={formik.handleChange('confirmPassword')}
+                            secureTextEntry={true}
+                            style={[
+                                styles.input,
+                                formik.touched.confirmPassword && formik.errors.confirmPassword ? styles.inputError : null
+                            ]}
+                        />
+                        {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                            <Text style={{ color: 'red', marginBottom: 10 }}>{formik.errors.confirmPassword}</Text>
+                        ) : null}
 
                         <View style={styles.checkboxContainer}>
-                            <Checkbox value={termsAccepted} onValueChange={setTermsAccepted} />
-                            <Text style={styles.checkboxText}>Aceptar términos y condiciones</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Checkbox
+                                    value={formik.values.termsAccepted}
+                                    onValueChange={(value) => formik.setFieldValue('termsAccepted', value)}
+                                />
+                                <Text style={styles.checkboxText}>Aceptar términos y condiciones</Text>
+                            </View>
+                            {formik.touched.termsAccepted && formik.errors.termsAccepted ? (
+                                <Text style={{
+                                    color: 'red',
+                                }}>{formik.errors.termsAccepted}</Text>
+                            ) : null}
                         </View>
+
 
                         <View style={styles.buttonsContainer}>
                             <View style={[styles.button, styles.roundedButton]}>
                                 <Button title="Volver" color="#FF5C5C" onPress={handleNavigationToLogin} />
                             </View>
                             <View style={[styles.button, styles.roundedButton]}>
-                                <Button title="Crear cuenta" color="#5CB1FF" onPress={handleRegister} />
+                                <Button title="Crear cuenta" color="#5CB1FF" onPress={() => formik.handleSubmit()} />
                             </View>
                         </View>
                     </View>
@@ -155,8 +288,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 30,
-        width: '85%',
-        margin: 50
+        width: '98%',
+        maxWidth: '90%',
+        margin: 50,
+        flexShrink: 1,
     },
     input: {
         borderWidth: 1,
@@ -168,10 +303,11 @@ const styles = StyleSheet.create({
     },
 
     checkboxContainer: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         marginBottom: 10,
     },
+
     checkboxText: {
         marginLeft: 15,
     },
@@ -243,6 +379,9 @@ const styles = StyleSheet.create({
     addIcon: {
         fontSize: 20,
         color: 'white',
+    },
+    inputError: {
+        borderColor: 'red',
     },
 });
 

@@ -1,15 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-  View,
-  Text,
-  TextInput,
-  Alert,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInputMask } from "react-native-masked-text";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
