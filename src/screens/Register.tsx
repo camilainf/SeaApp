@@ -7,12 +7,18 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import CountryPicker from 'react-native-country-picker-modal';
 
 type Props = {
     navigation: StackNavigationProp<RootStackParamList>;
 };
 
+type CountryCode = 'CL';
+
+
 const Register: React.FC<Props> = ({ navigation }) => {
+
+    const [countryCode, setCountryCode] = useState<CountryCode>('CL');
 
     const formik = useFormik({
         initialValues: {
@@ -43,14 +49,16 @@ const Register: React.FC<Props> = ({ navigation }) => {
             termsAccepted: Yup.boolean()
                 .oneOf([true], 'Debe aceptar los términos.')
                 .required("Requerido"),
-            day: Yup.string().required("Requerido"),
-            month: Yup.string().required("Requerido"),
-            year: Yup.string().required("Requerido"),
+            // day: Yup.string().required("Requerido"),
+            // month: Yup.string().required("Requerido"),
+            // year: Yup.string().required("Requerido"),
         }),
         onSubmit: async (values) => {
+            console.log("Inicio de onSubmit", values);
             try {
                 const user = {
                     ...values,
+                    telefono: `+56${values.telefono}`
                 };
                 const newUser = await createUser(user);
                 console.log('Usuario creado:', newUser);
@@ -111,6 +119,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         <TextInput
                             value={formik.values.name}
                             onChangeText={formik.handleChange('name')}
+                            maxLength={25}
                             style={[
                                 styles.input,
                                 formik.touched.name && formik.errors.name ? styles.inputError : null
@@ -121,6 +130,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         <TextInput
                             value={formik.values.apellidoPaterno}
                             onChangeText={formik.handleChange('apellidoPaterno')}
+                            maxLength={20}
                             style={[
                                 styles.input,
                                 formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? styles.inputError : null
@@ -131,6 +141,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         <TextInput
                             value={formik.values.apellidoMaterno}
                             onChangeText={formik.handleChange('apellidoMaterno')}
+                            maxLength={20}
                             style={[
                                 styles.input,
                                 formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? styles.inputError : null
@@ -138,70 +149,38 @@ const Register: React.FC<Props> = ({ navigation }) => {
                         />
 
                         <Text>Teléfono:</Text>
-                        <TextInput
-                            value={formik.values.telefono}
-                            onChangeText={formik.handleChange('telefono')}
-                            style={[
-                                styles.input,
-                                formik.touched.telefono && formik.errors.telefono ? styles.inputError : null
-                            ]}
-                        />
-
-                        {/* <Text>Teléfono:</Text>
-                        <View style={styles.dateContainer}>
-                            <View style={styles.dateInput}>
-                                <Text>+56</Text>
+                        <View style={styles.telefonoContainer}>
+                            <View pointerEvents="none">
+                                <CountryPicker
+                                    withFilter
+                                    withFlag
+                                    withCountryNameButton
+                                    withCallingCode
+                                    withCallingCodeButton
+                                    countryCode={countryCode}
+                                    onSelect={(country) => {
+                                        // Aunque el picker está deshabilitado, mantenemos esta función por si acaso.
+                                        setCountryCode(country.cca2 as CountryCode);
+                                    }}
+                                />
                             </View>
                             <TextInput
                                 value={formik.values.telefono}
                                 onChangeText={formik.handleChange('telefono')}
+                                maxLength={9} // Limitar a 9 dígitos
                                 style={[
-                                    styles.dateInput,
+                                    styles.inputTelefono,
                                     formik.touched.telefono && formik.errors.telefono ? styles.inputError : null
                                 ]}
                             />
-                        </View> */}
-
-
-                        {/* <Text>Fecha de Nacimiento:</Text>
-                        <View style={styles.dateContainer}>
-                            <TextInput
-                                placeholder="Día"
-                                value={formik.values.day}
-                                onChangeText={formik.handleChange('day')}
-                                style={[
-                                    styles.dateInput,
-                                    styles.input,
-                                    formik.touched.day && formik.errors.day ? styles.inputError : null
-                                ]}
-                            />
-                            <TextInput
-                                placeholder="Mes"
-                                value={formik.values.month}
-                                onChangeText={formik.handleChange('month')}
-                                style={[
-                                    styles.dateInputMonth,
-                                    styles.input,
-                                    formik.touched.month && formik.errors.month ? styles.inputError : null
-                                ]}
-                            />
-                            <TextInput
-                                placeholder="Año"
-                                value={formik.values.year}
-                                onChangeText={formik.handleChange('year')}
-                                style={[
-                                    styles.dateInput,
-                                    styles.input,
-                                    formik.touched.year && formik.errors.year ? styles.inputError : null
-                                ]}
-                            />
-                        </View> */}
+                        </View>
 
                         <Text>Email:</Text>
                         <TextInput
                             value={formik.values.email}
                             onChangeText={formik.handleChange('email')}
                             keyboardType="email-address" // Asegura que el teclado sea de tipo email
+                            maxLength={30}
                             style={[
                                 styles.input,
                                 formik.touched.email && formik.errors.email ? styles.inputError : null
@@ -257,7 +236,10 @@ const Register: React.FC<Props> = ({ navigation }) => {
                                 <Button title="Volver" color="#FF5C5C" onPress={handleNavigationToLogin} />
                             </View>
                             <View style={[styles.button, styles.roundedButton]}>
-                                <Button title="Crear cuenta" color="#5CB1FF" onPress={() => formik.handleSubmit()} />
+                                <Button title="Crear cuenta" color="#5CB1FF" onPress={() => {
+                                    // console.log("Errores de Formik:", formik.errors);
+                                    formik.handleSubmit();
+                                }} />
                             </View>
                         </View>
                     </View>
@@ -279,7 +261,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     centeredContainer: {
-        flex: 1,
+        // flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -288,10 +270,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 30,
-        width: '98%',
-        maxWidth: '90%',
+        width: '94%',
         margin: 50,
-        flexShrink: 1,
+        overflow: 'hidden',
     },
     input: {
         borderWidth: 1,
@@ -300,6 +281,8 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
         backgroundColor: '#F3F6FF',
+        maxWidth: '100%',
+        flexShrink: 1,
     },
 
     checkboxContainer: {
@@ -332,6 +315,19 @@ const styles = StyleSheet.create({
     dateContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+    telefonoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center', // Alinear verticalmente
+    },
+    inputTelefono: {
+        flex: 1, // Ocupar todo el espacio disponible
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginLeft: 10, // Espacio entre el CountryPicker y el TextInput
+        backgroundColor: '#F3F6FF',
     },
     dateInput: {
         flex: 1,
