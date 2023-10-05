@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../routes/NavigatorTypes';
 import Home from '../screens/Home';
@@ -6,6 +6,9 @@ import Profile from '../screens/Profile';
 import { Image } from 'react-native';
 import Mas from '../screens/Mas';
 import Crear from '../screens/Crear';
+import { getToken } from '../services/storageService';
+import { decodeToken } from '../services/tokenService';
+import { DecodedToken } from '../types/auth';
 
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -17,6 +20,25 @@ const masIcon = require('../../assets/tab-icons/Settings.png');
 
 
 const TabGroup: React.FC = () => {
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchIdFromToken = async () => {
+            try {
+                const token = await getToken();
+                if (token) {
+                    // Suponiendo que puedes obtener el ID del usuario desde el token de esta manera:
+                    const decodedToken = decodeToken(token) as DecodedToken;
+                    setUserId(decodedToken.id);
+                } 
+            } catch (error) {
+                console.error("Error al obtener el ID desde el token: ", error);
+            }
+        };
+
+        fetchIdFromToken();
+    }, []);
+    
     return (
         <Tab.Navigator
             screenOptions={({route}) => ({
@@ -51,7 +73,7 @@ const TabGroup: React.FC = () => {
                         e.preventDefault();
 
                         // Navegando a "Perfil" con la id que desees
-                        navigation.navigate('Perfil', { id: '651e0192c74b332038c105c5' });
+                        navigation.navigate('Perfil', { id: userId });
                     },
                 })}
             />

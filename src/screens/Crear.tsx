@@ -68,6 +68,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         if (!token) {
           // Estrategia 1: Redirigir al usuario a la pantalla de inicio de sesión
           navigation.navigate("Auth");
+
           return; // Termina la ejecución aquí si no hay token
         }
         const decodedToken = decodeToken(token) as DecodedToken;
