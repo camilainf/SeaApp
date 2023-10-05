@@ -33,17 +33,14 @@ type PerfilRouteProp = RouteProp<MainTabParamList, 'Perfil'>;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
   const route = useRoute<PerfilRouteProp>();
-  const idUsuarioParametro = route.params?.id || '';
 
   const [usuarioData, setUsuarioData] = useState<NuevoUsuario | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
   const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
-
+  const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const UsuarioPerfil: Usuario = UsuarioP;
-  //const userPrueba: Usuario = getUserById('651d745476cf17f354f5aeb4');
   
   const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
 
@@ -59,9 +56,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     const fetchData = async () => {
         try {
             console.log("aer que llega",route.params.id); 
-            const data = await getUserById(route.params.id);
-            console.log(data)
-            setUsuarioData(data);
+            if (route.params.id) {
+              const data = await getUserById(route.params.id);
+              setUsuarioData(data);
+
+            }else {
+
+            }
+            
             setLoading(false);
 
         } catch (err) {
@@ -174,7 +176,7 @@ if (error) {
 </View>
 
         {/* TARJETA RESUMEN  */}
-        {esPerfilPersonal && (
+        {perfilPersonal && (
           <View style={styles.tarjetaResumen}>
             <View>
               <Text
