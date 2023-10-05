@@ -11,7 +11,7 @@ import { DecodedToken } from "../types/auth";
 import { createService } from "../services/serviceService";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
-import { Categoria } from "../resources/categoria";
+import { Categoria } from "../resources/category";
 import { getAllCategories } from "../services/categoryService";
 
 type Props = {
