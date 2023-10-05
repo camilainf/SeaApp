@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TouchableNativeFeedback,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
@@ -23,26 +24,31 @@ import { solicitudesPropias } from "../resources/Listas";
 import { getUserById } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { getToken } from "../services/storageService";
+import { decodeToken } from "../services/tokenService";
+import { DecodedToken } from "../types/auth";
+import { getUserIdFromToken } from "../services/authService";
+import SinSolicitudes from "../components/SinSolicitudes";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
-  
 };
-type PerfilRouteProp = RouteProp<MainTabParamList, 'Perfil'>;
-
+type PerfilRouteProp = RouteProp<MainTabParamList, "Perfil">;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
   const route = useRoute<PerfilRouteProp>();
 
   const [usuarioData, setUsuarioData] = useState<NuevoUsuario | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
-  const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
+  const [serviciosTerminados, setServiciosTerminados] = useState<
+    ServicioData[]
+  >([]);
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  
-  const esPerfilPersonal = true; // Crear funcion que valide que este es el usuario de este perfil
 
   const gananciaDinero = 4300; //
   const solicitudesCreadas: ServicioData[] = solicitudesPropias;
@@ -52,73 +58,48 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const numeroSolicitudesCreadas = solicitudesCreadas.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
 
-  useEffect(() => {
-    const fetchData = async () => {
-        try {
-            console.log("aer que llega",route.params.id); 
-            if (route.params.id) {
-              const data = await getUserById(route.params.id);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+          try {
+              let userId;
+
+              if (route.params?.id) {
+                  userId = route.params.id;
+              } else {
+                  userId = await getUserIdFromToken();
+                  if (!userId) {
+                      throw new Error("No se pudo obtener el ID del usuario.");
+                  }
+                  setPerfilPersonal(true);
+              }
+
+              const data = await getUserById(userId);
               setUsuarioData(data);
+              setLoading(false);
+          } catch (err) {
+              const error = err as { message?: string };
+              setError(error.message || "Ocurrió un error al cargar los datos.");
+              setLoading(false);
+          }
+      };
 
-            }else {
+      fetchData();
 
-            }
-            
-            setLoading(false);
-
-        } catch (err) {
-            const error = err as { message?: string }; // <-- Usamos una afirmación de tipo aquí
-            setError(error.message || "Ocurrió un error al cargar los datos.");
-            setLoading(false);
-        }
-    }
-
-    fetchData();
-}, []);
-
-  const SinSolicitudes = () => (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-      }}
-    >
-      {/* Un simple círculo con un ícono/texto dentro */}
-      <View
-        style={{
-          width: 60,
-          height: 60,
-          borderRadius: 50,
-          backgroundColor: "#EEF2FF",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text style={{ fontSize: 30, color: "#4E479A" }}>!</Text>
-      </View>
-
-      <Text
-        style={{
-          textAlign: "center",
-          marginVertical: 5,
-          fontSize: 18,
-          color: "#4E479A",
-          fontWeight: "300",
-        }}
-      >
-        Aun no hay solicitudes en este momento.
-      </Text>
-    </View>
+      return () => {
+        // Aquí puedes añadir lógica de limpieza si es necesario.
+      };
+    }, []) 
   );
-  if (loading) {
-    return <Text>Cargando datos...</Text>;
-}
 
-if (error) {
+  
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
     return <Text>Error: {error}</Text>;
-}
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -138,42 +119,43 @@ if (error) {
           end={{ x: 0, y: 1 }}
         />
         <View style={styles.profileCard}>
-    <View style={styles.imageContainer}>
-        {usuarioData?.imagenDePerfil ? (
-            <Image
+          <View style={styles.imageContainer}>
+            {usuarioData?.imagenDePerfil ? (
+              <Image
                 source={{ uri: usuarioData?.imagenDePerfil }}
                 style={styles.profileImage}
-            />
-        ) : (
-            <Image
+              />
+            ) : (
+              <Image
                 source={require("../../assets/iconos/usericon.png")}
                 style={styles.profileImage}
+              />
+            )}
+            <Rating
+              imageSize={20}
+              readonly
+              startingValue={usuarioData?.calificacion}
+              style={styles.rating}
             />
-        )}
-        <Rating
-            imageSize={20}
-            readonly
-            startingValue={usuarioData?.calificacion}
-            style={styles.rating}
-        />
-    </View>
-    <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
-        {usuarioData?.name} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
-    </Text>
-    <TouchableOpacity
-        style={styles.contactButton}
-        onPress={() => Alert.alert(
-          "Información de contacto",
-          `📧  ${usuarioData?.email}\n📞  ${usuarioData?.telefono}`,
-          [
-              { text: "OK" }
-          ]
-      )}
-    >
-        <FontAwesome name="envelope" size={15} color="white" />
-        <Text style={styles.contactButtonText}>Contacto</Text>
-    </TouchableOpacity>
-</View>
+          </View>
+          <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
+            {usuarioData?.name} {usuarioData?.apellidoPaterno}{" "}
+            {usuarioData?.apellidoMaterno}
+          </Text>
+          <TouchableOpacity
+            style={styles.contactButton}
+            onPress={() =>
+              Alert.alert(
+                "Información de contacto",
+                `📧  ${usuarioData?.email}\n📞  ${usuarioData?.telefono}`,
+                [{ text: "OK" }]
+              )
+            }
+          >
+            <FontAwesome name="envelope" size={15} color="white" />
+            <Text style={styles.contactButtonText}>Contacto</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* TARJETA RESUMEN  */}
         {perfilPersonal && (
@@ -462,8 +444,7 @@ const styles = StyleSheet.create({
   tarjetaResumen: {
     paddingRight: 16,
     paddingTop: 5,
-    marginTop: 20,
-    marginHorizontal:20,
+    marginHorizontal: 20,
     backgroundColor: "#FFF",
     borderRadius: 15,
     marginBottom: 16,

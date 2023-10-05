@@ -20,24 +20,7 @@ const masIcon = require('../../assets/tab-icons/Settings.png');
 
 
 const TabGroup: React.FC = () => {
-    const [userId, setUserId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchIdFromToken = async () => {
-            try {
-                const token = await getToken();
-                if (token) {
-                    // Suponiendo que puedes obtener el ID del usuario desde el token de esta manera:
-                    const decodedToken = decodeToken(token) as DecodedToken;
-                    setUserId(decodedToken.id);
-                } 
-            } catch (error) {
-                console.error("Error al obtener el ID desde el token: ", error);
-            }
-        };
-
-        fetchIdFromToken();
-    }, []);
     
     return (
         <Tab.Navigator
@@ -64,19 +47,7 @@ const TabGroup: React.FC = () => {
         >
             <Tab.Screen name="Home" component={Home}/>
             <Tab.Screen name="Crear" component={Crear}/>
-            <Tab.Screen
-                name="Perfil"
-                component={Profile}
-                listeners={({ navigation }) => ({
-                    tabPress: e => {
-                        // Previniendo el comportamiento por defecto
-                        e.preventDefault();
-
-                        // Navegando a "Perfil" con la id que desees
-                        navigation.navigate('Perfil', { id: userId });
-                    },
-                })}
-            />
+            <Tab.Screen name="Perfil" component={Profile} />
             <Tab.Screen name="Mas" component={Mas}/>
         </Tab.Navigator>
     );
