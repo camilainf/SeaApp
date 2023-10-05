@@ -16,18 +16,25 @@ import { convertirFecha } from "../utils/randomService";
 import { Usuario, NuevoUsuario } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../routes/NavigatorTypes";
+import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { ServicioData } from "../resources/service";
 import { UsuarioP, solicitudesTerminadas } from "../resources/Listas";
 import { solicitudesPropias } from "../resources/Listas";
 import { getUserById } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
+  
 };
+type PerfilRouteProp = RouteProp<MainTabParamList, 'Perfil'>;
+
 
 const Profile: React.FC<Props> = ({ navigation }) => {
+  const route = useRoute<PerfilRouteProp>();
+  const idUsuarioParametro = route.params?.id || '';
+
   const [usuarioData, setUsuarioData] = useState<NuevoUsuario | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
   const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
@@ -51,7 +58,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const data = await getUserById('651df2db6cc06527a6b8c43d');
+            console.log("aer que llega",route.params.id); 
+            const data = await getUserById(route.params.id);
 
             setUsuarioData(data);
             setLoading(false);

@@ -42,7 +42,19 @@ const TabGroup: React.FC = () => {
         >
             <Tab.Screen name="Home" component={Home}/>
             <Tab.Screen name="Crear" component={Crear}/>
-            <Tab.Screen name="Perfil" component={Profile}/>
+            <Tab.Screen
+                name="Perfil"
+                component={Profile}
+                listeners={({ navigation }) => ({
+                    tabPress: e => {
+                        // Previniendo el comportamiento por defecto
+                        e.preventDefault();
+
+                        // Navegando a "Perfil" con la id que desees
+                        navigation.navigate('Perfil', { id: '651e0192c74b332038c105c5' });
+                    },
+                })}
+            />
             <Tab.Screen name="Mas" component={Mas}/>
         </Tab.Navigator>
     );
