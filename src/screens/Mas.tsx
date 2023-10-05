@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import { Avatar, Button, Card, Title } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { logout } from '../services/authService';
 
 interface Props {
   navigation: any;
@@ -16,6 +17,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
 
   const handleButtonPress = (title: string) => {
     if (title === "Desconectarse") {
+      logout();
       navigation.navigate("Auth");
     } else {
       Alert.alert(title);

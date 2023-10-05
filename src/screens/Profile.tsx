@@ -60,7 +60,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
         try {
             console.log("aer que llega",route.params.id); 
             const data = await getUserById(route.params.id);
-
+            console.log(data)
             setUsuarioData(data);
             setLoading(false);
 
