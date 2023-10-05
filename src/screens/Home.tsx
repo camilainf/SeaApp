@@ -129,9 +129,18 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <FlatList
               data={categoriasPopulares} // Utilizar el estado de categorías populares
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
-                  console.log('Tarjeta Categoría clickeada:', item.nombre);
-                }}>
+                // <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
+                //   console.log('Tarjeta Categoría clickeada:', item.nombre);
+                // }}>
+                //   <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
+                //   <Text style={styles.tituloCategoria}>{item.nombre}</Text>
+                // </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.tarjetaCategoria}
+                  onPress={() => {
+                    navigation.navigate('ServiciosPorCategoria', { categoria: item.nombre });
+                  }}
+                >
                   <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
                   <Text style={styles.tituloCategoria}>{item.nombre}</Text>
                 </TouchableOpacity>

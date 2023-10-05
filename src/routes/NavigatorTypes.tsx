@@ -8,6 +8,9 @@ export type RootStackParamList = {
     Servicio: ServicioData;
     Main: { screen: keyof MainTabParamList };
     TerminosCondiciones: undefined;
+    ServiciosPorCategoria: {
+        categoria: string;
+    };
 };
 
 export type MainTabParamList = {
@@ -18,14 +21,3 @@ export type MainTabParamList = {
     };
     Mas: undefined;
 };
-
-// Ejemplo
-// export type MainTabParamList = {
-//     Home: undefined;
-//     Crear: undefined;
-//     Perfil: {
-//         id: string;
-//         nombre: string;
-//     };
-//     Mas: undefined;
-// };

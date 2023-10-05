@@ -1,6 +1,3 @@
-// ServicioType.tsx
-import { RouteProp } from '@react-navigation/native';
-
 export type ServicioData = {
   id: number;
   idCreador: number;
