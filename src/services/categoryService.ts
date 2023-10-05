@@ -21,7 +21,7 @@ export const getAllCategories = async (): Promise<Categoria[]> => {
 };
 
 export const getPopularCategories = async (): Promise<CategoriaPopular[]> => {
-  const response = await fetch(BASE_URL);
+  const response = await fetch(BASE_URL + '/popular');
 
   if (!response.ok) {
     const errorData = await response.json();

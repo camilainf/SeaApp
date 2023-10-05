@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
+import { CategoriaPopular } from '../resources/category';
+import { getPopularCategories } from '../services/categoryService';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -10,9 +12,28 @@ type Props = {
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
+  const [categoriasPopulares, setCategoriasPopulares] = useState<CategoriaPopular[]>([]);
+
+  // Al cargar el componente, obtener las categorías populares
+  useEffect(() => {
+    const fetchCategoriasPopulares = async () => {
+      try {
+        const categorias = await getPopularCategories();
+        setCategoriasPopulares(categorias.map(cat => ({
+          ...cat,
+          imagen: require('../../assets/iconos/ImageReferencia.png') // Establecer imagen por defecto
+        })));
+      } catch (error) {
+        console.error("Error al obtener las categorías populares:", error);
+      }
+    };
+
+    fetchCategoriasPopulares();
+  }, []);
+
   const usuario = {
     nombre: 'Case',
-    foto:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_i2_vJN5rUWFIs3kXNqiy2EyzgYXwKUFvJg&usqp=CAU'),
+    foto: ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_i2_vJN5rUWFIs3kXNqiy2EyzgYXwKUFvJg&usqp=CAU'),
   };
 
   const trabajosDestacados = [
@@ -53,7 +74,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
             </View>
             <View style={styles.fila}>
-              <Image source={{uri:usuario.foto}} style={styles.fotoPerfil} />
+              <Image source={{ uri: usuario.foto }} style={styles.fotoPerfil} />
               <View style={styles.gananciasContainer}>
                 <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
                 <Text style={styles.gananciaNumero}>39.000 CLP</Text>
@@ -106,13 +127,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.tarjeta}>
             <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
             <FlatList
-              data={categoriasDestacadas}
+              data={categoriasPopulares} // Utilizar el estado de categorías populares
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
-                  console.log('Tarjeta Categoría clickeada:', item.titulo);
+                  console.log('Tarjeta Categoría clickeada:', item.nombre);
                 }}>
-                  <Image source={item.imagen} style={styles.imagenCategoria} />
-                  <Text style={styles.tituloCategoria}>{item.titulo}</Text>
+                  <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
+                  <Text style={styles.tituloCategoria}>{item.nombre}</Text>
                 </TouchableOpacity>
               )}
               keyExtractor={(item) => item.id}
@@ -212,7 +233,7 @@ const styles = StyleSheet.create({
   fotoPerfil: {
     width: 110,
     height: 110,
-    borderRadius:60,
+    borderRadius: 60,
     resizeMode: 'cover',
   },
 
