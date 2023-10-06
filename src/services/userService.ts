@@ -1,4 +1,4 @@
-import { NuevoUsuario } from "../resources/user";
+import { Usuario } from "../resources/user";
 
 const BASE_URL = 'http://10.0.2.2:9000/api/users';
 //const BASE_URL = 'http://localhost:9000/api/users';
@@ -47,7 +47,7 @@ export const logout = () => {
   // código para cerrar sesión, borrando tokens, restableciendo estados, etc.
 }
 
-export const getUserById = async (id: string): Promise<NuevoUsuario> => {
+export const getUserById = async (id: string): Promise<Usuario> => {
   const response = await fetch(BASE_URL + '/' + id, {
     method: 'GET',
     headers: {
@@ -60,6 +60,6 @@ export const getUserById = async (id: string): Promise<NuevoUsuario> => {
     throw new Error(errorData.message || "No se encontro o cargo el usuario");
   }
   
-  const userData: NuevoUsuario = await response.json();
+  const userData: Usuario = await response.json();
   return userData;
 };

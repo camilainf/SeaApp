@@ -18,7 +18,7 @@ import { Usuario } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
-import { ServicioData } from "../resources/service";
+import { ServicioData, ServicioDataNew } from "../resources/service";
 import { UsuarioP, solicitudesTerminadas } from "../resources/Listas";
 import { solicitudesPropias } from "../resources/Listas";
 import { getUserById } from "../services/userService";
@@ -29,65 +29,66 @@ import { decodeToken } from "../services/tokenService";
 import { DecodedToken } from "../types/auth";
 import { getUserIdFromToken } from "../services/authService";
 import SinSolicitudes from "../components/SinSolicitudes";
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
-
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { getServiceById, getServicesByUser } from "../services/serviceService";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
-type PerfilRouteProp = RouteProp<RootStackParamList & MainTabParamList, "Perfil" | "PerfilAjeno">;
+type PerfilRouteProp = RouteProp<
+  RootStackParamList & MainTabParamList,
+  "Perfil" | "PerfilAjeno"
+>;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
-  
   const route = useRoute<PerfilRouteProp>();
-  // if(route.params.id === undefined){
-  //   console.log("No hay params for Perfil");
-  // }else{
-  //   console.log("ENTREEE ",route.params.id);
-  // }
-  
+
   const [usuarioData, setUsuarioData] = useState<Usuario | null>(null);
-  const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
+  const [serviciosPropios, setServiciosPropios] = useState<ServicioDataNew[]>([]);
   const [serviciosTerminados, setServiciosTerminados] = useState<
     ServicioData[]
   >([]);
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const gananciaDinero = 4300; //
-  const solicitudesCreadas: ServicioData[] = solicitudesPropias;
 
-  //const solicitudesCreadas: FechaObjeto[] = [];
-  const solicitudesAceptadas: ServicioData[] = solicitudesTerminadas;
-  const numeroSolicitudesCreadas = solicitudesCreadas.length; //Valor de solicitudes creadas
-  const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
+  const solicitudesAceptadas: ServicioDataNew[] = [];
+  const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
+  const numeroSolicitudesAceptadas = serviciosTerminados.length; //Valor de solicitudes recibidas
 
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
-          try {
-              let userId;
+        try {
+          setLoading(true);
+          let userId;
 
-              if (route.params?.id) {
-                  userId = route.params.id;
-              } else {
-                  userId = await getUserIdFromToken();
-                  if (!userId) {
-                      throw new Error("No se pudo obtener el ID del usuario.");
-                  }
-                  setPerfilPersonal(true);
-              }
-
-              const data = await getUserById(userId);
-              setUsuarioData(data);
-              setLoading(false);
-          } catch (err) {
-              const error = err as { message?: string };
-              setError(error.message || "Ocurrió un error al cargar los datos.");
-              setLoading(false);
+          if (route.params?.id) {
+            userId = route.params.id;
+          } else {
+            userId = await getUserIdFromToken();
+            if (!userId) {
+              throw new Error("No se pudo obtener el ID del usuario.");
+            }
+            setPerfilPersonal(true);
           }
+
+          const data = await getUserById(userId);
+          setUsuarioData(data);
+
+          const fetchedServices = await getServicesByUser("651df2db6cc06527a6b8c43d");
+          setServiciosPropios(fetchedServices);
+
+          setLoading(false);
+        } catch (err) {
+          console.log(err)
+          const error = err as { message?: string };
+          setError(error.message || "Ocurrió un error al cargar los datos.");
+          setLoading(false);
+        }
       };
 
       fetchData();
@@ -95,10 +96,9 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       return () => {
         // Aquí puedes añadir lógica de limpieza si es necesario.
       };
-    }, []) 
+    }, [])
   );
 
-  
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -250,11 +250,11 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           >
             Solicitudes creadas
           </Text>
-          {solicitudesCreadas.length === 0 ? (
+          {serviciosPropios.length === 0 ? (
             <SinSolicitudes />
           ) : (
             <FlatList
-              data={solicitudesCreadas}
+              data={serviciosPropios}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.tarjetaTrabajo}
@@ -267,7 +267,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                   }}
                 >
                   <Image
-                    source={{ uri: item.imagen }}
+                    source={require("../../assets/iconos/ImageReferencia.png")}
                     style={styles.imagenTrabajo}
                   />
                   <View style={{ marginEnd: 90 }}>
