@@ -11,6 +11,9 @@ export type RootStackParamList = {
     ServiciosPorCategoria: {
         categoria: string;
     };
+    PerfilAjeno: {
+        id: string;
+    };
 };
 
 export type MainTabParamList = {

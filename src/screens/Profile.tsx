@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
-import { Usuario, NuevoUsuario } from "../resources/user";
+import { Usuario } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
@@ -36,12 +36,18 @@ import { useCallback } from 'react';
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
-type PerfilRouteProp = RouteProp<MainTabParamList, "Perfil">;
+type PerfilRouteProp = RouteProp<RootStackParamList & MainTabParamList, "Perfil" | "PerfilAjeno">;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
+  
   const route = useRoute<PerfilRouteProp>();
-
-  const [usuarioData, setUsuarioData] = useState<NuevoUsuario | null>(null);
+  // if(route.params.id === undefined){
+  //   console.log("No hay params for Perfil");
+  // }else{
+  //   console.log("ENTREEE ",route.params.id);
+  // }
+  
+  const [usuarioData, setUsuarioData] = useState<Usuario | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
   const [serviciosTerminados, setServiciosTerminados] = useState<
     ServicioData[]
@@ -396,6 +402,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 15,
     alignItems: "center",
+    marginHorizontal: 10,
   },
   contactButtonText: {
     color: "white",

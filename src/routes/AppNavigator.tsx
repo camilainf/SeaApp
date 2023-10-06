@@ -9,6 +9,7 @@ import BuscadorScreen from '../screens/Buscador';
 import ServicioScreen from '../screens/Servicio';
 import TerminosCondiciones from '../screens/TerminosCondiciones';
 import ServiciosPorCategoria from '../screens/ServiciosPorCategoria';
+import Profile from '../screens/Profile';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -66,7 +67,15 @@ const AppNavigator: React.FC = () => {
                     name="Main"
                     component={TabGroup}
                 />
-
+                <Stack.Screen
+        name="PerfilAjeno"
+        component={Profile}
+        options={{
+            headerShown: true,
+            headerBackTitleVisible: false,
+            headerTitle: 'Perfil Ajeno',
+        }}
+    />
             </Stack.Navigator>
         </NavigationContainer>
     );
