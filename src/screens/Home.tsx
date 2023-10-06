@@ -33,7 +33,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const usuario = {
     nombre: 'Case',
-    foto: ('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_i2_vJN5rUWFIs3kXNqiy2EyzgYXwKUFvJg&usqp=CAU'),
+    foto: ('https://cdn.discordapp.com/attachments/767184234427056178/1159689687384985650/image.png?ex=6531f02f&is=651f7b2f&hm=9d3e5689c1478674a4c48f4e2f69e636eabc0901c18d8b8ae81b725f23d8043b&'),
   };
 
   const trabajosDestacados = [
