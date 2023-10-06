@@ -10,40 +10,47 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import Slider from '@react-native-community/slider';
+import Slider from "@react-native-community/slider";
 
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { convertirFecha } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../routes/NavigatorTypes";
-
+import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
-const ServicioScreen: React.FC = () => {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList>;
+};
+
+const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const route = useRoute<ServicioRouteProp>();
   const servicioCargado = route.params || {};
-  const navigation = useNavigation();
-  const [estadoSolicitud, setEstadoSolicitud] = useState(servicioCargado.estado); // Puedes cambiar esto según el estado real
+  const [estadoSolicitud, setEstadoSolicitud] = useState(
+    servicioCargado.estado
+  ); // Puedes cambiar esto según el estado real
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
   const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
   const userCargado = {
-    nombre: "Hector Lopez Valenzuela",
+    nombre: "Sebastian Moyano Riveros",
     email: "efpyi@example.com",
     telefono: "+569123456789",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Joe_Biden_presidential_portrait.jpg/640px-Joe_Biden_presidential_portrait.jpg"};
-    const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
-    const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
-    const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
-  
-    const ofertas = [
-      { Nombre: "hola", valor: 3 },
-      { Nombre: "que tal", valor: 10 },
-    ];
-  return ( 
+    imagen:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Joe_Biden_presidential_portrait.jpg/640px-Joe_Biden_presidential_portrait.jpg",
+  };
+  const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
+  const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
+  const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
+
+  const ofertas = [
+    { Nombre: "hola", valor: 3 },
+    { Nombre: "que tal", valor: 10 },
+  ];
+  return (
     <ScrollView style={styles.container}>
       {/* Boton para ir pa atras*/}
       <View style={styles.header}>
@@ -53,21 +60,36 @@ const ServicioScreen: React.FC = () => {
         >
           <FontAwesome name="arrow-left" size={24} color="#476D9A" />
         </TouchableOpacity> */}
-        
       </View>
       {/* Barra de Usuario */}
       {!esDueno && (
-        <View style={styles.userBar}>
-        <Image source={{ uri: userCargado.imagen }} style={styles.userImage} />
-        <View style={styles.userNameContainer}>
-          <Text numberOfLines={2}
-                ellipsizeMode="tail" style={styles.userName}>{userCargado.nombre}</Text>
-        </View>
-        <TouchableOpacity style={styles.contactButton} onPress={() => setModalVisible(true)}>
-          <Text style={styles.contactButtonText}>Contactar</Text>
+    <View style={styles.userBar}>
+        {/* Contenedor para la imagen y el nombre */}
+        <TouchableOpacity 
+            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} // Añade flex para que ocupe el espacio disponible
+            onPress={() => {
+              navigation.navigate("PerfilAjeno", {id:"651dd0b46cc06527a6b8c435"});
+          }}
+          
+        >
+            <Image source={{ uri: userCargado.imagen }} style={styles.userImage} />
+            <View style={styles.userNameContainer}>
+                <Text 
+                    numberOfLines={2}
+                    ellipsizeMode="tail" 
+                    style={styles.userName}
+                >
+                    {userCargado.nombre}
+                </Text>
+            </View>
         </TouchableOpacity>
-      </View>
-      )}
+
+        {/* Botón de contactar */}
+        <TouchableOpacity style={styles.contactButton} onPress={() => setModalVisible(true)}>
+            <Text style={styles.contactButtonText}>Contactar</Text>
+        </TouchableOpacity>
+    </View>
+)}
       {/* Modal de informacion de contacto */}
       <Modal
         animationType="slide"
@@ -97,7 +119,7 @@ const ServicioScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-      
+
       {/*Titulo de servicio */}
       <Text style={styles.title}>{servicioCargado.nombreServicio}</Text>
       {/* Imagen del servicio */}
@@ -105,7 +127,9 @@ const ServicioScreen: React.FC = () => {
         <Image source={{ uri: servicioCargado.imagen }} style={styles.image} />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
-          <Text style={styles.estadoText}>Estado: {servicioCargado.estado}</Text>
+          <Text style={styles.estadoText}>
+            Estado: {servicioCargado.estado}
+          </Text>
           <Text style={styles.categoriaText}>{servicioCargado.categoria}</Text>
         </View>
       </View>
@@ -140,68 +164,80 @@ const ServicioScreen: React.FC = () => {
       <Text style={styles.amount}>Monto: ${servicioCargado.monto}</Text>
       {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
-  {estadoSolicitud === 1 && (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => {
-        if (esDueno) {
-          setVerOfertasModalVisible(true);
-        } else {
-          setCrearOfertaModalVisible(true);
-        }
-      }}
-    >
-      <Text style={styles.buttonText}>
-        {esDueno ? "Ver ofertas" : "Ofertar"}
-      </Text>
-    </TouchableOpacity>
-  )}
+        {estadoSolicitud === 1 && (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              if (esDueno) {
+                setVerOfertasModalVisible(true);
+              } else {
+                setCrearOfertaModalVisible(true);
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {esDueno ? "Ver ofertas" : "Ofertar"}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-  {estadoSolicitud === 2 && (
-    <TouchableOpacity
-      style={esDueno ? styles.buttonYellow : styles.button}
-      onPress={() => {
-        if (esDueno) {
-          Alert.alert("Por iniciar", "Debes esperar que el trabajador inicie el servicio");
-        } else {
-          Alert.alert("Comenzar", "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
-        }
-      }}
-    >
-      <Text style={styles.buttonText}>
-        {esDueno ? "Por iniciar" : "Comenzar"}
-      </Text>
-    </TouchableOpacity>
-  )}
+        {estadoSolicitud === 2 && (
+          <TouchableOpacity
+            style={esDueno ? styles.buttonYellow : styles.button}
+            onPress={() => {
+              if (esDueno) {
+                Alert.alert(
+                  "Por iniciar",
+                  "Debes esperar que el trabajador inicie el servicio"
+                );
+              } else {
+                Alert.alert(
+                  "Comenzar",
+                  "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉"
+                );
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {esDueno ? "Por iniciar" : "Comenzar"}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-  {estadoSolicitud === 3 && (
-    <TouchableOpacity
-      style={esDueno ? styles.buttonGray : styles.button}
-      onPress={() => {
-        if (esDueno) {
-          Alert.alert("En proceso", "El trabajador sigue en proceso con este servicio, espera a que este termine");
-        } else {
-          Alert.alert("Terminar", "Se ha terminado el servicio, comunicate con el contratador para avisarle");
-        }
-      }}
-    >
-      <Text style={styles.buttonText}>
-        {esDueno ? "En proceso" : "Terminar"}
-      </Text>
-    </TouchableOpacity>
-  )}
+        {estadoSolicitud === 3 && (
+          <TouchableOpacity
+            style={esDueno ? styles.buttonGray : styles.button}
+            onPress={() => {
+              if (esDueno) {
+                Alert.alert(
+                  "En proceso",
+                  "El trabajador sigue en proceso con este servicio, espera a que este termine"
+                );
+              } else {
+                Alert.alert(
+                  "Terminar",
+                  "Se ha terminado el servicio, comunicate con el contratador para avisarle"
+                );
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {esDueno ? "En proceso" : "Terminar"}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-  {estadoSolicitud === 4 && (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => {
-        setValorarModalVisible(true);
-      }}
-    >
-      <Text style={styles.buttonText}>Valorar</Text>
-    </TouchableOpacity>
-  )}
-</View>
+        {estadoSolicitud === 4 && (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setValorarModalVisible(true);
+            }}
+          >
+            <Text style={styles.buttonText}>Valorar</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/*Modal de Creacion de oferta*/}
       <Modal
@@ -288,7 +324,7 @@ const ServicioScreen: React.FC = () => {
         }}
       >
         <View style={styles.centeredView}>
-        <View style={styles.modalView}>
+          <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Calificar Usuario</Text>
             <Text>Valoración:</Text>
             <Slider
@@ -309,9 +345,7 @@ const ServicioScreen: React.FC = () => {
                 setValorarModalVisible(false);
               }}
             >
-              <Text style={styles.createButtonText}>
-                Enviar Valoración
-              </Text>
+              <Text style={styles.createButtonText}>Enviar Valoración</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -330,11 +364,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop:20
+    marginTop: 20,
   },
   backButton: {
     marginTop: 10,
-    marginBottom:15,
+    marginBottom: 15,
   },
   title: {
     fontSize: 28,
@@ -433,7 +467,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 15,
     fontWeight: "600",
-    
   },
   userBar: {
     flexDirection: "row",
@@ -442,36 +475,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 5,
     borderBottomWidth: 1, // Puedes eliminarlo si no te gusta
-    borderBottomColor: '#003366',
+    borderBottomColor: "#003366",
   },
 
   userImage: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 25,
     marginRight: 10,
+    marginBottom: 2,
   },
 
   userNameContainer: {
     // Esta es la nueva View que envolverá el nombre del usuario
     flex: 2, // Ajusta este valor si es necesario
     marginRight: 10, // Un pequeño margen para asegurar el espacio entre el nombre y el botón
+    marginLeft:5
   },
 
   userName: {
     fontSize: 18,
-    color: '#003366',  // Un tono azul-grisáceo para el nombre
+    color: "#003366", // Un tono azul-grisáceo para el nombre
     flexShrink: 1, // Asegura que el texto pueda reducirse si es necesario
     overflow: "hidden", // Esconde el exceso de texto
   },
 
   contactButton: {
-    padding: 10,
+    padding: 7,
+    paddingHorizontal:20,
     //marginLeft:30,
     //marginRight:80,
     backgroundColor: "#1D5F9C",
     borderRadius: 8,
-    flex: 1,
     alignItems: "center",
   },
   contactButtonText: {
@@ -521,18 +556,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  //Estilos para modal 
+  //Estilos para modal
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     paddingHorizontal: 10,
     marginBottom: 15,
     borderRadius: 8,
   },
   modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   cancelButton: {
     flex: 1,
@@ -559,10 +594,10 @@ const styles = StyleSheet.create({
 
   // Estilos para el modal de ver ofertas
   ofertaItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#EEF2FF",
     padding: 10,
     marginBottom: 10,
     borderRadius: 8,
@@ -591,7 +626,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
-  
 });
 
 export default ServicioScreen;

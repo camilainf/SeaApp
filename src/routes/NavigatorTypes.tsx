@@ -12,6 +12,9 @@ export type RootStackParamList = {
         categoria: string;
     };
     UltimosServicios: undefined;
+    PerfilAjeno: {
+        id: string;
+    };
 };
 
 export type MainTabParamList = {
