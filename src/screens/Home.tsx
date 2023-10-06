@@ -21,7 +21,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         const categorias = await getPopularCategories();
         setCategoriasPopulares(categorias.map(cat => ({
           ...cat,
-          imagen: require('../../assets/iconos/ImageReferencia.png') // Establecer imagen por defecto
+          imagen: require('../../assets/iconos/ImageReferencia.png') // Establecer imagen por defecto, esto es temporal.
         })));
       } catch (error) {
         console.error("Error al obtener las categorías populares:", error);
@@ -44,13 +44,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     { id: '5', titulo: 'Trabajo 5', imagen: require('../../assets/iconos/ImageReferencia.png') },
   ];
 
-  const categoriasDestacadas = [
-    { id: '1', titulo: 'Categoría 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '2', titulo: 'Categoría 2', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '3', titulo: 'Categoría 3', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '4', titulo: 'Categoría 4', imagen: require('../../assets/iconos/ImageReferencia.png') },
-  ];
-
   const serviceIcon = require('../../assets/iconos/Work.png');
   const searchIcon = require('../../assets/iconos/Search.png');
 
@@ -58,113 +51,106 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Primera view */}
-      <View style={{ flex: 1 }}>
-        <LinearGradient
-          colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
-          style={styles.gradientBackground}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        />
-        <View style={styles.contentContainer}>
-          {/* Tarjeta superior */}
-          <View style={styles.tarjetaSuperior}>
-            <View style={styles.fila}>
-              <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
-              <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
-            </View>
-            <View style={styles.fila}>
-              <Image source={{ uri: usuario.foto }} style={styles.fotoPerfil} />
-              <View style={styles.gananciasContainer}>
-                <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
-                <Text style={styles.gananciaNumero}>39.000 CLP</Text>
-              </View>
+
+      <LinearGradient
+        colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
+        style={styles.gradientBackground}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+      <View style={styles.contentContainer}>
+        {/* Tarjeta superior */}
+        <View style={styles.tarjetaSuperior}>
+          <View style={styles.fila}>
+            <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
+            <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
+          </View>
+          <View style={styles.fila}>
+            <Image source={{ uri: usuario.foto }} style={styles.fotoPerfil} />
+            <View style={styles.gananciasContainer}>
+              <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
+              <Text style={styles.gananciaNumero}>39.000 CLP</Text>
             </View>
           </View>
-
-          {/* Buscador */}
-          <View style={styles.buscadorContainer}>
-            <TextInput
-              placeholder="¿Qué buscas?"
-              style={styles.buscadorTexto}
-              placeholderTextColor="#AEBFFB"
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-            />
-            <TouchableOpacity onPress={() => {
-              console.log('Ícono de búsqueda clickeado');
-              if (searchTerm.trim() !== '') {  // Verifica que searchTerm no esté vacío o solo contenga espacios en blanco
-                navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
-              } else {
-                console.log('Por favor, ingresa una palabra en el buscador.');
-                // Puedes mostrar un mensaje al usuario indicando que debe ingresar una palabra en el buscador
-              }
-            }}>
-              <Image source={searchIcon} style={styles.iconoLupa} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Trabajos destacados */}
-          <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
-            <FlatList
-              data={trabajosDestacados}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                  console.log('Tarjeta Trabajo clickeada:', item.titulo);
-                }}>
-                  <Image source={item.imagen} style={styles.imagenTrabajo} />
-                  <Text>{item.titulo}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-
-          </View>
-
-          {/* Categorias destacadas */}
-          <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
-            <FlatList
-              data={categoriasPopulares} // Utilizar el estado de categorías populares
-              renderItem={({ item }) => (
-                // <TouchableOpacity style={styles.tarjetaCategoria} onPress={() => {
-                //   console.log('Tarjeta Categoría clickeada:', item.nombre);
-                // }}>
-                //   <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
-                //   <Text style={styles.tituloCategoria}>{item.nombre}</Text>
-                // </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.tarjetaCategoria}
-                  onPress={() => {
-                    navigation.navigate('ServiciosPorCategoria', { categoria: item.nombre });
-                  }}
-                >
-                  <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
-                  <Text style={styles.tituloCategoria}>{item.nombre}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id}
-              numColumns={2}
-              scrollEnabled={false}
-            />
-          </View>
-
-          {/* Ve los ultimos trabajos */}
-          <TouchableNativeFeedback onPress={() => {
-            console.log('Tarjeta clickeada');
-          }}>
-            <View style={styles.tarjetaUltimosTrabajos}>
-              <Text style={styles.saludoUltimosTrabajos}>
-                ¡Ve los últimos {"\n"}
-                servicios {"\n"}
-                publicados!
-              </Text>
-              <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
-            </View>
-          </TouchableNativeFeedback>
         </View>
+
+        {/* Buscador */}
+        <View style={styles.buscadorContainer}>
+          <TextInput
+            placeholder="¿Qué buscas?"
+            style={styles.buscadorTexto}
+            placeholderTextColor="#AEBFFB"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+          <TouchableOpacity onPress={() => {
+            console.log('Ícono de búsqueda clickeado');
+            if (searchTerm.trim() !== '') {  // Verifica que searchTerm no esté vacío o solo contenga espacios en blanco
+              navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
+            } else {
+              console.log('Por favor, ingresa una palabra en el buscador.');
+              // Puedes mostrar un mensaje al usuario indicando que debe ingresar una palabra en el buscador
+            }
+          }}>
+            <Image source={searchIcon} style={styles.iconoLupa} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Trabajos destacados */}
+        <View style={styles.tarjeta}>
+          <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
+          <FlatList
+            data={trabajosDestacados}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+                console.log('Tarjeta Trabajo clickeada:', item.titulo);
+              }}>
+                <Image source={item.imagen} style={styles.imagenTrabajo} />
+                <Text>{item.titulo}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+
+        </View>
+
+        {/* Categorias destacadas */}
+        <View style={styles.tarjeta}>
+          <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
+          <FlatList
+            data={categoriasPopulares} // Utilizar el estado de categorías populares
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.tarjetaCategoria}
+                onPress={() => {
+                  navigation.navigate('ServiciosPorCategoria', { categoria: item.nombre });
+                }}
+              >
+                <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
+                <Text style={styles.tituloCategoria}>{item.nombre}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            scrollEnabled={false}
+          />
+        </View>
+
+        {/* Ve los ultimos trabajos */}
+        <TouchableNativeFeedback onPress={() => {
+          navigation.navigate('UltimosServicios'); // Asume que 'LastServices' es el nombre de la ruta para LastServicesScreen en tu Navigator
+        }}>
+          <View style={styles.tarjetaUltimosTrabajos}>
+            <Text style={styles.saludoUltimosTrabajos}>
+              ¡Ve los últimos {"\n"}
+              servicios {"\n"}
+              publicados!
+            </Text>
+            <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
+          </View>
+        </TouchableNativeFeedback>
+
       </View>
     </ScrollView>
 

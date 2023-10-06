@@ -9,6 +9,7 @@ import BuscadorScreen from '../screens/Buscador';
 import ServicioScreen from '../screens/Servicio';
 import TerminosCondiciones from '../screens/TerminosCondiciones';
 import ServiciosPorCategoria from '../screens/ServiciosPorCategoria';
+import UltimosServicios from '../screens/UltimosServicios';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -55,6 +56,16 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen
                     name="ServiciosPorCategoria"
                     component={ServiciosPorCategoria}
+                    options={{
+                        headerShown: true, // Muestra la barra superior
+                        headerBackTitleVisible: false, // Oculta el título de volver atrás
+                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                    }}
+                />
+
+                <Stack.Screen
+                    name="UltimosServicios"
+                    component={UltimosServicios}
                     options={{
                         headerShown: true, // Muestra la barra superior
                         headerBackTitleVisible: false, // Oculta el título de volver atrás

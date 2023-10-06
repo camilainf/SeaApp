@@ -1,27 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
+import { RootStackParamList } from '../routes/NavigatorTypes';
 import { listaCategorias, listaServicios, listaUsuarios } from '../resources/Listas';
-import { StackNavigationProp } from "@react-navigation/stack";
-
 
 type BuscadorRouteProp = RouteProp<RootStackParamList, 'Buscador'>;
-
-// Ejemplo
-// type PerfilRouteProp = RouteProp<MainTabParamList, 'Perfil'>;
 
 const BuscadorScreen: React.FC = ({ }) => {
 
     const route = useRoute<BuscadorRouteProp>();
-
-    // Ejemplo de como obtener los parametros que vengan desde el perfil
-    // const routePerfil = useRoute<PerfilRouteProp>();
-    // const { id, nombre } = route.params? || '';
-
-    // también puede ser así:
-    // const id = route.params?.id || '';
-    // const nombre = route.params?.nombre || '';
 
     // Recibe el término de búsqueda desde los parámetros de la ruta
     const initialSearchTerm = route.params?.keyword || '';
