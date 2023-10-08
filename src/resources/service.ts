@@ -1,4 +1,4 @@
-export type ServicioData = {
+export type ServicioDataNew = {
   id: number;
   idCreador: number;
   nombreServicio: string;
@@ -12,9 +12,9 @@ export type ServicioData = {
   estado:number
 };
 
-export type ServicioDataNew = {
-  id: number;
-  idCreador: number;
+export type ServicioData = {
+  id: string;
+  idCreador: string;
   nombreServicio: string;
   categoria: string;
   descripcion: string;

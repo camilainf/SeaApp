@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import Slider from "@react-native-community/slider";
 
@@ -18,6 +20,11 @@ import { convertirFecha } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { UsuarioCasted } from "../resources/user";
+import { getUserById } from "../services/userService";
+import { ServicioData } from "../resources/service";
+import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
+import { getUserIdFromToken } from "../services/authService";
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
@@ -26,70 +33,130 @@ type Props = {
 };
 
 const ServicioScreen: React.FC<Props> = ({ navigation }) => {
+  //Variables Independientes de la vista
   const route = useRoute<ServicioRouteProp>();
-  const servicioCargado = route.params || {};
-  const [estadoSolicitud, setEstadoSolicitud] = useState(
-    servicioCargado.estado
-  ); // Puedes cambiar esto según el estado real
-  const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
-  const esDueno = false; // Aquí deberías determinar si esDueño es verdadero o falso
-  const userCargado = {
-    nombre: "Sebastian Moyano Riveros",
-    email: "efpyi@example.com",
-    telefono: "+569123456789",
-    imagen:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Joe_Biden_presidential_portrait.jpg/640px-Joe_Biden_presidential_portrait.jpg",
-  };
   const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
+
   const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
+  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(
+    null
+  );
+  const idServicio = route.params.id || null;
+  const [estadoSolicitud, setEstadoSolicitud] = useState<number>(1);
+  const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
+  const [esDueno,setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
+  //NO TOCAR TODAVIA ESTA VARIABLE
+  const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
 
   const ofertas = [
     { Nombre: "hola", valor: 3 },
     { Nombre: "que tal", valor: 10 },
   ];
-  return (
-    <ScrollView style={styles.container}>
-      {/* Boton para ir pa atras*/}
-      <View style={styles.header}>
-        {/* <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <FontAwesome name="arrow-left" size={24} color="#476D9A" />
-        </TouchableOpacity> */}
+
+  const fetchData = async () => {
+    setIsLoading(true); // Comienza la carga
+
+    try {
+      // 1. Obtener datos del servicio
+      if (idServicio) {
+        const fetchedServicio = await getServiceById(idServicio);
+        setServicioCargado(fetchedServicio);
+
+        // 2. Usando el servicio obtenido, cargar datos del usuario creador
+        if (fetchedServicio && fetchedServicio.idCreador) {
+          const fetchedUser = await getUserById(fetchedServicio.idCreador);
+          setUserCreador(fetchedUser);
+          const userToken = await getUserIdFromToken();
+          if(fetchedServicio.idCreador === userToken){
+            setEsDueno(true);
+          }
+        }
+        
+
+        // 3. Aquí puedes cargar el estado de la solicitud y cualquier otro dato que necesites.
+        // Por ejemplo:
+        setEstadoSolicitud(fetchedServicio.estado);
+      }
+    } catch (error) {
+      console.error("Hubo un error:", error);
+      Alert.alert(
+        "Error",
+        "No se pudo obtener la información. Por favor, intenta de nuevo."
+      );
+    } finally {
+      setIsLoading(false); // Termina la carga
+    }
+    setIsLoading(false);
+    setIsRefreshing(false); // Agregar esta línea
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [idServicio]); // Se llamará cada vez que idServicio cambie.
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
+    );
+  }
+  const onRefresh = () => {
+    setIsRefreshing(true);
+    fetchData();
+  };
+
+  return (
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.header}></View>
       {/* Barra de Usuario */}
       {!esDueno && (
-    <View style={styles.userBar}>
-        {/* Contenedor para la imagen y el nombre */}
-        <TouchableOpacity 
-            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} // Añade flex para que ocupe el espacio disponible
+        <View style={styles.userBar}>
+          {/* Contenedor para la imagen y el nombre */}
+          <TouchableOpacity
+            style={{ flexDirection: "row", alignItems: "center", flex: 1 }} // Añade flex para que ocupe el espacio disponible
             onPress={() => {
-              navigation.navigate("PerfilAjeno", {id:"651dd0b46cc06527a6b8c435"});
-          }}
-          
-        >
-            <Image source={{ uri: userCargado.imagen }} style={styles.userImage} />
+              navigation.navigate("PerfilAjeno", {
+                id: "651dd0b46cc06527a6b8c435",
+              });
+            }}
+          >
+            <Image
+              source={{ uri: userCreador?.imagenDePerfil }}
+              style={styles.userImage}
+            />
             <View style={styles.userNameContainer}>
-                <Text 
-                    numberOfLines={2}
-                    ellipsizeMode="tail" 
-                    style={styles.userName}
-                >
-                    {userCargado.nombre}
-                </Text>
+              <Text
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                style={styles.userName}
+              >
+                {userCreador?.name} {userCreador?.apellidoPaterno}{" "}
+                {userCreador?.apellidoMaterno}
+              </Text>
             </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
-        {/* Botón de contactar */}
-        <TouchableOpacity style={styles.contactButton} onPress={() => setModalVisible(true)}>
-            <Text style={styles.contactButtonText}>Contactar</Text>
-        </TouchableOpacity>
-    </View>
-)}
+          {/* Botón de contactar */}
+          {userCreador && (
+            <TouchableOpacity
+              style={styles.contactButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.contactButtonText}>Contactar</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
       {/* Modal de informacion de contacto */}
       <Modal
         animationType="slide"
@@ -104,11 +171,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.modalTitle}>Los datos del usuario son:</Text>
             <View style={styles.contactInfo}>
               <MaterialIcons name="email" size={24} color="#003366" />
-              <Text style={styles.contactText}> {userCargado.email}</Text>
+              <Text style={styles.contactText}> {userCreador?.email}</Text>
             </View>
             <View style={styles.contactInfo}>
               <FontAwesome name="phone" size={24} color="#003366" />
-              <Text style={styles.contactText}> {userCargado.telefono}</Text>
+              <Text style={styles.contactText}> {userCreador?.telefono}</Text>
             </View>
             <TouchableOpacity
               style={styles.closeButton}
@@ -121,23 +188,24 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       </Modal>
 
       {/*Titulo de servicio */}
-      <Text style={styles.title}>{servicioCargado.nombreServicio}</Text>
+      <Text style={styles.title}>{servicioCargado?.nombreServicio}</Text>
       {/* Imagen del servicio */}
       <View>
-        <Image source={{ uri: servicioCargado.imagen }} style={styles.image} />
+        <Image source={{ uri: servicioCargado?.imagen }} style={styles.image} />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
-          <Text style={styles.estadoText}>
-            Estado: {servicioCargado.estado}
-          </Text>
-          <Text style={styles.categoriaText}>{servicioCargado.categoria}</Text>
+        <Text style={styles.estadoText}>
+  Estado: {obtenerTextoEstado(servicioCargado?.estado)}
+</Text>
+
+          <Text style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
         </View>
       </View>
       {/* Descripcion de servicio */}
       <View style={styles.descriptionContainer}>
         <Text style={styles.descriptionTitle}>Descripción:</Text>
         <Text style={styles.descriptionText}>
-          {servicioCargado.descripcion}
+          {servicioCargado?.descripcion}
         </Text>
       </View>
       <View>
@@ -145,23 +213,23 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.date}>
           <FontAwesome name="calendar" size={16} color="#476D9A" />
           {"  "}
-          {convertirFecha(servicioCargado.fechaSolicitud)}
+          {convertirFecha(servicioCargado?.fechaSolicitud)}
         </Text>
         {/* Hora de solicitud*/}
         <Text style={styles.date}>
           <FontAwesome name="clock-o" size={16} color="#476D9A" />
           {"  "}
-          {servicioCargado.horaSolicitud}
+          {servicioCargado?.horaSolicitud}
         </Text>
       </View>
       {/*Direccion de solicitud */}
       <Text style={styles.address}>
         <FontAwesome name="map-marker" size={16} color="#476D9A" />
         {"  "}
-        {servicioCargado.direccion}
+        {servicioCargado?.direccion}
       </Text>
       {/*Texto de mongo, y el valor */}
-      <Text style={styles.amount}>Monto: ${servicioCargado.monto}</Text>
+      <Text style={styles.amount}>Monto: ${servicioCargado?.monto}</Text>
       {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
         {estadoSolicitud === 1 && (
@@ -490,7 +558,7 @@ const styles = StyleSheet.create({
     // Esta es la nueva View que envolverá el nombre del usuario
     flex: 2, // Ajusta este valor si es necesario
     marginRight: 10, // Un pequeño margen para asegurar el espacio entre el nombre y el botón
-    marginLeft:5
+    marginLeft: 5,
   },
 
   userName: {
@@ -502,7 +570,7 @@ const styles = StyleSheet.create({
 
   contactButton: {
     padding: 7,
-    paddingHorizontal:20,
+    paddingHorizontal: 20,
     //marginLeft:30,
     //marginRight:80,
     backgroundColor: "#1D5F9C",

@@ -1,4 +1,8 @@
-export function convertirFecha(fecha: string): string {
+export function convertirFecha(fecha: string | undefined): string {
+    if (fecha === undefined) {
+        return "Fecha no disponible"; // Puedes cambiar este mensaje según tus necesidades
+    }
+
     const meses: string[] = [
         "enero", "febrero", "marzo", "abril", "mayo", "junio",
         "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"

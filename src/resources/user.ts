@@ -14,4 +14,15 @@ type Usuario = {
   calificacion: number;
 };
 
-export { Usuario };
+type UsuarioCasted = {
+  _id:string;
+  name: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  email: string;
+  telefono: string;
+  imagenDePerfil?: string;
+  calificacion: number;
+}
+
+export { Usuario, UsuarioCasted };

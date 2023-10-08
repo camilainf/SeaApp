@@ -14,24 +14,19 @@ import {
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { convertirFecha } from "../utils/randomService";
-import { Usuario } from "../resources/user";
+import { UsuarioCasted } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { ServicioData, ServicioDataNew } from "../resources/service";
-import { UsuarioP, solicitudesTerminadas } from "../resources/Listas";
-import { solicitudesPropias } from "../resources/Listas";
 import { getUserById } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { getToken } from "../services/storageService";
-import { decodeToken } from "../services/tokenService";
-import { DecodedToken } from "../types/auth";
 import { getUserIdFromToken } from "../services/authService";
 import SinSolicitudes from "../components/SinSolicitudes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { getServiceById, getServicesByUser } from "../services/serviceService";
+import { getServicesByUser } from "../services/serviceService";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -42,22 +37,21 @@ type PerfilRouteProp = RouteProp<
 >;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
+  //Variables independientes
   const route = useRoute<PerfilRouteProp>();
-
-  const [usuarioData, setUsuarioData] = useState<Usuario | null>(null);
-  const [serviciosPropios, setServiciosPropios] = useState<ServicioDataNew[]>([]);
-  const [serviciosTerminados, setServiciosTerminados] = useState<
-    ServicioData[]
-  >([]);
-  const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const gananciaDinero = 4300; //
-
-  const solicitudesAceptadas: ServicioDataNew[] = [];
+  //Variables de la vista
+  const [usuarioData, setUsuarioData] = useState<UsuarioCasted | null>(null);
+  const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
+  const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
+  const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = serviciosTerminados.length; //Valor de solicitudes recibidas
+  //Por ver  
+  const gananciaDinero = 4300; //
+  const solicitudesAceptadas: ServicioData[] = [];
+  
 
   useFocusEffect(
     useCallback(() => {
@@ -79,7 +73,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           const data = await getUserById(userId);
           setUsuarioData(data);
 
-          const fetchedServices = await getServicesByUser("651df2db6cc06527a6b8c43d");
+          const fetchedServices = await getServicesByUser(userId);
           setServiciosPropios(fetchedServices);
 
           setLoading(false);
@@ -100,13 +94,18 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
+    return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+    );
+}
 
   if (error) {
     return <Text>Error: {error}</Text>;
   }
-
+  
+  
   return (
     <ScrollView style={styles.container}>
       {/* INFORMACION USUARIO */}

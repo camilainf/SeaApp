@@ -35,7 +35,7 @@ export const getServicesByCategory = async (categoria: string): Promise<Servicio
   }
 
   const serviciosData = await response.json();
-  const servicios: ServicioDataNew[] = serviciosData.map((serv: any) => ({
+  const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
     id: serv._id,
     idCreador: serv.idCreador,
     nombreServicio: serv.nombreServicio,
@@ -62,7 +62,7 @@ export const getLastServices = async (skip: number = 0): Promise<ServicioData[]>
   }
 
   const serviciosData = await response.json();
-  const servicios: ServicioDataNew[] = serviciosData.map((serv: any) => ({
+  const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
     id: serv._id,
     idCreador: serv.idCreador,
     nombreServicio: serv.nombreServicio,
@@ -81,7 +81,7 @@ export const getLastServices = async (skip: number = 0): Promise<ServicioData[]>
   return servicios;
 };
 
-export const getServicesByUser = async (idUsuario: string): Promise<ServicioDataNew[]> => {
+export const getServicesByUser = async (idUsuario: string): Promise<ServicioData[]> => {
   const response = await fetch(`${BASE_URL}/byUser?idCreador=${encodeURIComponent(idUsuario)}`);
 
   if (!response.ok) {
@@ -89,7 +89,7 @@ export const getServicesByUser = async (idUsuario: string): Promise<ServicioData
     throw new Error(errorData.message || "Error al obtener los servicios por usuario.");
   }
   const serviciosData = await response.json();
-  const servicios: ServicioDataNew[] = serviciosData.map((serv: any) => ({
+  const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
     id: serv._id,
     idCreador: serv.idCreador,
     nombreServicio: serv.nombreServicio,
@@ -106,7 +106,7 @@ export const getServicesByUser = async (idUsuario: string): Promise<ServicioData
   return servicios;
 };
 
-export const getServiceById = async (id: string): Promise<ServicioDataNew> => {
+export const getServiceById = async (id: string): Promise<ServicioData> => {
   const response = await fetch(BASE_URL + '/' + id, {
     method: 'GET',
     headers: {
@@ -119,6 +119,44 @@ export const getServiceById = async (id: string): Promise<ServicioDataNew> => {
     throw new Error(errorData.message || "No se encontro o cargo el servicio");
   }
   
-  const servicioData: ServicioDataNew = await response.json();
+  const servicioData: ServicioData = await response.json();
   return servicioData;
+};
+
+export const updateServiceStatus = async (id: string, estado: number) => {
+  const response = await fetch(BASE_URL + '/' + id, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ estado }), 
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "No se pudo actualizar el estado del servicio");
+  }
+  
+  const servicioData = await response.json();
+  return servicioData;
+}
+
+export  const obtenerTextoEstado = (estado: number | undefined) => {
+  if (estado === undefined) {
+    return "Estado no disponible";
+  }
+  switch (estado) {
+    case 1:
+      return "En oferta";
+    case 2:
+      return "Por iniciar";
+    case 3:
+      return "Trabajando";
+    case 4:
+      return "En valoración";
+    case 5:
+      return "Terminado";
+    default:
+      return "Estado desconocido";
+  }
 };
