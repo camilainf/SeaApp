@@ -4,10 +4,15 @@ import { getLastServices } from '../services/serviceService';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
 import ServiceCard from '../components/ServiceCard';
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type Props = {
+    navigation: StackNavigationProp<RootStackParamList>;
+  };
 
 type UltimosServiciosProp = RouteProp<RootStackParamList, "UltimosServicios">;
 
-const UltimosServicios: React.FC = () => {
+const UltimosServicios: React.FC<Props> = ({ navigation }) => {
 
     const route = useRoute<UltimosServiciosProp>();
     const categoria = route.params?.categoria;
@@ -57,11 +62,12 @@ const UltimosServicios: React.FC = () => {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
-    const handleServiceClick = (serviceId: string) => {
+    const handleServiceClick = (service: any) => {
         // Aquí puedes implementar la navegación al servicio específico
         // Por ejemplo:
         // navigation.navigate('ServiceDetail', { serviceId });
-        console.log(`Service clicked with ID: ${serviceId}`);
+        console.log(`Service clicked with ID: ${service.id}`);
+        navigation.navigate("Servicio", service);
     };
 
     return (
@@ -70,7 +76,7 @@ const UltimosServicios: React.FC = () => {
                 ref={flatListRef}
                 data={services}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleServiceClick(item.id)}>
+                    <TouchableOpacity onPress={() => handleServiceClick(item)}>
                         <ServiceCard item={item} />
                     </TouchableOpacity>
                 )}
