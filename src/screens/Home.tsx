@@ -124,7 +124,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.tarjetaCategoria}
                 onPress={() => {
-                  navigation.navigate('ServiciosPorCategoria', { categoria: item.nombre });
+                  navigation.navigate('UltimosServicios', { categoria: item.nombre });
                 }}
               >
                 <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
@@ -139,7 +139,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Ve los ultimos trabajos */}
         <TouchableNativeFeedback onPress={() => {
-          navigation.navigate('UltimosServicios'); // Asume que 'LastServices' es el nombre de la ruta para LastServicesScreen en tu Navigator
+          navigation.navigate('UltimosServicios', { categoria: "" });
         }}>
           <View style={styles.tarjetaUltimosTrabajos}>
             <Text style={styles.saludoUltimosTrabajos}>

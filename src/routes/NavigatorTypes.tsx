@@ -11,7 +11,9 @@ export type RootStackParamList = {
     ServiciosPorCategoria: {
         categoria: string;
     };
-    UltimosServicios: undefined;
+    UltimosServicios: {
+        categoria: string;
+    };
     PerfilAjeno: {
         id: string;
     };

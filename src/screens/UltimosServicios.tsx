@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Image, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { getLastServices } from '../services/serviceService'; // Asegúrate de importar el servicio adecuado
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
+import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Importa FontAwesome
+
+type UltimosServiciosProp = RouteProp< RootStackParamList, "UltimosServicios">;
 
 const UltimosServicios: React.FC = () => {
+
+    const route = useRoute<UltimosServiciosProp>();
+    const categoria = route.params?.categoria;
+
     const [services, setServices] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [skip, setSkip] = useState(0);
@@ -10,7 +19,6 @@ const UltimosServicios: React.FC = () => {
     const defaultImage = require('../../assets/iconos/ImageReferencia.png'); // Ajusta la ruta a tu imagen predeterminada
     const [allLoaded, setAllLoaded] = useState(false); // Nuevo estado para verificar si todos los servicios han sido cargados
     const [isFetching, setIsFetching] = useState(false);
-
 
     useEffect(() => {
         fetchServices();
@@ -25,7 +33,7 @@ const UltimosServicios: React.FC = () => {
         setSkip(nextSkip); // Actualiza el valor de skip inmediatamente
 
         try {
-            const fetchedServices = await getLastServices(skip);
+            const fetchedServices = await getLastServices(skip, categoria);
 
             if (fetchedServices.length < 5) { // Si se devuelven menos de 5 servicios, significa que todos los servicios han sido cargados
                 setAllLoaded(true);

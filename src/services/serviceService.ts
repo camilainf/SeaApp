@@ -53,8 +53,11 @@ export const getServicesByCategory = async (categoria: string): Promise<Servicio
   return servicios;
 };
 
-export const getLastServices = async (skip: number = 0): Promise<ServicioData[]> => {
-  const response = await fetch(`${BASE_URL}/lastServices?skip=${skip}`);
+export const getLastServices = async (skip: number = 0, categoria?: string): Promise<ServicioData[]> => {
+  
+  // Si se proporciona una categoría, añadirla a la URL, de lo contrario, no hacer nada
+  const categoryQuery = categoria ? `&categoria=${categoria}` : '';
+  const response = await fetch(`${BASE_URL}/lastServices?skip=${skip}${categoryQuery}`);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -77,9 +80,9 @@ export const getLastServices = async (skip: number = 0): Promise<ServicioData[]>
     fechaCreacion: serv.fechaCreacion
   }));
 
-
   return servicios;
 };
+
 
 export const getServicesByUser = async (idUsuario: string): Promise<ServicioData[]> => {
   const response = await fetch(`${BASE_URL}/byUser?idCreador=${encodeURIComponent(idUsuario)}`);
@@ -118,7 +121,7 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se encontro o cargo el servicio");
   }
-  
+
   const servicioData: ServicioData = await response.json();
   return servicioData;
 };
@@ -129,19 +132,19 @@ export const updateServiceStatus = async (id: string, estado: number) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ estado }), 
+    body: JSON.stringify({ estado }),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se pudo actualizar el estado del servicio");
   }
-  
+
   const servicioData = await response.json();
   return servicioData;
 }
 
-export  const obtenerTextoEstado = (estado: number | undefined) => {
+export const obtenerTextoEstado = (estado: number | undefined) => {
   if (estado === undefined) {
     return "Estado no disponible";
   }
