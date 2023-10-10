@@ -19,3 +19,15 @@ export function convertirFecha(fecha: string | undefined): string {
 
     return `${dia} de ${mesTexto} del ${anoLargo}`;
 }
+
+export function calcularPromedioCalificaciones(calificaciones :number[] | undefined):number {
+    if ( calificaciones === undefined ||calificaciones.length === 0 ) {
+        return 0;
+    } else{
+        let suma = 0;
+        for (let i = 0; i < calificaciones.length; i++) {
+            suma += calificaciones[i];
+        }
+        return suma / calificaciones.length;
+    }
+}

@@ -11,7 +11,7 @@ type Usuario = {
   telefono: string;
   password: string;
   imagenDePerfil?: string;
-  calificacion: number;
+  calificacion: [number];
 };
 
 type UsuarioCasted = {
@@ -22,7 +22,7 @@ type UsuarioCasted = {
   email: string;
   telefono: string;
   imagenDePerfil?: string;
-  calificacion: number;
+  calificacion: number[];
 }
 
 export { Usuario, UsuarioCasted };

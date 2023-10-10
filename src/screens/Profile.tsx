@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Rating, Card } from "react-native-elements";
-import { convertirFecha } from "../utils/randomService";
+import { calcularPromedioCalificaciones, convertirFecha } from "../utils/randomService";
 import { UsuarioCasted } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -139,7 +139,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             <Rating
               imageSize={20}
               readonly
-              startingValue={usuarioData?.calificacion}
+              startingValue={calcularPromedioCalificaciones(usuarioData?.calificacion)}
               style={styles.rating}
             />
           </View>
