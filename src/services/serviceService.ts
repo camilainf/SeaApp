@@ -54,7 +54,7 @@ export const getServicesByCategory = async (categoria: string): Promise<Servicio
 };
 
 export const getLastServices = async (skip: number = 0, categoria?: string): Promise<ServicioData[]> => {
-  
+
   // Si se proporciona una categoría, añadirla a la URL, de lo contrario, no hacer nada
   const categoryQuery = categoria ? `&categoria=${categoria}` : '';
   const response = await fetch(`${BASE_URL}/lastServices?skip=${skip}${categoryQuery}`);
@@ -147,6 +147,25 @@ export const updateServiceStatus = async (id: string, estado: number) => {
 export const getOffersByServiceId = (serviceId: string) => {}
 
 export const getOfferAcceptedByServiceId = (serviceId: string) => {}
+
+
+export const incrementServiceClick = async (id: string) => {
+  const response = await fetch(`${BASE_URL}/incrementClick/${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "No se pudo incrementar el contador de clics");
+  }
+
+  const servicioData = await response.json();
+  return servicioData;
+}
+
 
 
 export const obtenerTextoEstado = (estado: number | undefined) => {

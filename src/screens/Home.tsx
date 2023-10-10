@@ -87,9 +87,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             console.log('Ícono de búsqueda clickeado');
             if (searchTerm.trim() !== '') {  // Verifica que searchTerm no esté vacío o solo contenga espacios en blanco
               navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
-            } else {
-              console.log('Por favor, ingresa una palabra en el buscador.');
-              // Puedes mostrar un mensaje al usuario indicando que debe ingresar una palabra en el buscador
             }
           }}>
             <Image source={searchIcon} style={styles.iconoLupa} />
@@ -119,12 +116,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.tarjeta}>
           <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
           <FlatList
-            data={categoriasPopulares} // Utilizar el estado de categorías populares
+            data={categoriasPopulares}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.tarjetaCategoria}
                 onPress={() => {
-                  navigation.navigate('UltimosServicios', { categoria: item.nombre });
+                  navigation.navigate('ListaServicios', { categoria: item.nombre });
                 }}
               >
                 <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
@@ -139,7 +136,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Ve los ultimos trabajos */}
         <TouchableNativeFeedback onPress={() => {
-          navigation.navigate('UltimosServicios', { categoria: "" });
+          navigation.navigate('ListaServicios', { categoria: "" });
         }}>
           <View style={styles.tarjetaUltimosTrabajos}>
             <Text style={styles.saludoUltimosTrabajos}>

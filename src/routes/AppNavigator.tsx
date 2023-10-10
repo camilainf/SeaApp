@@ -8,9 +8,8 @@ import Register from '../screens/Register';
 import BuscadorScreen from '../screens/Buscador';
 import ServicioScreen from '../screens/Servicio';
 import TerminosCondiciones from '../screens/TerminosCondiciones';
-import ServiciosPorCategoria from '../screens/ServiciosPorCategoria';
-import UltimosServicios from '../screens/UltimosServicios';
 import Profile from '../screens/Profile';
+import ListaServicios from '../screens/ListaServicios';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -55,18 +54,8 @@ const AppNavigator: React.FC = () => {
                 />
 
                 <Stack.Screen
-                    name="ServiciosPorCategoria"
-                    component={ServiciosPorCategoria}
-                    options={{
-                        headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
-                    }}
-                />
-
-                <Stack.Screen
-                    name="UltimosServicios"
-                    component={UltimosServicios}
+                    name="ListaServicios"
+                    component={ListaServicios}
                     options={{
                         headerShown: true, // Muestra la barra superior
                         headerBackTitleVisible: false, // Oculta el título de volver atrás

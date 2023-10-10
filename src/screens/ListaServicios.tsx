@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { getLastServices } from '../services/serviceService';
+import { getLastServices, incrementServiceClick } from '../services/serviceService';
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
+import { RootStackParamList } from '../routes/NavigatorTypes';
 import ServiceCard from '../components/ServiceCard';
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type Props = {
     navigation: StackNavigationProp<RootStackParamList>;
-  };
+};
 
-type UltimosServiciosProp = RouteProp<RootStackParamList, "UltimosServicios">;
+type UltimosServiciosProp = RouteProp<RootStackParamList, "ListaServicios">;
 
-const UltimosServicios: React.FC<Props> = ({ navigation }) => {
+const ListaServicios: React.FC<Props> = ({ navigation }) => {
 
     const route = useRoute<UltimosServiciosProp>();
     const categoria = route.params?.categoria;
@@ -23,6 +23,9 @@ const UltimosServicios: React.FC<Props> = ({ navigation }) => {
     const flatListRef = useRef<FlatList>(null);
     const [allLoaded, setAllLoaded] = useState(false); // Nuevo estado para verificar si todos los servicios han sido cargados
     const [isFetching, setIsFetching] = useState(false);
+
+    const title = categoria ? `Servicios de: ${categoria}` : "Ultimos servicios ⭐️";
+
 
     useEffect(() => {
         fetchServices();
@@ -62,16 +65,37 @@ const UltimosServicios: React.FC<Props> = ({ navigation }) => {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
-    const handleServiceClick = (service: any) => {
-        // Aquí puedes implementar la navegación al servicio específico
-        // Por ejemplo:
-        // navigation.navigate('ServiceDetail', { serviceId });
-        console.log(`Service clicked with ID: ${service.id}`);
+    const handleServiceClick = async (service: any) => {
+        console.log(`Servicio clickeado con ID: ${service.id}`);
+
+        // Incrementar el contador de clics
+        try {
+            await incrementServiceClick(service.id);
+        } catch (error) {
+            console.error("Error al incrementar el contador de clics:", error);
+        }
+
         navigation.navigate("Servicio", service);
     };
 
+
     return (
         <View style={styles.container}>
+
+            {/* Titulo */}
+            <Text style={styles.title}>{title}</Text>
+
+            {!categoria && (
+                <View style={styles.infoCard}>
+                    <Text style={styles.infoText}>
+                        <Text style={styles.boldText}>Descubre</Text> los últimos servicios publicados en
+                        <Text style={styles.boldText}> Seajob</Text> y encuentra el que mejor se
+                        <Text style={styles.boldText}> adapte</Text> a lo que estás
+                        <Text style={styles.boldText}> buscando</Text> 📌.
+                    </Text>
+                </View>
+            )}
+
             <FlatList
                 ref={flatListRef}
                 data={services}
@@ -97,6 +121,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFFFFF',
     },
+    title: {
+        fontSize: 24, // Puedes ajustar el tamaño de fuente según prefieras
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10, // Espaciado vertical para separar el título del FlatList
+        color: '#0797FF',
+    },
     scrollToTopButton: {
         position: 'absolute',
         right: 10,
@@ -109,6 +140,21 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 20,
     },
+    infoCard: {
+        backgroundColor: '#02B3FF',
+        borderRadius: 40, // Redondea las esquinas de la tarjeta
+        marginHorizontal: 15, // Margen horizontal para separar la tarjeta de los bordes laterales
+        padding: 15, // Espaciado interno de la tarjeta
+        marginBottom: 10, // Espaciado inferior para separar la tarjeta del FlatList
+    },
+    infoText: {
+        color: '#FFFFFF', // Color de texto blanco para contrastar con el fondo azul
+        fontSize: 16, // Tamaño de fuente
+        textAlign: 'center', // Centra el texto horizontalmente
+    },
+    boldText: {
+        fontWeight: 'bold',
+    },
 });
 
-export default UltimosServicios;
+export default ListaServicios;
