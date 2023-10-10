@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const defaultImage = require('../../assets/iconos/ImageReferencia.png');
+const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
 
 interface ServiceCardProps {
     item: any;
@@ -18,18 +18,18 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ item }) => {
                 />
             </View>
             <View style={styles.infoColumn}>
-                <Text style={styles.serviceName} numberOfLines={2}>{item.nombreServicio}</Text>
+                <Text style={[styles.serviceName, styles.textBold]} numberOfLines={2}>{item.nombreServicio}</Text>
                 <Text style={styles.serviceDescription} numberOfLines={3}>{item.descripcion}</Text>
 
                 <View style={styles.iconRowContainer}>
                     <View style={styles.iconRow}>
                         <View style={styles.iconColumn}>
-                            <FontAwesome name="map-marker" size={16} color="#4E479A" />
-                            <FontAwesome name="calendar" size={16} color="#4E479A" style={styles.iconSpacing} />
+                            <FontAwesome name="map-marker" size={16} color="#4593EE" />
+                            <FontAwesome name="calendar" size={16} color="#4593EE" style={styles.iconSpacing} />
                         </View>
                         <View style={styles.iconInfoColumn}>
-                            <Text>{item.direccion}</Text>
-                            <Text>{item.fechaSolicitud}</Text>
+                            <Text style={styles.textBold}>{item.direccion}</Text>
+                            <Text style={styles.textBold}>{item.fechaSolicitud}</Text>
                         </View>
                     </View>
                 </View>
@@ -86,17 +86,17 @@ const styles = StyleSheet.create({
     },
     serviceName: {
         fontSize: 18,
-        fontWeight: 'bold',
+        color: '#4593EE', // Cambio de color
         height: 40,
-        // justifyContent: 'center',
-        textAlign: 'justify',
-        overflow: 'hidden', // Asegura que el texto se corte correctamente
+        textAlign: 'center',
+        overflow: 'hidden',
     },
     serviceDescription: {
         marginVertical: 10,
         height: 70,
+        color: '#4593EE', // Cambio de color
         textAlign: 'justify',
-        overflow: 'hidden', // Asegura que el texto se corte correctamente
+        overflow: 'hidden',
     },
     iconRowContainer: {
         flex: 1,
@@ -114,8 +114,12 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'space-between',
     },
+    textBold: {
+        fontWeight: 'bold', // Estilo en negrita
+        color: '#4593EE', // Cambio de color
+    },
     iconSpacing: {
-        marginTop: 10,
+        marginTop: 20,
     },
 });
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Image, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { getLastServices } from '../services/serviceService'; // Asegúrate de importar el servicio adecuado
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { getLastServices } from '../services/serviceService';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Importa FontAwesome
-import ServiceCard from '../components/ServiceCard'; 
+import ServiceCard from '../components/ServiceCard';
 
 type UltimosServiciosProp = RouteProp<RootStackParamList, "UltimosServicios">;
 
@@ -54,9 +53,15 @@ const UltimosServicios: React.FC = () => {
         }
     };
 
-
     const scrollToTop = () => {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    };
+
+    const handleServiceClick = (serviceId: string) => {
+        // Aquí puedes implementar la navegación al servicio específico
+        // Por ejemplo:
+        // navigation.navigate('ServiceDetail', { serviceId });
+        console.log(`Service clicked with ID: ${serviceId}`);
     };
 
     return (
@@ -64,7 +69,11 @@ const UltimosServicios: React.FC = () => {
             <FlatList
                 ref={flatListRef}
                 data={services}
-                renderItem={({ item }) => <ServiceCard item={item} />}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => handleServiceClick(item.id)}>
+                        <ServiceCard item={item} />
+                    </TouchableOpacity>
+                )}
                 keyExtractor={(item) => `${item.id}`}
                 onEndReached={fetchServices}
                 onEndReachedThreshold={0.5}

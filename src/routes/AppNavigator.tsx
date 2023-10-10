@@ -34,7 +34,7 @@ const AppNavigator: React.FC = () => {
                     component={BuscadorScreen}
                     options={{
                         headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: true, // Oculta el título de volver atrás
+                        headerBackTitleVisible: false, // Oculta el título de volver atrás
                         headerTitle: 'Buscador', // Establece el título en una cadena vacía para ocultarlo
                     }}
                 />
