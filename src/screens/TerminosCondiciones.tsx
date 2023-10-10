@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 15,
         color: '#322E61',
-        letterSpacing: 0.4, // Puedes ajustar esto para intentar justificar el texto
+        textAlign: 'justify',
     },
 });
 
