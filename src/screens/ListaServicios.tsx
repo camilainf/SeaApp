@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { getLastServices } from '../services/serviceService';
+import { getLastServices, incrementServiceClick } from '../services/serviceService';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from '../routes/NavigatorTypes';
 import ServiceCard from '../components/ServiceCard';
@@ -65,10 +65,19 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
-    const handleServiceClick = (service: any) => {
+    const handleServiceClick = async (service: any) => {
         console.log(`Servicio clickeado con ID: ${service.id}`);
+
+        // Incrementar el contador de clics
+        try {
+            await incrementServiceClick(service.id);
+        } catch (error) {
+            console.error("Error al incrementar el contador de clics:", error);
+        }
+
         navigation.navigate("Servicio", service);
     };
+
 
     return (
         <View style={styles.container}>
@@ -79,7 +88,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
             {!categoria && (
                 <View style={styles.infoCard}>
                     <Text style={styles.infoText}>
-                        <Text style={styles.boldText}>Descubre</Text> los últimos servicios publicados en 
+                        <Text style={styles.boldText}>Descubre</Text> los últimos servicios publicados en
                         <Text style={styles.boldText}> Seajob</Text> y encuentra el que mejor se
                         <Text style={styles.boldText}> adapte</Text> a lo que estás
                         <Text style={styles.boldText}> buscando</Text> 📌.
