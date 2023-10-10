@@ -4,8 +4,9 @@ import { getLastServices } from '../services/serviceService'; // Asegúrate de i
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from '../routes/NavigatorTypes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Importa FontAwesome
+import ServiceCard from '../components/ServiceCard'; 
 
-type UltimosServiciosProp = RouteProp< RootStackParamList, "UltimosServicios">;
+type UltimosServiciosProp = RouteProp<RootStackParamList, "UltimosServicios">;
 
 const UltimosServicios: React.FC = () => {
 
@@ -16,7 +17,6 @@ const UltimosServicios: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [skip, setSkip] = useState(0);
     const flatListRef = useRef<FlatList>(null);
-    const defaultImage = require('../../assets/iconos/ImageReferencia.png'); // Ajusta la ruta a tu imagen predeterminada
     const [allLoaded, setAllLoaded] = useState(false); // Nuevo estado para verificar si todos los servicios han sido cargados
     const [isFetching, setIsFetching] = useState(false);
 
@@ -64,16 +64,7 @@ const UltimosServicios: React.FC = () => {
             <FlatList
                 ref={flatListRef}
                 data={services}
-                renderItem={({ item }) => (
-                    <View style={styles.serviceCard}>
-                        <Image
-                            source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
-                            style={styles.serviceImage}
-                        />
-                        <Text>{item.nombreServicio}</Text>
-                        <Text>{item.descripcion}</Text>
-                    </View>
-                )}
+                renderItem={({ item }) => <ServiceCard item={item} />}
                 keyExtractor={(item) => `${item.id}`}
                 onEndReached={fetchServices}
                 onEndReachedThreshold={0.5}
@@ -89,17 +80,7 @@ const UltimosServicios: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    serviceCard: {
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    serviceImage: {
-        width: '100%',
-        height: 200,
-        resizeMode: 'cover',
+        backgroundColor: '#FFFFFF',
     },
     scrollToTopButton: {
         position: 'absolute',
