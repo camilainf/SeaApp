@@ -144,6 +144,11 @@ export const updateServiceStatus = async (id: string, estado: number) => {
   return servicioData;
 }
 
+export const getOffersByServiceId = (serviceId: string) => {}
+
+export const getOfferAcceptedByServiceId = (serviceId: string) => {}
+
+
 export const obtenerTextoEstado = (estado: number | undefined) => {
   if (estado === undefined) {
     return "Estado no disponible";

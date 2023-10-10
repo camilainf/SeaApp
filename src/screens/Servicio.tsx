@@ -25,6 +25,7 @@ import { getUserById } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
+const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
@@ -126,12 +127,12 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             style={{ flexDirection: "row", alignItems: "center", flex: 1 }} // Añade flex para que ocupe el espacio disponible
             onPress={() => {
               navigation.navigate("PerfilAjeno", {
-                id: "651dd0b46cc06527a6b8c435",
+                id: servicioCargado?.idCreador || "",
               });
             }}
           >
             <Image
-              source={{ uri: userCreador?.imagenDePerfil }}
+              source={userCreador?.imagenDePerfil ? { uri: userCreador?.imagenDePerfil } : require("./../../assets/iconos/UserProfile.png")}
               style={styles.userImage}
             />
             <View style={styles.userNameContainer}>
@@ -191,7 +192,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.title}>{servicioCargado?.nombreServicio}</Text>
       {/* Imagen del servicio */}
       <View>
-        <Image source={{ uri: servicioCargado?.imagen }} style={styles.image} />
+      
+        <Image source={servicioCargado?.imagen ? { uri: servicioCargado?.imagen } : defaultImage} style={styles.image} />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
         <Text style={styles.estadoText}>
