@@ -13,7 +13,6 @@ import {
   RefreshControl,
 } from "react-native";
 import Slider from "@react-native-community/slider";
-
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { convertirFecha } from "../utils/randomService";
@@ -25,7 +24,9 @@ import { getUserById } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
-const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
+import { Oferta } from "../resources/offer";
+import { getOffersByServiceId } from "../services/offerService";
+const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
@@ -42,17 +43,19 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
   const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
-
-  const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
-  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(
-    null
-  );
   const idServicio = route.params.id || null;
+  const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
+  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
+  const [confirmModalVisible, setConfirmModalVisible] =useState<boolean>(false);
+  const [usuariosOfertantes, setUsuariosOfertantes] = useState<Record<string, UsuarioCasted>>({});
+  const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
+
   const [estadoSolicitud, setEstadoSolicitud] = useState<number>(1);
   const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
-  const [esDueno,setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
+  const [esDueno, setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
   //NO TOCAR TODAVIA ESTA VARIABLE
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
+  const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
 
   const ofertas = [
     { Nombre: "hola", valor: 3 },
@@ -73,15 +76,25 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
           setUserCreador(fetchedUser);
           const userToken = await getUserIdFromToken();
-          if(fetchedServicio.idCreador === userToken){
+          if (fetchedServicio.idCreador === userToken) {
+            console.log(`USuario cargadoo :`, fetchedServicio, '   Usuario tOKEEEN', userToken);
             setEsDueno(true);
           }
         }
-        
-
         // 3. Aquí puedes cargar el estado de la solicitud y cualquier otro dato que necesites.
         // Por ejemplo:
         setEstadoSolicitud(fetchedServicio.estado);
+        const fetchedOffer = await getOffersByServiceId(idServicio);
+        setOfertasCargadas(fetchedOffer);
+        const userPromises = fetchedOffer.map((offer) =>
+          getUserById(offer.idCreadorOferta)
+        );
+        const ofertantes = await Promise.all(userPromises);
+        const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
+        ofertantes.forEach((offerUser) => {
+          usuariosOfertantesMap[offerUser._id] = offerUser;
+        });
+        setUsuariosOfertantes(usuariosOfertantesMap);
       }
     } catch (error) {
       console.error("Hubo un error:", error);
@@ -132,7 +145,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             }}
           >
             <Image
-              source={userCreador?.imagenDePerfil ? { uri: userCreador?.imagenDePerfil } : require("./../../assets/iconos/UserProfile.png")}
+              source={
+                userCreador?.imagenDePerfil
+                  ? { uri: userCreador?.imagenDePerfil }
+                  : require("./../../assets/iconos/UserProfile.png")
+              }
               style={styles.userImage}
             />
             <View style={styles.userNameContainer}>
@@ -192,13 +209,19 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.title}>{servicioCargado?.nombreServicio}</Text>
       {/* Imagen del servicio */}
       <View>
-      
-        <Image source={servicioCargado?.imagen ? { uri: servicioCargado?.imagen } : defaultImage} style={styles.image} />
+        <Image
+          source={
+            servicioCargado?.imagen
+              ? { uri: servicioCargado?.imagen }
+              : defaultImage
+          }
+          style={styles.image}
+        />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
-        <Text style={styles.estadoText}>
-  Estado: {obtenerTextoEstado(servicioCargado?.estado)}
-</Text>
+          <Text style={styles.estadoText}>
+            Estado: {obtenerTextoEstado(servicioCargado?.estado)}
+          </Text>
 
           <Text style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
         </View>
@@ -361,20 +384,85 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Ofertas disponibles:</Text>
-            {ofertas.map((oferta, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.ofertaItem}
-                onPress={() => {
-                  console.log("Oferta seleccionada:", oferta.Nombre);
-                  setVerOfertasModalVisible(false);
+            <Text style={styles.modalTitle}>
+              <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas
+              publicadas
+            </Text>
+            {ofertasCargadas.length > 0 ? (
+              ofertasCargadas.map((oferta, index) => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}
+                  key={index}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("PerfilAjeno", {
+                        id:
+                          usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
+                      });
+                      setVerOfertasModalVisible(false);
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      flex: 1,
+                    }}
+                  >
+                    <Image
+                      source={
+                        usuariosOfertantes[oferta.idCreadorOferta]
+                          ?.imagenDePerfil
+                          ? {
+                              uri: usuariosOfertantes[oferta.idCreadorOferta]
+                                ?.imagenDePerfil,
+                            }
+                          : require("../../assets/iconos/UserProfile.png")
+                      }
+                      style={styles.ofertaImage}
+                    />
+                    <Text
+                      style={{ marginRight: 3, maxWidth: 120 }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {usuariosOfertantes[oferta.idCreadorOferta]?.name ||
+                        "Cargando..."}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text style={{ marginRight: 10, fontWeight: "bold" }}>
+                      CLP ${oferta.montoOfertado.toLocaleString()}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedOferta(oferta);
+                        setConfirmModalVisible(true);
+                      }}
+                    >
+                      {/* Aquí puedes reemplazar el ícono por el de tu elección */}
+                      <MaterialIcons name="check" size={24} color="green" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 10,
                 }}
               >
-                <Text>{oferta.Nombre}</Text>
-                <Text>${oferta.valor}</Text>
-              </TouchableOpacity>
-            ))}
+                <Text style={{ marginRight: 10, color: "grey" }}>
+                  No hay ofertas disponibles por el momento...
+                </Text>
+              </View>
+            )}
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setVerOfertasModalVisible(false)}
@@ -384,6 +472,50 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      {/* Modal de confirmación */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmModalVisible}
+        onRequestClose={() => {
+          setConfirmModalVisible(false);
+        }}
+      >
+        <View style={styles.centeredViewModal}>
+          <View style={styles.modalViewModal}>
+            <Text style={styles.descripcionModal}>
+              Quieres aceptar la oferta por el monto de:
+            </Text>
+            <Text style={styles.amountText}>
+              CLP {selectedOferta?.montoOfertado.toLocaleString()}
+            </Text>
+            <View style={styles.modalButtonsModal}>
+              <TouchableOpacity
+                style={[styles.buttonModall, styles.cancelButtonModal]}
+                onPress={() => {
+                  setConfirmModalVisible(false);
+                }}
+              >
+                <Text style={styles.buttonTextModal}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.buttonModall, styles.createButtonModal]}
+                onPress={() => {
+                  console.log(
+                    "Oferta aceptada:",
+                    selectedOferta?.montoOfertado
+                  );
+                  setConfirmModalVisible(false);
+                  setVerOfertasModalVisible(false);
+                }}
+              >
+                <Text style={styles.buttonTextModal}>Sí</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Modal de valoración */}
       <Modal
         animationType="slide"
@@ -471,6 +603,60 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: "#343a40",
     marginBottom: 15,
+  },
+  //MODAL CONFIRMACION
+  modalButtonsModal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  centeredViewModal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  
+  modalViewModal: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    alignItems: "center",
+    elevation: 5,
+  },
+  descripcionModal: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+
+  cancelButtonModal: {
+    backgroundColor: "#FF6B6B",
+  },
+  
+  createButtonModal: {
+    backgroundColor: "#4CAF50",  // Un verde representativo para el botón de "Sí"
+  },
+  
+  buttonTextModal: {
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  buttonModall: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+  },
+  // ACA
+  amountText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#003366",
+    marginBottom: 20,
   },
   descriptionText: {
     fontSize: 17,
@@ -602,6 +788,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
+    color: "#2E86C1",
   },
   contactInfo: {
     flexDirection: "row",
@@ -615,7 +802,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: "#003366",
+    backgroundColor: "#21618C",
     borderRadius: 8,
   },
   closeButtonText: {
@@ -663,15 +850,22 @@ const styles = StyleSheet.create({
   },
 
   // Estilos para el modal de ver ofertas
-  ofertaItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#EEF2FF",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
+  ofertaImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Esto hace que la imagen sea redonda, puedes ajustar según necesites
+    marginRight: 10,
   },
+
+  // ofertaItem: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   backgroundColor: "#EEF2FF",
+  //   padding: 10,
+  //   marginBottom: 10,
+  //   borderRadius: 8,
+  // },
   buttonYellow: {
     backgroundColor: "#FFC700",
     padding: 15,
