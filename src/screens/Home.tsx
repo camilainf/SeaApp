@@ -5,6 +5,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { CategoriaPopular } from '../resources/category';
 import { getPopularCategories } from '../services/categoryService';
+import { getServicesTopOfWeek, incrementServiceClick } from '../services/serviceService';
+import { ServicioData } from '../resources/service';
+
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -12,9 +15,11 @@ type Props = {
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
+  const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
   const [categoriasPopulares, setCategoriasPopulares] = useState<CategoriaPopular[]>([]);
+  const [serviciosDestacados, setServiciosDestacados] = useState<ServicioData[]>([]);
 
-  // Al cargar el componente, obtener las categorías populares
+  // Al cargar el componente, obtener las categorías populares y los servicios top of the week
   useEffect(() => {
     const fetchCategoriasPopulares = async () => {
       try {
@@ -28,6 +33,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       }
     };
 
+    const fetchServiciosDestacados = async () => {
+      try {
+        const servicios = await getServicesTopOfWeek();
+        setServiciosDestacados(servicios);
+      } catch (error) {
+        console.error("Error al obtener los servicios destacados de la semana:", error);
+      }
+    };
+
+    fetchServiciosDestacados();
     fetchCategoriasPopulares();
   }, []);
 
@@ -36,18 +51,23 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     foto: ('https://cdn.discordapp.com/attachments/767184234427056178/1159689687384985650/image.png?ex=6531f02f&is=651f7b2f&hm=9d3e5689c1478674a4c48f4e2f69e636eabc0901c18d8b8ae81b725f23d8043b&'),
   };
 
-  const trabajosDestacados = [
-    { id: '1', titulo: 'Trabajo 1', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '2', titulo: 'Trabajo 2', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '3', titulo: 'Trabajo 3', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '4', titulo: 'Trabajo 4', imagen: require('../../assets/iconos/ImageReferencia.png') },
-    { id: '5', titulo: 'Trabajo 5', imagen: require('../../assets/iconos/ImageReferencia.png') },
-  ];
-
   const serviceIcon = require('../../assets/iconos/Work.png');
   const searchIcon = require('../../assets/iconos/Search.png');
 
   const [searchTerm, setSearchTerm] = useState('');
+
+  const handleServiceClick = async (service: any) => {
+    console.log(`Servicio clickeado con ID: ${service.id}`);
+
+    // Incrementar el contador de clics
+    try {
+        await incrementServiceClick(service.id);
+    } catch (error) {
+        console.error("Error al incrementar el contador de clics:", error);
+    }
+
+    navigation.navigate("Servicio", service);
+};
 
   return (
     <ScrollView style={styles.container}>
@@ -97,13 +117,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.tarjeta}>
           <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
           <FlatList
-            data={trabajosDestacados}
+            data={serviciosDestacados}
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                console.log('Tarjeta Trabajo clickeada:', item.titulo);
+                handleServiceClick(item)
               }}>
-                <Image source={item.imagen} style={styles.imagenTrabajo} />
-                <Text>{item.titulo}</Text>
+                <Image
+                  source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
+                  style={styles.imagenTrabajo}
+                />
+                <Text>{item.nombreServicio}</Text>
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}

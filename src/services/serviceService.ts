@@ -166,7 +166,32 @@ export const incrementServiceClick = async (id: string) => {
   return servicioData;
 }
 
+export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
+  const response = await fetch(BASE_URL + '/topOfWeek');
 
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al obtener los servicios destacados de la semana.");
+  }
+
+  const serviciosData = await response.json();
+  const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
+    id: serv._id,
+    idCreador: serv.idCreador,
+    nombreServicio: serv.nombreServicio,
+    categoria: serv.categoria,
+    descripcion: serv.descripcion,
+    fechaSolicitud: serv.fechaSolicitud,
+    horaSolicitud: serv.horaSolicitud,
+    direccion: serv.direccion,
+    monto: serv.monto,
+    imagen: serv.imagen,
+    estado: serv.estado,
+    fechaCreacion: serv.fechaCreacion
+  }));
+  
+  return servicios;
+};
 
 export const obtenerTextoEstado = (estado: number | undefined) => {
   if (estado === undefined) {
