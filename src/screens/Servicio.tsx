@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { convertirFecha } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
@@ -24,8 +23,8 @@ import { getUserById } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
-import { Oferta } from "../resources/offer";
-import { getOffersByServiceId } from "../services/offerService";
+import { Oferta, Postoferta } from "../resources/offer";
+import { OfferResponse, getOffersByServiceId, postOffer } from "../services/offerService";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -45,22 +44,22 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
   const idServicio = route.params.id || null;
   const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
-  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
-  const [confirmModalVisible, setConfirmModalVisible] =useState<boolean>(false);
-  const [usuariosOfertantes, setUsuariosOfertantes] = useState<Record<string, UsuarioCasted>>({});
+  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(
+    null
+  );
+  const [confirmModalVisible, setConfirmModalVisible] =
+    useState<boolean>(false);
+  const [usuariosOfertantes, setUsuariosOfertantes] = useState<
+    Record<string, UsuarioCasted>
+  >({});
   const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
-
   const [estadoSolicitud, setEstadoSolicitud] = useState<number>(1);
   const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
   const [esDueno, setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
+  const [userToken, setUserToken] = useState<string | null>("");
   //NO TOCAR TODAVIA ESTA VARIABLE
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
-  const [ofertaValue, setOfertaValue] = useState(""); // Estado para el valor de la oferta
-
-  const ofertas = [
-    { Nombre: "hola", valor: 3 },
-    { Nombre: "que tal", valor: 10 },
-  ];
+  const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
 
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
@@ -75,10 +74,12 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         if (fetchedServicio && fetchedServicio.idCreador) {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
           setUserCreador(fetchedUser);
-          const userToken = await getUserIdFromToken();
-          if (fetchedServicio.idCreador === userToken) {
-            console.log(`USuario cargadoo :`, fetchedServicio, '   Usuario tOKEEEN', userToken);
+          const userData = await getUserIdFromToken();
+          setUserToken(userData);
+          if (fetchedServicio.idCreador === userData) {
             setEsDueno(true);
+          } else {
+            setEsDueno(false);
           }
         }
         // 3. Aquí puedes cargar el estado de la solicitud y cualquier otro dato que necesites.
@@ -124,6 +125,63 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     fetchData();
   };
 
+  const handlePublicarOfertas = async () => {
+    if (idServicio && ofertaValue && userToken) {
+      try {
+        const postOferta = {
+          idCreadorOferta: userToken, // Deberías considerar renombrar esto a userId o similar
+          idServicio: idServicio,
+          montoOfertado: parseInt(ofertaValue),
+        };
+        const response: OfferResponse = await postOffer(postOferta);
+  
+        // Si la respuesta tiene una propiedad de éxito (esto depende de cómo estés estructurando las respuestas en tu back-end)
+        if (response.success) {
+          Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
+            {
+              text: "Ok",
+              onPress: () => console.log("Oferta creada con éxito"),
+            },
+          ]);
+        } else {
+          Alert.alert(
+            "Error",
+            response.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+            [
+              {
+                text: "Ok",
+                onPress: () => console.log("Error al crear oferta"),
+              },
+            ]
+          );
+        }
+      } catch (error) {
+        console.error("Hubo un error al crear la oferta:", error);
+        Alert.alert(
+          "Error",
+          error.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+          [
+            {
+              text: "Ok",
+              onPress: () => console.log("Error al crear oferta"),
+            },
+          ]
+        );
+      }
+    } else {
+      Alert.alert(
+        "Error",
+        "Asegúrate de haber ingresado todos los datos necesarios.",
+        [
+          {
+            text: "Ok",
+            onPress: () => console.log("Datos incompletos"),
+          },
+        ]
+      );
+    }
+  };
+  
   return (
     <ScrollView
       style={styles.container}
@@ -342,19 +400,33 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         }}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
+          <View style={{ ...styles.modalView, backgroundColor: "white" }}>
             <Text style={styles.modalTitle}>Crear oferta</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese el valor de la oferta"
-              onChangeText={(text) => setOfertaValue(text)}
-            />
-            <View style={styles.modalButtons}>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: "gray",
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ padding: 10 }}>CLP</Text>
+              <TextInput
+                style={{ flex: 1, height: 40, paddingHorizontal: 10 }}
+                placeholder="Ingrese el valor de la oferta"
+                keyboardType="number-pad"
+                maxLength={10}
+                onChangeText={(text) => setOfertaValue(text)}
+              />
+            </View>
+            <View style={{ ...styles.modalButtons, marginTop: 20 }}>
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => {
                   setCrearOfertaModalVisible(false);
-                  setOfertaValue(""); // Limpia el valor del input
+                  setOfertaValue("");
                 }}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
@@ -362,9 +434,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.createButton}
                 onPress={() => {
-                  console.log("Oferta creada:", ofertaValue);
+                  handlePublicarOfertas();
+
                   setCrearOfertaModalVisible(false);
-                  setOfertaValue(""); // Limpia el valor del input
+                  setOfertaValue("");
                 }}
               >
                 <Text style={styles.createButtonText}>Crear</Text>
@@ -616,7 +689,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.4)",
   },
-  
+
   modalViewModal: {
     width: "80%",
     padding: 20,
@@ -634,11 +707,11 @@ const styles = StyleSheet.create({
   cancelButtonModal: {
     backgroundColor: "#FF6B6B",
   },
-  
+
   createButtonModal: {
-    backgroundColor: "#4CAF50",  // Un verde representativo para el botón de "Sí"
+    backgroundColor: "#4CAF50", // Un verde representativo para el botón de "Sí"
   },
-  
+
   buttonTextModal: {
     color: "#FFFFFF",
     textAlign: "center",
@@ -759,8 +832,6 @@ const styles = StyleSheet.create({
   contactButton: {
     padding: 7,
     paddingHorizontal: 20,
-    //marginLeft:30,
-    //marginRight:80,
     backgroundColor: "#1D5F9C",
     borderRadius: 8,
     alignItems: "center",
@@ -840,7 +911,7 @@ const styles = StyleSheet.create({
   createButton: {
     flex: 1,
     backgroundColor: "#44B1EE",
-    padding: 20,
+    padding: 10,
     borderRadius: 8,
     marginLeft: 5,
   },
