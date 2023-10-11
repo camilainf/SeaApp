@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
+import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback, RefreshControl } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
@@ -7,7 +7,6 @@ import { CategoriaPopular } from '../resources/category';
 import { getPopularCategories } from '../services/categoryService';
 import { getServicesTopOfWeek, incrementServiceClick } from '../services/serviceService';
 import { ServicioData } from '../resources/service';
-
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -18,33 +17,35 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
   const [categoriasPopulares, setCategoriasPopulares] = useState<CategoriaPopular[]>([]);
   const [serviciosDestacados, setServiciosDestacados] = useState<ServicioData[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   // Al cargar el componente, obtener las categorías populares y los servicios top of the week
   useEffect(() => {
-    const fetchCategoriasPopulares = async () => {
-      try {
-        const categorias = await getPopularCategories();
-        setCategoriasPopulares(categorias.map(cat => ({
-          ...cat,
-          imagen: require('../../assets/iconos/ImageReferencia.png') // Establecer imagen por defecto, esto es temporal.
-        })));
-      } catch (error) {
-        console.error("Error al obtener las categorías populares:", error);
-      }
-    };
-
-    const fetchServiciosDestacados = async () => {
-      try {
-        const servicios = await getServicesTopOfWeek();
-        setServiciosDestacados(servicios);
-      } catch (error) {
-        console.error("Error al obtener los servicios destacados de la semana:", error);
-      }
-    };
-
-    fetchServiciosDestacados();
-    fetchCategoriasPopulares();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      setIsRefreshing(true);
+
+      const [categorias, servicios] = await Promise.all([
+        getPopularCategories(),
+        getServicesTopOfWeek()
+      ]);
+
+      setCategoriasPopulares(categorias.map(cat => ({
+        ...cat,
+        imagen: require('../../assets/iconos/ImageReferencia.png')
+      })));
+
+      setServiciosDestacados(servicios);
+
+    } catch (error) {
+      console.error("Error al cargar los datos:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const usuario = {
     nombre: 'Case',
@@ -61,16 +62,22 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
     // Incrementar el contador de clics
     try {
-        await incrementServiceClick(service.id);
+      await incrementServiceClick(service.id);
     } catch (error) {
-        console.error("Error al incrementar el contador de clics:", error);
+      console.error("Error al incrementar el contador de clics:", error);
     }
 
     navigation.navigate("Servicio", service);
-};
+  };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={loadData}
+        />
+      }>
 
       <LinearGradient
         colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
