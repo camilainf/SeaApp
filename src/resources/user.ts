@@ -15,7 +15,7 @@ type Usuario = {
 };
 
 type UsuarioCasted = {
-  id:string;
+  _id:string;
   nombre: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
