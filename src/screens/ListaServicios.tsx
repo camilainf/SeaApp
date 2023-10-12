@@ -3,7 +3,7 @@ import { View, FlatList, TouchableOpacity, Text, StyleSheet, ActivityIndicator }
 import { getLastServices, incrementServiceClick } from '../services/serviceService';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from '../routes/NavigatorTypes';
-import ServiceCard from '../components/ServiceCard';
+import TarjetaServicioYPerfil from '../components/TarjetaServicioYPerfil';
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type Props = {
@@ -101,7 +101,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
                 data={services}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleServiceClick(item)}>
-                        <ServiceCard item={item} type="servicio" />
+                        <TarjetaServicioYPerfil item={item} type="servicio" />
                     </TouchableOpacity>
                 )}
                 keyExtractor={(item) => `${item.id}`}
