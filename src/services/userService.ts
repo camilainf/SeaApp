@@ -3,9 +3,17 @@ import { UsuarioCasted } from "../resources/user";
 const BASE_URL = 'http://10.0.2.2:9000/api/users';
 //const BASE_URL = 'http://localhost:9000/api/users';
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
   const response = await fetch(BASE_URL);
-  return await response.json();
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al obtener los usuarios");
+  }
+
+  
+  const users: UsuarioCasted[] = await response.json();
+  return users;
 };
 
 export const createUser = async (user: any) => {

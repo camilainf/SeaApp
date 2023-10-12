@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/NavigatorTypes';
-import { listaCategorias, listaServicios, listaUsuarios } from '../resources/Listas';
+import { ServicioData } from '../resources/service';
+import { UsuarioCasted } from '../resources/user';
+import { getAllServices } from '../services/serviceService';
+import { getAllUsers } from '../services/userService';
 
 type BuscadorRouteProp = RouteProp<RootStackParamList, 'Buscador'>;
 
@@ -17,16 +20,43 @@ const BuscadorScreen: React.FC = ({ }) => {
     const searchIcon = require('../../assets/iconos/Search.png');
     const serviceIcon = require('../../assets/iconos/ImageReferencia.png')
 
-    const usuariosModificados = listaUsuarios.map(u => ({ ...u, id: `usuario-${u.id}` }));
-    const serviciosModificados = listaServicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
-    const categoriasModificadas = listaCategorias.map(c => ({ ...c, id: `categoria-${c.id}` }));
+    const [servicios, setServicios] = useState<ServicioData[]>([]);
+    const [usuarios, setUsuarios] = useState<UsuarioCasted[]>([]);
 
-    const allData = [...usuariosModificados, ...serviciosModificados, ...categoriasModificadas];
-    const searchResults = searchTerm.trim() !== '' ? allData.filter(item => item.nombre.toLowerCase().includes(searchTerm.toLowerCase())) : [];
+    useEffect(() => {
+        // Obtener todos los servicios
+        getAllServices()
+            .then(data => {
+                setServicios(data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los servicios:", error);
+            });
+
+        // Obtener todos los usuarios
+        getAllUsers()
+            .then(data => {
+                setUsuarios(data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los usuarios:", error);
+            });
+    }, []); // El array vacío indica que este useEffect se ejecutará solo una vez, cuando el componente se monte
+
+    const usuariosModificados = usuarios.map(u => ({ ...u, id: `usuario-${u._id}` }));
+    const serviciosModificados = servicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
+
+    const allData = [...usuariosModificados, ...serviciosModificados];
+    const searchResults = searchTerm.trim() !== ''
+        ? allData.filter(item =>
+            'nombreServicio' in item
+                ? item.nombreServicio.toLowerCase().includes(searchTerm.toLowerCase())
+                : item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : [];
 
     const handleNavigationToResult = () => {
         console.log("Navegado a la cosa seleccionada")
-        // navigation.navigate('screen');
     };
 
     return (
@@ -53,12 +83,11 @@ const BuscadorScreen: React.FC = ({ }) => {
                     data={searchResults}
                     renderItem={({ item }) => (
                         <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                            console.log('Resultado clickeado:', item.nombre);
-                            handleNavigationToResult(); // AQUI SE DEBE IMPLEMENTAR EL NAVIGATOR A LA VISTA ESPECIFICA DEPENDIENDO DEL TIPO DE ENTIDAD DEL RESULTADO QUE SE CLICKEE
+                            console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.name);
+                            handleNavigationToResult();
                         }}>
-                            {/* Puedes agregar una imagen si la tienes, de lo contrario omite esta línea */}
                             <Image source={serviceIcon} style={styles.imagenTrabajo} />
-                            <Text>{item.nombre}</Text>
+                            <Text>{'nombreServicio' in item ? item.nombreServicio : item.name}</Text>
                         </TouchableOpacity>
                     )}
                     keyExtractor={(item) => item.id}
@@ -68,7 +97,6 @@ const BuscadorScreen: React.FC = ({ }) => {
                     <Text style={styles.noResultsText}>No hay resultados</Text>
                 </View>
             )}
-
         </View>
     );
 };

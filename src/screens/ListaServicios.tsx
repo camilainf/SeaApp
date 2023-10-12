@@ -101,7 +101,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
                 data={services}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleServiceClick(item)}>
-                        <ServiceCard item={item} />
+                        <ServiceCard item={item} type="servicio" />
                     </TouchableOpacity>
                 )}
                 keyExtractor={(item) => `${item.id}`}

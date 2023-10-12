@@ -1,41 +1,62 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { ServicioData } from '../resources/service';
+import { Usuario } from '../resources/user';
 
 const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
 
 interface ServiceCardProps {
-    item: any;
+    item: ServicioData | Usuario;
+    type: 'servicio' | 'usuario';
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ item }) => {
-    return (
-        <View style={styles.serviceCard}>
-            <View style={styles.imageColumn}>
-                <Image
-                    source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
-                    style={styles.serviceImage}
-                />
-            </View>
-            <View style={styles.infoColumn}>
-                <Text style={[styles.serviceName, styles.textBold]} numberOfLines={2}>{item.nombreServicio}</Text>
-                <Text style={styles.serviceDescription} numberOfLines={3}>{item.descripcion}</Text>
+const ServiceCard: React.FC<ServiceCardProps> = ({ item, type }) => {
 
-                <View style={styles.iconRowContainer}>
-                    <View style={styles.iconRow}>
-                        <View style={styles.iconColumn}>
-                            <FontAwesome name="map-marker" size={16} color="#4593EE" />
-                            <FontAwesome name="calendar" size={16} color="#4593EE" style={styles.iconSpacing} />
-                        </View>
-                        <View style={styles.iconInfoColumn}>
-                            <Text style={styles.textBold}>{item.direccion}</Text>
-                            <Text style={styles.textBold}>{item.fechaSolicitud}</Text>
+    if (type === 'servicio') {
+        const servicioItem = item as ServicioData;
+
+        return (
+            <View style={styles.serviceCard}>
+                <View style={styles.imageColumn}>
+                    <Image
+                        source={servicioItem.imagen && servicioItem.imagen !== '' ? { uri: servicioItem.imagen } : defaultImage}
+                        style={styles.serviceImage}
+                    />
+                </View>
+                <View style={styles.infoColumn}>
+                    <Text style={[styles.serviceName, styles.textBold]} numberOfLines={2}>{servicioItem.nombreServicio}</Text>
+                    <Text style={styles.serviceDescription} numberOfLines={3}>{servicioItem.descripcion}</Text>
+    
+                    <View style={styles.iconRowContainer}>
+                        <View style={styles.iconRow}>
+                            <View style={styles.iconColumn}>
+                                <FontAwesome name="map-marker" size={16} color="#4593EE" />
+                                <FontAwesome name="calendar" size={16} color="#4593EE" style={styles.iconSpacing} />
+                            </View>
+                            <View style={styles.iconInfoColumn}>
+                                <Text style={styles.textBold}>{servicioItem.direccion}</Text>
+                                <Text style={styles.textBold}>{servicioItem.fechaSolicitud}</Text>
+                            </View>
                         </View>
                     </View>
+                    <Text style={[styles.categoryTag]} numberOfLines={2}>{servicioItem.categoria}</Text>
                 </View>
             </View>
-        </View>
-    );
+        );
+    } else {
+        const usuarioItem = item as Usuario;
+        return (
+            <View style={styles.serviceCard}>
+                <View style={styles.imageColumn}>
+                    <Image
+                        source={usuarioItem.imagenDePerfil && usuarioItem.imagenDePerfil !== '' ? { uri: usuarioItem.imagenDePerfil } : defaultImage}
+                        style={styles.serviceImage}
+                    />
+                </View>
+            </View>
+        );
+    }
 };
 
 const styles = StyleSheet.create({
@@ -65,7 +86,7 @@ const styles = StyleSheet.create({
         paddingTop: 15,    // Añade padding en la parte superior
         marginBottom: 10,
         justifyContent: 'space-between',
-        height: 200, // Restaura la altura fija
+        height: 250, // Restaura la altura fija
     },
     imageColumn: {
         width: '40%',
@@ -106,7 +127,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     iconColumn: {
-        width: '15%',
+        width: '13%',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
@@ -121,6 +142,20 @@ const styles = StyleSheet.create({
     iconSpacing: {
         marginTop: 20,
     },
+    categoryTag: {
+        fontSize: 12,
+        backgroundColor: '#8DBEEF', // Color de fondo del tag
+        color: 'white', // Cambio de color
+        textAlign: 'center',
+        overflow: 'hidden',
+        borderRadius: 10,
+        paddingVertical: 5,
+        marginTop: 10,
+        alignSelf: 'center',
+        paddingHorizontal: 10,
+        fontWeight: "500",
+    },
+
 });
 
 export default ServiceCard;
