@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { ServicioData } from '../resources/service';
-import { Usuario } from '../resources/user';
+import {UsuarioCasted } from '../resources/user';
 
 const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
 
 interface ServiceCardProps {
-    item: ServicioData | Usuario;
+    item: ServicioData | UsuarioCasted;
     type: 'servicio' | 'usuario';
 }
 
@@ -21,7 +21,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ item, type }) => {
                 <View style={styles.imageColumn}>
                     <Image
                         source={servicioItem.imagen && servicioItem.imagen !== '' ? { uri: servicioItem.imagen } : defaultImage}
-                        style={styles.serviceImage}
+                        style={styles.image}
                     />
                 </View>
                 <View style={styles.infoColumn}>
@@ -45,14 +45,23 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ item, type }) => {
             </View>
         );
     } else {
-        const usuarioItem = item as Usuario;
+        const usuarioItem = item as UsuarioCasted;
+        const nombreCompleto = [
+            usuarioItem.name,
+            usuarioItem.apellidoPaterno || '',
+            usuarioItem.apellidoMaterno || ''
+        ].join(' ').trim();
         return (
-            <View style={styles.serviceCard}>
+            <View style={styles.profileCard}>
                 <View style={styles.imageColumn}>
                     <Image
                         source={usuarioItem.imagenDePerfil && usuarioItem.imagenDePerfil !== '' ? { uri: usuarioItem.imagenDePerfil } : defaultImage}
-                        style={styles.serviceImage}
+                        style={styles.image}
                     />
+                </View>
+                <View style={styles.infoColumn}>
+                    <Text style={[styles.profileName, styles.textBold]} numberOfLines={2}>{nombreCompleto}</Text>
+                    <Text style={[styles.profileDescription]} numberOfLines={5}>Esta es una descripción de ejemplo ❤️, soy una persona muy entusiasmada por trabajar ⭐, denme pega por favor 😥, haré bien mi trabajo LO PROMETO LO JURO.</Text>
                 </View>
             </View>
         );
@@ -82,32 +91,44 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         borderRadius: 10,
         padding: 5,
-        paddingBottom: 15, // Añade padding en la parte inferior
-        paddingTop: 15,    // Añade padding en la parte superior
+        paddingBottom: 15,
+        paddingTop: 15,
         marginBottom: 10,
         justifyContent: 'space-between',
-        height: 250, // Restaura la altura fija
+        height: 250, 
+    },
+    profileCard: {
+        flexDirection: 'row',
+        backgroundColor: '#EEF9FF',
+        marginHorizontal: 15,
+        borderRadius: 10,
+        padding: 5,
+        paddingBottom: 15,
+        paddingTop: 15,
+        marginBottom: 10,
+        justifyContent: 'space-between',
+        height: 250,
     },
     imageColumn: {
         width: '40%',
-        height: '100%', // Establece la altura al 100% de serviceCard
+        height: '100%', 
         marginLeft: 5
 
     },
-    serviceImage: {
+    image: {
         width: '100%',
-        height: '100%', // Establece la altura al 100% de imageColumn
+        height: '100%', 
         resizeMode: 'cover',
     },
     infoColumn: {
         width: '60%',
-        height: '100%', // Establece la altura al 100% de serviceCard
+        height: '100%', 
         paddingHorizontal: 10,
-        justifyContent: 'space-between', // Alinea el contenido verticalmente
+        justifyContent: 'center', // Centra el contenido verticalmente
     },
     serviceName: {
         fontSize: 18,
-        color: '#4593EE', // Cambio de color
+        color: '#4593EE',
         height: 40,
         textAlign: 'center',
         overflow: 'hidden',
@@ -115,7 +136,7 @@ const styles = StyleSheet.create({
     serviceDescription: {
         marginVertical: 10,
         height: 70,
-        color: '#4593EE', // Cambio de color
+        color: '#4593EE',
         textAlign: 'justify',
         overflow: 'hidden',
     },
@@ -136,16 +157,16 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     textBold: {
-        fontWeight: 'bold', // Estilo en negrita
-        color: '#4593EE', // Cambio de color
+        fontWeight: 'bold', 
+        color: '#4593EE',
     },
     iconSpacing: {
         marginTop: 20,
     },
     categoryTag: {
         fontSize: 12,
-        backgroundColor: '#8DBEEF', // Color de fondo del tag
-        color: 'white', // Cambio de color
+        backgroundColor: '#8DBEEF',
+        color: 'white',
         textAlign: 'center',
         overflow: 'hidden',
         borderRadius: 10,
@@ -154,6 +175,20 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         paddingHorizontal: 10,
         fontWeight: "500",
+    },
+    profileName: {
+        fontSize: 18,
+        color: '#4593EE',
+        textAlign: 'center',
+        overflow: 'hidden',
+        marginBottom: 5, // Reduce el margen inferior
+    },
+
+    profileDescription: {
+        marginTop: 5, // Reduce el margen superior
+        color: '#4593EE',
+        textAlign: 'justify',
+        overflow: 'hidden',
     },
 
 });

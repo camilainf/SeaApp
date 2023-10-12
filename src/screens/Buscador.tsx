@@ -6,10 +6,20 @@ import { ServicioData } from '../resources/service';
 import { UsuarioCasted } from '../resources/user';
 import { getAllServices } from '../services/serviceService';
 import { getAllUsers } from '../services/userService';
+import ServiceCard from '../components/ServiceCard';
+import { StackNavigationProp } from "@react-navigation/stack";
+import { getUserIdFromToken } from '../services/authService';
 
+type Props = {
+    navigation: BuscadorNavigationProp;
+    route: BuscadorRouteProp;
+};
+
+type BuscadorNavigationProp = StackNavigationProp<RootStackParamList, 'Buscador'>;
 type BuscadorRouteProp = RouteProp<RootStackParamList, 'Buscador'>;
 
-const BuscadorScreen: React.FC = ({ }) => {
+
+const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
 
     const route = useRoute<BuscadorRouteProp>();
 
@@ -43,8 +53,8 @@ const BuscadorScreen: React.FC = ({ }) => {
             });
     }, []); // El array vacío indica que este useEffect se ejecutará solo una vez, cuando el componente se monte
 
-    const usuariosModificados = usuarios.map(u => ({ ...u, id: `usuario-${u._id}` }));
-    const serviciosModificados = servicios.map(s => ({ ...s, id: `servicio-${s.id}` }));
+    const usuariosModificados = usuarios.map(u => ({ ...u, id: `${u._id}` }));
+    const serviciosModificados = servicios.map(s => ({ ...s, id: `${s.id}` }));
 
     const allData = [...usuariosModificados, ...serviciosModificados];
     const searchResults = searchTerm.trim() !== ''
@@ -55,9 +65,26 @@ const BuscadorScreen: React.FC = ({ }) => {
         )
         : [];
 
-    const handleNavigationToResult = () => {
-        console.log("Navegado a la cosa seleccionada")
-    };
+        const handleNavigationToResult = async (item: ServicioData | UsuarioCasted) => {
+            if ('nombreServicio' in item) {
+                // Es un servicio
+                navigation.navigate('Servicio', { id: item.id });
+            } else {
+                // Es un usuario
+                const userIdFromToken = await getUserIdFromToken();
+                if (item._id === userIdFromToken) {
+                    // Es el perfil propio
+                    navigation.navigate('Main', {
+                        screen: 'Perfil',
+                        params: { id: item._id },
+                    } as any);
+
+                } else {
+                    // Es un perfil ajeno
+                    navigation.navigate('PerfilAjeno', { id: item._id });
+                }
+            }
+        };
 
     return (
         <View style={styles.container}>
@@ -79,24 +106,26 @@ const BuscadorScreen: React.FC = ({ }) => {
 
             {/* Resultados */}
             {searchResults.length > 0 ? (
-                <FlatList
-                    data={searchResults}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+            <FlatList
+                data={searchResults}
+                renderItem={({ item }) => {
+                    const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
+                    return (
+                        <TouchableOpacity onPress={() => {
                             console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.name);
-                            handleNavigationToResult();
+                            handleNavigationToResult(item);
                         }}>
-                            <Image source={serviceIcon} style={styles.imagenTrabajo} />
-                            <Text>{'nombreServicio' in item ? item.nombreServicio : item.name}</Text>
+                            <ServiceCard item={item} type={itemType} />
                         </TouchableOpacity>
-                    )}
-                    keyExtractor={(item) => item.id}
-                />
-            ) : (
-                <View>
-                    <Text style={styles.noResultsText}>No hay resultados</Text>
-                </View>
-            )}
+                    );
+                }}
+                keyExtractor={(item) => item.id}
+            />
+        ) : (
+            <View>
+                <Text style={styles.noResultsText}>No hay resultados</Text>
+            </View>
+        )}
         </View>
     );
 };
