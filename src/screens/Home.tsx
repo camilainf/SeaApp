@@ -10,7 +10,7 @@ import { ServicioData } from '../resources/service';
 import { UsuarioCasted } from '../resources/user';
 import { getUserIdFromToken } from '../services/authService';
 import { getUserById } from '../services/userService';
-import TarjetaSuperior from '../components/TarjetaSuperior';
+import TarjetaSuperiorHome from '../components/TarjetaSuperiorHome';
 import Buscador from '../components/Buscador';
 import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
 
@@ -90,7 +90,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       />
       <View style={styles.contentContainer}>
 
-        <TarjetaSuperior usuario={usuario} />
+        <TarjetaSuperiorHome usuario={usuario} />
 
         <Buscador onSearch={(term) => {
           console.log('Ícono de búsqueda clickeado');

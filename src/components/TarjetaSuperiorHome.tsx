@@ -2,23 +2,34 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { UsuarioCasted } from '../resources/user';
 
-type TarjetaSuperiorProps = {
+type TarjetaSuperiorHomeProps = {
     usuario: UsuarioCasted | undefined;
 };
 
-const TarjetaSuperior: React.FC<TarjetaSuperiorProps> = ({ usuario }) => {
-    const defaultFotoPerfil = require('../../assets/iconos/UserProfileRegistro.png'); // Importa la imagen predeterminada
+const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario }) => {
+    const defaultFotoPerfil = require('../../assets/iconos/UserProfileRegistro.png');
     const imagenPerfil = usuario?.imagenDePerfil ? { uri: usuario.imagenDePerfil } : defaultFotoPerfil;
+    const logo = require('../../assets/seaJoblogo.png');
 
     return (
-        <View style={styles.tarjetaSuperior}>
+        <View style={styles.tarjeta}>
+            {/* Logo y foto de perfil */}
             <View style={styles.fila}>
-                <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
-                <Text style={styles.saludo}>Hola {usuario?.nombre}!</Text>
+                <View style={styles.containerLogo}>
+                    <Image source={logo} style={styles.logo} />
+                </View>
+                <View style={styles.containerSaludo}>
+                    <Text style={styles.saludo}>Hola {usuario?.nombre}!</Text>
+                </View>
             </View>
+
+            {/* Saludo y ganancias */}
             <View style={styles.fila}>
-                <Image source={imagenPerfil} style={styles.fotoPerfil} />
-                <View style={styles.gananciasContainer}>
+                <View style={styles.containerFoto}>
+                    <Image source={imagenPerfil} style={styles.fotoPerfil} />
+                </View>
+
+                <View style={styles.containerGanancias}>
                     <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
                     <Text style={styles.gananciaNumero}>$39.000 CLP</Text>
                 </View>
@@ -28,50 +39,52 @@ const TarjetaSuperior: React.FC<TarjetaSuperiorProps> = ({ usuario }) => {
 };
 
 const styles = StyleSheet.create({
-    tarjetaSuperior: {
+    tarjeta: {
         padding: 16,
         backgroundColor: '#FFF',
         borderRadius: 20,
         marginBottom: 16,
         shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.23,
-        shadowRadius: 2.62,
         elevation: 6,
     },
     fila: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 8,
+        marginVertical: 5,
+    },
+    containerLogo: {
+        width: '40%',
+        alignItems: 'center',
     },
     logo: {
-        width: 150,
+        width: '100%',
         height: 30,
         resizeMode: 'contain',
     },
-
+    containerSaludo: {
+        width: '60%',
+        alignItems: 'center',
+    },
     saludo: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#66638C',
     },
-
+    containerFoto: {
+        width: '40%',
+        alignItems: 'center',
+    },
     fotoPerfil: {
         width: 110,
         height: 110,
         borderRadius: 60,
         resizeMode: 'cover',
     },
-
-    gananciasContainer: {
+    containerGanancias: {
         alignItems: 'center',
         marginRight: 16,
+        width: '60%',
     },
-
     gananciaTexto: {
         fontSize: 15,
         fontWeight: '700',
@@ -81,15 +94,14 @@ const styles = StyleSheet.create({
         color: '#0182AB',
         marginBottom: 8,
     },
-
     gananciaNumero: {
         fontSize: 30,
         fontWeight: '400',
         lineHeight: 30,
         letterSpacing: 0,
         textAlign: 'left',
-        color: '#47AE64', // Puedes ajustar el tono de verde según prefieras
+        color: '#47AE64',
     },
 });
 
-export default TarjetaSuperior;
+export default TarjetaSuperiorHome;
