@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/NavigatorTypes';
 import { ServicioData } from '../resources/service';
@@ -86,13 +86,15 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
     return (
         <View style={styles.container}>
             {/* Buscador */}
-            <Buscador 
-                onSearch={(term) => {
-                    setSearchTerm(term);
-                    console.log('Ícono de búsqueda clickeado');
-                }}
-                initialValue={initialSearchTerm}
-            />
+            <View style={{ paddingHorizontal: 20 }}>
+                <Buscador
+                    onSearch={(term) => {
+                        setSearchTerm(term);
+                        console.log('Ícono de búsqueda clickeado');
+                    }}
+                    initialValue={initialSearchTerm}
+                />
+            </View>
 
             {/* Resultados */}
             {searchResults.length > 0 ? (
@@ -123,7 +125,6 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 20,
         backgroundColor: '#FFFFFF',
     },
 

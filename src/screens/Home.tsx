@@ -158,7 +158,6 @@ const styles = StyleSheet.create({
   // ESTILOS GENERALES
 
   container: {
-    paddingVertical: 0,
     backgroundColor: '#FFFFFF',
   },
 
