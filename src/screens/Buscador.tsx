@@ -61,7 +61,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
         ? allData.filter(item =>
             'nombreServicio' in item
                 ? item.nombreServicio.toLowerCase().includes(searchTerm.toLowerCase())
-                : item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                : item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
         )
         : [];
 
@@ -112,7 +112,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
                     const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
                     return (
                         <TouchableOpacity onPress={() => {
-                            console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.name);
+                            console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.nombre);
                             handleNavigationToResult(item);
                         }}>
                             <ServiceCard item={item} type={itemType} />

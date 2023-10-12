@@ -91,22 +91,22 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           getUserById(offer.idCreadorOferta)
         );
         const ofertantes = await Promise.all(userPromises);
-        const ofertantesMapped: UsuarioCasted[] = ofertantes.map(
-          (usr: any) => ({
-            id: usr._id,
-            nombre: usr.nombre,
-            apellidoPaterno: usr.ApellidoMaterno,
-            apellidoMaterno: usr.ApellidoPaterno,
-            descripcion: usr.Descripcion,
-            email: usr.email,
-            telefono: usr.telefono,
-            imagenDePerfil: usr.imagenDePerfil,
-            calificacion: usr.calificacion,
-          })
-        );
+        // const ofertantesMapped: UsuarioCasted[] = ofertantes.map(
+        //   (usr: any) => ({
+        //     id: usr._id,
+        //     nombre: usr.nombre,
+        //     apellidoPaterno: usr.ApellidoMaterno,
+        //     apellidoMaterno: usr.ApellidoPaterno,
+        //     descripcion: usr.Descripcion,
+        //     email: usr.email,
+        //     telefono: usr.telefono,
+        //     imagenDePerfil: usr.imagenDePerfil,
+        //     calificacion: usr.calificacion,
+        //   })
+        // );
         const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
-        ofertantesMapped.forEach((offerUser) => {
-          usuariosOfertantesMap[offerUser.id] = offerUser;
+        ofertantes.forEach((offerUser) => {
+          usuariosOfertantesMap[offerUser._id] = offerUser;
         });
         setUsuariosOfertantes(usuariosOfertantesMap);
       }
@@ -491,7 +491,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     onPress={() => {
                       navigation.navigate("PerfilAjeno", {
                         id:
-                          usuariosOfertantes[oferta.idCreadorOferta]?.id || "",
+                          usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
                       });
                       setVerOfertasModalVisible(false);
                     }}
