@@ -166,10 +166,6 @@ export const updateServiceStatus = async (id: string, estado: number) => {
   return servicioData;
 }
 
-export const getOffersByServiceId = (serviceId: string) => {}
-
-export const getOfferAcceptedByServiceId = (serviceId: string) => {}
-
 
 export const incrementServiceClick = async (id: string) => {
   const response = await fetch(`${BASE_URL}/incrementClick/${id}`, {

@@ -60,6 +60,7 @@ const AppNavigator: React.FC = () => {
                         headerShown: true, // Muestra la barra superior
                         headerBackTitleVisible: false, // Oculta el título de volver atrás
                         headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                        
                     }}
                 />
 
