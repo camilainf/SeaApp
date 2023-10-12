@@ -91,8 +91,21 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           getUserById(offer.idCreadorOferta)
         );
         const ofertantes = await Promise.all(userPromises);
+        const ofertantesMapped: UsuarioCasted[] = ofertantes.map(
+          (usr: any) => ({
+            id: usr._id,
+            nombre: usr.nombre,
+            apellidoPaterno: usr.ApellidoMaterno,
+            apellidoMaterno: usr.ApellidoPaterno,
+            descripcion: usr.Descripcion,
+            email: usr.email,
+            telefono: usr.telefono,
+            imagenDePerfil: usr.imagenDePerfil,
+            calificacion: usr.calificacion,
+          })
+        );
         const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
-        ofertantes.forEach((offerUser) => {
+        ofertantesMapped.forEach((offerUser) => {
           usuariosOfertantesMap[offerUser.id] = offerUser;
         });
         setUsuariosOfertantes(usuariosOfertantesMap);
@@ -133,9 +146,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           idServicio: idServicio,
           montoOfertado: parseInt(ofertaValue),
         };
-        
+
         const response = await postOffer(postOferta);
-  
+
         // Si llegas aquí, la oferta se ha creado correctamente
         Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
           {
@@ -143,32 +156,32 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             onPress: () => console.log("Oferta creada con éxito"),
           },
         ]);
-  
       } catch (error) {
         if (error instanceof Error) {
-            console.error("Hubo un error al crear la oferta:", error.message);
-            Alert.alert(
-                "Error",
-                error.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-                [
-                    {
-                        text: "Ok",
-                        onPress: () => console.log("Error al crear oferta"),
-                    },
-                ]
-            );
+          console.error("Hubo un error al crear la oferta:", error.message);
+          Alert.alert(
+            "Error",
+            error.message ||
+              "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+            [
+              {
+                text: "Ok",
+                onPress: () => console.log("Error al crear oferta"),
+              },
+            ]
+          );
         } else {
-            console.error("Hubo un error al crear la oferta:", error);
-            Alert.alert(
-                "Error",
-                "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-                [
-                    {
-                        text: "Ok",
-                        onPress: () => console.log("Error al crear oferta"),
-                    },
-                ]
-            );
+          console.error("Hubo un error al crear la oferta:", error);
+          Alert.alert(
+            "Error",
+            "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+            [
+              {
+                text: "Ok",
+                onPress: () => console.log("Error al crear oferta"),
+              },
+            ]
+          );
         }
       }
     } else {
@@ -184,8 +197,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       );
     }
   };
-  
-  
+
   return (
     <ScrollView
       style={styles.container}

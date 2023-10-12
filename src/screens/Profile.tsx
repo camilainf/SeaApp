@@ -170,7 +170,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 style={{
                   fontSize: 20,
                   fontWeight: "bold",
-                  color: "#4E479A",
+                  color: "#0797FF",
                   paddingLeft: 15,
                 }}
               >
@@ -391,13 +391,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    color: "#4E479A",
+    color: "#0797FF",
     fontWeight: "bold",
     textAlign: "center",
   },
   contactButton: {
     marginTop: 10,
-    backgroundColor: "#4E479A",
+    backgroundColor: "#0797FF",
     padding: 5,
     borderRadius: 15,
     alignItems: "center",
@@ -477,11 +477,11 @@ const styles = StyleSheet.create({
     paddingLeft: 8, // Espacio entre las dos columnas
   },
   textoSolicitudes: {
-    color: "#4E479A",
+    color: "#0797FF",
     fontSize: 17,
   },
   numberText: {
-    color: "#4E479A",
+    color: "#0797FF",
     fontWeight: "400",
     fontSize: 30,
     paddingHorizontal: 10,
