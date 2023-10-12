@@ -47,7 +47,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ item, type }) => {
     } else {
         const usuarioItem = item as UsuarioCasted;
         const nombreCompleto = [
-            usuarioItem.name,
+            usuarioItem.nombre,
             usuarioItem.apellidoPaterno || '',
             usuarioItem.apellidoMaterno || ''
         ].join(' ').trim();
