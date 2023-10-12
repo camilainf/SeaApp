@@ -53,7 +53,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
 
   const handleNavigationToRegister = () => {
-    navigation.navigate("Register");
+    navigation.navigate("Registro");
   };
 
   return (

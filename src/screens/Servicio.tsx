@@ -93,7 +93,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         const ofertantes = await Promise.all(userPromises);
         const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
         ofertantes.forEach((offerUser) => {
-          usuariosOfertantesMap[offerUser._id] = offerUser;
+          usuariosOfertantesMap[offerUser.id] = offerUser;
         });
         setUsuariosOfertantes(usuariosOfertantesMap);
       }
@@ -220,7 +220,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 ellipsizeMode="tail"
                 style={styles.userName}
               >
-                {userCreador?.name} {userCreador?.apellidoPaterno}{" "}
+                {userCreador?.nombre} {userCreador?.apellidoPaterno}{" "}
                 {userCreador?.apellidoMaterno}
               </Text>
             </View>
@@ -479,7 +479,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     onPress={() => {
                       navigation.navigate("PerfilAjeno", {
                         id:
-                          usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
+                          usuariosOfertantes[oferta.idCreadorOferta]?.id || "",
                       });
                       setVerOfertasModalVisible(false);
                     }}
@@ -506,7 +506,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      {usuariosOfertantes[oferta.idCreadorOferta]?.name ||
+                      {usuariosOfertantes[oferta.idCreadorOferta]?.nombre ||
                         "Cargando..."}
                     </Text>
                   </TouchableOpacity>

@@ -1,7 +1,7 @@
 import {ServicioData} from '../resources/service'
 export type RootStackParamList = {
     Auth: undefined;
-    Register: undefined;
+    Registro: undefined;
     Buscador: {
         keyword: string;
     };

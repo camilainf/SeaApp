@@ -4,7 +4,7 @@ import { RootStackParamList } from './NavigatorTypes';
 import Login from '../screens/Login';
 import TabGroup from '../components/TabNavigator';
 import { NavigationContainer } from '@react-navigation/native';
-import Register from '../screens/Register';
+import Registro from '../screens/Registro';
 import BuscadorScreen from '../screens/Buscador';
 import ServicioScreen from '../screens/Servicio';
 import TerminosCondiciones from '../screens/TerminosCondiciones';
@@ -24,8 +24,8 @@ const AppNavigator: React.FC = () => {
                 />
 
                 <Stack.Screen
-                    name="Register"
-                    component={Register}
+                    name="Registro"
+                    component={Registro}
                 />
 
                 <Stack.Screen

@@ -15,10 +15,11 @@ type Usuario = {
 };
 
 type UsuarioCasted = {
-  _id:string;
-  name: string;
+  id:string;
+  nombre: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
+  descripcion: string;
   email: string;
   telefono: string;
   imagenDePerfil?: string;

@@ -144,7 +144,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             />
           </View>
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
-            {usuarioData?.name} {usuarioData?.apellidoPaterno}{" "}
+            {usuarioData?.nombre} {usuarioData?.apellidoPaterno}{" "}
             {usuarioData?.apellidoMaterno}
           </Text>
           <TouchableOpacity
