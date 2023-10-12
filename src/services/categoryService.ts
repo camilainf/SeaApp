@@ -2,6 +2,7 @@ import { Categoria, CategoriaPopular } from "../resources/category";
 
 const BASE_URL = 'http://10.0.2.2:9000/api/categories';
 //const BASE_URL = 'http://localhost:9000/api/categories';
+// const BASE_URL = 'http://192.168.0.112:9000/api/categories';
 
 export const getAllCategories = async (): Promise<Categoria[]> => {
   const response = await fetch(BASE_URL);

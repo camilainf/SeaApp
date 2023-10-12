@@ -2,6 +2,7 @@ import { ServicioData, ServicioDataNew } from "../resources/service";
 
 const BASE_URL = 'http://10.0.2.2:9000/api/services';
 //const BASE_URL = 'http://localhost:9000/api/services';
+// const BASE_URL = 'http://192.168.0.112:9000/api/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
   const response = await fetch(BASE_URL);
