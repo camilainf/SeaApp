@@ -24,7 +24,7 @@ import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
-import { OfferResponse, getOffersByServiceId, postOffer } from "../services/offerService";
+import { getOffersByServiceId, postOffer } from "../services/offerService";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -129,44 +129,47 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     if (idServicio && ofertaValue && userToken) {
       try {
         const postOferta = {
-          idCreadorOferta: userToken, // Deberías considerar renombrar esto a userId o similar
+          idCreadorOferta: userToken,
           idServicio: idServicio,
           montoOfertado: parseInt(ofertaValue),
         };
-        const response: OfferResponse = await postOffer(postOferta);
+        
+        const response = await postOffer(postOferta);
   
-        // Si la respuesta tiene una propiedad de éxito (esto depende de cómo estés estructurando las respuestas en tu back-end)
-        if (response.success) {
-          Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
-            {
-              text: "Ok",
-              onPress: () => console.log("Oferta creada con éxito"),
-            },
-          ]);
-        } else {
-          Alert.alert(
-            "Error",
-            response.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-            [
-              {
-                text: "Ok",
-                onPress: () => console.log("Error al crear oferta"),
-              },
-            ]
-          );
-        }
+        // Si llegas aquí, la oferta se ha creado correctamente
+        Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
+          {
+            text: "Ok",
+            onPress: () => console.log("Oferta creada con éxito"),
+          },
+        ]);
+  
       } catch (error) {
-        console.error("Hubo un error al crear la oferta:", error);
-        Alert.alert(
-          "Error",
-          error.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-          [
-            {
-              text: "Ok",
-              onPress: () => console.log("Error al crear oferta"),
-            },
-          ]
-        );
+        if (error instanceof Error) {
+            console.error("Hubo un error al crear la oferta:", error.message);
+            Alert.alert(
+                "Error",
+                error.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+                [
+                    {
+                        text: "Ok",
+                        onPress: () => console.log("Error al crear oferta"),
+                    },
+                ]
+            );
+        } else {
+            console.error("Hubo un error al crear la oferta:", error);
+            Alert.alert(
+                "Error",
+                "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
+                [
+                    {
+                        text: "Ok",
+                        onPress: () => console.log("Error al crear oferta"),
+                    },
+                ]
+            );
+        }
       }
     } else {
       Alert.alert(
@@ -181,6 +184,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       );
     }
   };
+  
   
   return (
     <ScrollView

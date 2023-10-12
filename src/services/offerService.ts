@@ -1,12 +1,7 @@
 import { Oferta, Postoferta } from "../resources/offer";
 
 const BASE_URL = 'http://10.0.2.2:9000/api/offers';
-export interface OfferResponse {
-    success?: boolean;
-    message?: string;
-    // Otros campos que pueda devolver tu back-end
-  }
-  
+
 
 export const getOffersByServiceId = async (serviceId: string) : Promise<Oferta[]>=> {
     const response = await fetch(BASE_URL+"/getOfferOfService/"+serviceId);
@@ -34,7 +29,7 @@ export const getOfferAcceptedByServiceId = async (serviceId: string): Promise<Of
     return offer;
 }
 
-export const postOffer = async (offer: any): Promise<OfferResponse> => {
+export const postOffer = async (offer: any) => {
     try {
         const response = await fetch(BASE_URL + '/createOffer', {
             method: 'POST',
