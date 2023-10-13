@@ -17,12 +17,12 @@ const SinSolicitudes = () => (
         width: 60,
         height: 60,
         borderRadius: 50,
-        backgroundColor: "#EEF2FF",
+        backgroundColor: "#F2F4F4",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <Text style={{ fontSize: 30, color: "#4E479A" }}>!</Text>
+      <Text style={{ fontSize: 30, color: "#7F8C8D" }}>!</Text>
     </View>
 
     <Text
@@ -30,7 +30,7 @@ const SinSolicitudes = () => (
         textAlign: "center",
         marginVertical: 5,
         fontSize: 18,
-        color: "#4E479A",
+        color: "#2C3E50",
         fontWeight: "300",
       }}
     >

@@ -170,7 +170,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 style={{
                   fontSize: 20,
                   fontWeight: "bold",
-                  color: "#0797FF",
+                  color: "#415C80",
                   paddingLeft: 15,
                 }}
               >
@@ -241,10 +241,10 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text
             style={{
               fontSize: 20,
-              fontWeight: "400",
+              fontWeight: "bold",
               marginBottom: 8,
               paddingLeft: 15,
-              color: "#4E479A",
+              color: "#415C80",
             }}
           >
             Solicitudes creadas
@@ -273,12 +273,12 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     <Text
                       numberOfLines={1}
                       ellipsizeMode="tail"
-                      style={{ color: "#4E479A", fontWeight: "bold" }}
+                      style={{ color: "#50719D", fontWeight: "bold" }}
                     >
                       {item.nombreServicio}
                     </Text>
-                    <Text style={{ color: "#4E479A" }}>
-                      {convertirFecha(item.fechaSolicitud)}
+                    <Text style={{ color: "#50719D" }}>
+                      <FontAwesome name="calendar" size={15} color="#50719D" /> {" "} {convertirFecha(item.fechaSolicitud)}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -302,10 +302,10 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text
             style={{
               fontSize: 20,
-              fontWeight: "400",
+              fontWeight: "bold",
               marginBottom: 10,
               paddingLeft: 15,
-              color: "#4E479A",
+              color: "#3B5373",
             }}
           >
             Solicitudes Aceptadas
@@ -338,8 +338,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     >
                       {item.nombreServicio}
                     </Text>
-                    <Text style={{ color: "#4E479A" }}>
-                      {convertirFecha(item.fechaSolicitud)}
+                    <Text style={{ color: "#50719D" }}>
+                    <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -391,13 +391,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    color: "#0797FF",
+    color: "#415C80",
     fontWeight: "bold",
     textAlign: "center",
   },
   contactButton: {
     marginTop: 10,
-    backgroundColor: "#0797FF",
+    backgroundColor: "#0787E2",
     padding: 5,
     borderRadius: 15,
     alignItems: "center",
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     paddingTop: 30,
-    color: "#322E61",
+    color: "#435A9B",
   },
   infoLine: {
     flexDirection: "row",
@@ -433,11 +433,11 @@ const styles = StyleSheet.create({
   },
   datosUser: {
     fontSize: 16,
-    color: "#322E61",
+    color: "#546E7A",
   },
   textoDatosUser: {
     fontSize: 16,
-    color: "#322E61",
+    color: "#546E7A",
     fontWeight: "bold",
   },
   summaryCard: {
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 5,
     marginHorizontal: 20,
-    backgroundColor: "#FFF",
+    backgroundColor: "white",
     borderRadius: 15,
     marginBottom: 16,
     borderWidth: 3,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   resumenTexto: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#4E479A",
+    color: "white",
   },
   columnaIzquierda: {
     flex: 0.3,
@@ -477,17 +477,17 @@ const styles = StyleSheet.create({
     paddingLeft: 8, // Espacio entre las dos columnas
   },
   textoSolicitudes: {
-    color: "#0797FF",
+    color: "#0676C6",
     fontSize: 17,
   },
   numberText: {
-    color: "#0797FF",
+    color: "#0676C6",
     fontWeight: "400",
     fontSize: 30,
     paddingHorizontal: 10,
   },
   gananciaDineroTexto: {
-    color: "#4E479A",
+    color: "#0676C6",
     fontWeight: "500",
     fontSize: 15,
   },
@@ -495,24 +495,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     textAlign: "center",
-    color: "#47AE64", // Puedes ajustar el tono de verde según prefieras
+    color: "green", // Puedes ajustar el tono de verde según prefieras
   },
   numberContainer: {
     width: 75, // Puedes ajustar este valor según la cantidad máxima de dígitos que esperas
     alignItems: "flex-end", // Alinea el texto a la derecha
   },
   // Tarjeta de solicitudes
-  tarjetaSolicitudes: {
-    padding: 16,
-    backgroundColor: "#F3F6FF",
-    borderRadius: 8,
-    marginBottom: 16,
-  },
 
   tarjetaTrabajo: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F6FF",
+    backgroundColor: "#FCFCFC",
     padding: 16,
     marginBottom: 20,
     elevation: 4,
