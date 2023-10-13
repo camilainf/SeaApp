@@ -26,6 +26,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
+
   useEffect(() => {
     loadData();
   }, []);
@@ -48,7 +49,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
       setCategoriasPopulares(categorias.map(cat => ({
         ...cat,
-        imagen: require('../../assets/iconos/ImageReferencia.png')
       })));
 
       setServiciosDestacados(servicios);
@@ -131,7 +131,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   navigation.navigate('ListaServicios', { categoria: item.nombre });
                 }}
               >
-                <Image source={require('../../assets/iconos/ImageReferencia.png')} style={styles.imagenCategoria} />
+                <Image
+                  source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
+                  style={styles.imagenCategoria}
+                />
                 <Text style={styles.tituloCategoria}>{item.nombre}</Text>
               </TouchableOpacity>
             )}
@@ -140,6 +143,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             scrollEnabled={false}
           />
         </View>
+
 
         {/* Ve los ultimos trabajos */}
         <TarjetaUltimosTrabajos onPress={() => {
