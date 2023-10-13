@@ -24,7 +24,7 @@ import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
-import { getOffersByServiceId, postOffer } from "../services/offerService";
+import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -36,30 +36,30 @@ type Props = {
 const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   //Variables Independientes de la vista
   const route = useRoute<ServicioRouteProp>();
+  const idServicio = route.params.id || null;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [valorarModalVisible, setValorarModalVisible] = useState(false); // Estado del modal de valoración
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
   const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
-  const idServicio = route.params.id || null;
   const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
   const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(
     null
   );
   const [confirmModalVisible, setConfirmModalVisible] =
     useState<boolean>(false);
+
   const [usuariosOfertantes, setUsuariosOfertantes] = useState<
     Record<string, UsuarioCasted>
   >({});
   const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
-  const [estadoSolicitud, setEstadoSolicitud] = useState<number>(1);
   const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
   const [esDueno, setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
   const [userToken, setUserToken] = useState<string | null>("");
-  //NO TOCAR TODAVIA ESTA VARIABLE
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
+  const [ofertaSeleccionada, setOfertaSeleccionada] = useState<Oferta | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
@@ -82,33 +82,23 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             setEsDueno(false);
           }
         }
-        // 3. Aquí puedes cargar el estado de la solicitud y cualquier otro dato que necesites.
-        // Por ejemplo:
-        setEstadoSolicitud(fetchedServicio.estado);
+        //Carga de todas las ofertas del servicio
         const fetchedOffer = await getOffersByServiceId(idServicio);
         setOfertasCargadas(fetchedOffer);
+        //Carga de todos los usuarios ofertantes
         const userPromises = fetchedOffer.map((offer) =>
           getUserById(offer.idCreadorOferta)
         );
         const ofertantes = await Promise.all(userPromises);
-        // const ofertantesMapped: UsuarioCasted[] = ofertantes.map(
-        //   (usr: any) => ({
-        //     id: usr._id,
-        //     nombre: usr.nombre,
-        //     apellidoPaterno: usr.ApellidoMaterno,
-        //     apellidoMaterno: usr.ApellidoPaterno,
-        //     descripcion: usr.Descripcion,
-        //     email: usr.email,
-        //     telefono: usr.telefono,
-        //     imagenDePerfil: usr.imagenDePerfil,
-        //     calificacion: usr.calificacion,
-        //   })
-        // );
         const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
         ofertantes.forEach((offerUser) => {
           usuariosOfertantesMap[offerUser._id] = offerUser;
         });
         setUsuariosOfertantes(usuariosOfertantesMap);
+        //Carga de la oferta seleccionada
+        const fetchedOfferSelected = await getOfferAcceptedByServiceId(idServicio)
+        setOfertaSeleccionada(fetchedOfferSelected); 
+      
       }
     } catch (error) {
       console.error("Hubo un error:", error);
@@ -138,65 +128,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     fetchData();
   };
 
-  const handlePublicarOfertas = async () => {
-    if (idServicio && ofertaValue && userToken) {
-      try {
-        const postOferta = {
-          idCreadorOferta: userToken,
-          idServicio: idServicio,
-          montoOfertado: parseInt(ofertaValue),
-        };
-
-        const response = await postOffer(postOferta);
-
-        // Si llegas aquí, la oferta se ha creado correctamente
-        Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
-          {
-            text: "Ok",
-            onPress: () => console.log("Oferta creada con éxito"),
-          },
-        ]);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error("Hubo un error al crear la oferta:", error.message);
-          Alert.alert(
-            "Error",
-            error.message ||
-              "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-            [
-              {
-                text: "Ok",
-                onPress: () => console.log("Error al crear oferta"),
-              },
-            ]
-          );
-        } else {
-          console.error("Hubo un error al crear la oferta:", error);
-          Alert.alert(
-            "Error",
-            "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-            [
-              {
-                text: "Ok",
-                onPress: () => console.log("Error al crear oferta"),
-              },
-            ]
-          );
-        }
-      }
-    } else {
-      Alert.alert(
-        "Error",
-        "Asegúrate de haber ingresado todos los datos necesarios.",
-        [
-          {
-            text: "Ok",
-            onPress: () => console.log("Datos incompletos"),
-          },
-        ]
-      );
-    }
-  };
+  
 
   return (
     <ScrollView
@@ -331,7 +263,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.amount}>Monto: ${servicioCargado?.monto}</Text>
       {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
-        {estadoSolicitud === 1 && (
+        {servicioCargado?.estado === 1 && (
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -348,7 +280,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        {estadoSolicitud === 2 && (
+        {servicioCargado?.estado === 2 && (
           <TouchableOpacity
             style={esDueno ? styles.buttonYellow : styles.button}
             onPress={() => {
@@ -371,7 +303,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        {estadoSolicitud === 3 && (
+        {servicioCargado?.estado === 3 && (
           <TouchableOpacity
             style={esDueno ? styles.buttonGray : styles.button}
             onPress={() => {
@@ -394,7 +326,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        {estadoSolicitud === 4 && (
+        {servicioCargado?.estado === 4 && (
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -450,7 +382,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.createButton}
                 onPress={() => {
-                  handlePublicarOfertas();
+                  handlePublicarOfertas(idServicio,ofertaValue,userToken);
 
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
@@ -594,6 +526,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     "Oferta aceptada:",
                     selectedOferta?.montoOfertado
                   );
+                  handleAceptarOferta(selectedOferta);
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
                 }}
