@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
 import Checkbox from "expo-checkbox";
 import { createUser } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,15 +8,16 @@ import { RootStackParamList } from "../routes/NavigatorTypes";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import CountryPicker from "react-native-country-picker-modal";
+import * as ImagePicker from 'expo-image-picker';
+import { uploadImage } from "../services/imageService";
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList>;
-};
-
+type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
 
 const Registro: React.FC<Props> = ({ navigation }) => {
   const [countryCode, setCountryCode] = useState<CountryCode>("CL");
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [profilePicBase64, setProfilePicBase64] = useState<string | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -56,23 +47,27 @@ const Registro: React.FC<Props> = ({ navigation }) => {
         .required("Debe ingresar un email."),
       password: Yup.string().required("Requerido"),
       confirmPassword: Yup.string()
-        .oneOf([Yup.ref("password")], "Las contraseñas deben coincidir") // Validación de coincidencia de contraseñas
+        .oneOf([Yup.ref("password")], "Las contraseñas deben coincidir")
         .required("Debe ingresar su contraseña."),
       termsAccepted: Yup.boolean()
         .oneOf([true], "Debe aceptar los términos.")
         .required("Requerido"),
-      // day: Yup.string().required("Requerido"),
-      // month: Yup.string().required("Requerido"),
-      // year: Yup.string().required("Requerido"),
     }),
     onSubmit: async (values) => {
       console.log("Inicio de onSubmit", values);
       try {
+        let imageUrl = profilePic;
+        if (profilePicBase64) {
+          imageUrl = await uploadImage(`data:image/jpeg;base64,${profilePicBase64}`);
+        }
+
         const user = {
           ...values,
           telefono: `+56${values.telefono}`,
           calificacion: 0,
+          imagenDePerfil: imageUrl || "",
         };
+
         const newUser = await createUser(user);
         console.log("Usuario creado:", newUser);
         Alert.alert("Usuario creado con éxito.", "", [
@@ -89,18 +84,33 @@ const Registro: React.FC<Props> = ({ navigation }) => {
         Alert.alert("Error al crear el usuario :(");
       }
     },
+
   });
 
   const handleNavigationToRegister = () => {
     navigation.navigate("TerminosCondiciones");
   };
 
-  const handleAddProfilePic = () => {
-    // Función que se llama al tocar el icono "más"
-    Alert.alert(
-      "Agregar foto de perfil",
-      "Aquí se debe implementar la funcionalidad para agregar o cambiar la foto de perfil."
-    );
+  const handleAddProfilePic = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      alert('Necesitamos permisos para acceder a tus fotos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0].base64) {
+      setProfilePicBase64(result.assets[0].base64);
+      setProfilePic(result.assets[0].uri);
+    }
   };
 
   const handleNavigationToLogin = () => {
@@ -108,12 +118,12 @@ const Registro: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    
-      <ScrollView style={styles.container}>
-        <View style={{flex:1}}>
+
+    <ScrollView style={styles.container}>
+      <View style={{ flex: 1 }}>
         <LinearGradient
-            colors={["#5ABEF6", "#2476D3", "#0F4FC2"]}
-            style={{
+          colors={["#5ABEF6", "#2476D3", "#0F4FC2"]}
+          style={{
             position: "absolute",
             top: 0,
             left: 0,
@@ -130,7 +140,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
             <View style={styles.profilePicContainer}>
               <Image
-                source={require("../../assets/iconos/UserProfileRegistro.png")} // Ruta imagen predeterminada
+                source={profilePic ? { uri: profilePic } : require("../../assets/iconos/UserProfileRegistro.png")}
                 style={styles.profilePic}
               />
               <TouchableOpacity
@@ -184,11 +194,11 @@ const Registro: React.FC<Props> = ({ navigation }) => {
               value={formik.values.descripcion}
               onChangeText={formik.handleChange("descripcion")}
               maxLength={250}
-              multiline={true} // Para que el usuario pueda escribir en varias líneas si lo necesita
-              numberOfLines={4} // Establece la altura inicial del campo de descripción
+              multiline={true}
+              numberOfLines={4}
               style={[
                 styles.input,
-                styles.textArea, // Estilo adicional para el campo de descripción
+                styles.textArea,
                 formik.touched.descripcion && formik.errors.descripcion
                   ? styles.inputError
                   : null,
@@ -211,7 +221,6 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                   withCallingCodeButton
                   countryCode={countryCode}
                   onSelect={(country) => {
-                    // Aunque el picker está deshabilitado, mantenemos esta función por si acaso.
                     setCountryCode(country.cca2 as CountryCode);
                   }}
                 />
@@ -219,7 +228,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
               <TextInput
                 value={formik.values.telefono}
                 onChangeText={formik.handleChange("telefono")}
-                maxLength={9} // Limitar a 9 dígitos
+                maxLength={9}
                 keyboardType="number-pad"
                 style={[
                   styles.inputTelefono,
@@ -234,7 +243,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
             <TextInput
               value={formik.values.email}
               onChangeText={formik.handleChange("email")}
-              keyboardType="email-address" // Asegura que el teclado sea de tipo email
+              keyboardType="email-address"
               maxLength={30}
               style={[
                 styles.input,
@@ -327,9 +336,9 @@ const Registro: React.FC<Props> = ({ navigation }) => {
             </View>
           </View>
         </View>
-        </View>
-        
-      </ScrollView>
+      </View>
+
+    </ScrollView>
   );
 };
 
@@ -344,17 +353,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   centeredContainer: {
-    // flex: 1,
     paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,
-
   },
   textArea: {
-    height: 80, // Ajusta según tus necesidades
-    textAlignVertical: 'top', // Para que el texto comience en la parte superior del área de texto
-},
+    height: 80,
+    textAlignVertical: 'top',
+  },
   innerContainer: {
     backgroundColor: "white",
     padding: 20,
@@ -407,15 +414,15 @@ const styles = StyleSheet.create({
   },
   telefonoContainer: {
     flexDirection: "row",
-    alignItems: "center", // Alinear verticalmente
+    alignItems: "center",
   },
   inputTelefono: {
-    flex: 1, // Ocupar todo el espacio disponible
+    flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
-    marginLeft: 10, // Espacio entre el CountryPicker y el TextInput
+    marginLeft: 10,
     backgroundColor: "#F3F6FF",
   },
   dateInput: {
@@ -440,13 +447,13 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     borderRadius: 50,
-    marginHorizontal: 5, // Espaciado entre los botones
+    marginHorizontal: 5,
   },
   roundedButton: {
     borderRadius: 50,
     borderWidth: 1,
     borderColor: "#ccc",
-    overflow: "hidden", // Esto es importante para que el borderRadius se aplique correctamente
+    overflow: "hidden",
   },
   addIconContainer: {
     position: "absolute",

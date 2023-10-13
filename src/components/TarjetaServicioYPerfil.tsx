@@ -6,12 +6,12 @@ import {UsuarioCasted } from '../resources/user';
 
 const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
 
-interface ServiceCardProps {
+interface TarjetaProps {
     item: ServicioData | UsuarioCasted;
     type: 'servicio' | 'usuario';
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ item, type }) => {
+const TarjetaServicioYPerfil: React.FC<TarjetaProps> = ({ item, type }) => {
 
     if (type === 'servicio') {
         const servicioItem = item as ServicioData;
@@ -193,4 +193,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ServiceCard;
+export default TarjetaServicioYPerfil;

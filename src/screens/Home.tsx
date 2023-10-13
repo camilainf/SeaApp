@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback, RefreshControl } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
@@ -7,6 +7,12 @@ import { CategoriaPopular } from '../resources/category';
 import { getPopularCategories } from '../services/categoryService';
 import { getServicesTopOfWeek, incrementServiceClick } from '../services/serviceService';
 import { ServicioData } from '../resources/service';
+import { UsuarioCasted } from '../resources/user';
+import { getUserIdFromToken } from '../services/authService';
+import { getUserById } from '../services/userService';
+import TarjetaSuperiorHome from '../components/TarjetaSuperiorHome';
+import Buscador from '../components/Buscador';
+import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -17,9 +23,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const defaultImage = require('../../assets/iconos/Default_imagen.jpg');
   const [categoriasPopulares, setCategoriasPopulares] = useState<CategoriaPopular[]>([]);
   const [serviciosDestacados, setServiciosDestacados] = useState<ServicioData[]>([]);
+  const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  // Al cargar el componente, obtener las categorías populares y los servicios top of the week
   useEffect(() => {
     loadData();
   }, []);
@@ -30,8 +36,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
       const [categorias, servicios] = await Promise.all([
         getPopularCategories(),
-        getServicesTopOfWeek()
+        getServicesTopOfWeek(),
       ]);
+
+      const userId = await getUserIdFromToken();
+      if (!userId) {
+        throw new Error("No se pudo obtener el ID del usuario.");
+      }
+
+      setUsuario(await getUserById(userId));
 
       setCategoriasPopulares(categorias.map(cat => ({
         ...cat,
@@ -46,16 +59,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       setIsRefreshing(false);
     }
   };
-
-  const usuario = {
-    nombre: 'Case',
-    foto: ('https://cdn.discordapp.com/attachments/767184234427056178/1159689687384985650/image.png?ex=6531f02f&is=651f7b2f&hm=9d3e5689c1478674a4c48f4e2f69e636eabc0901c18d8b8ae81b725f23d8043b&'),
-  };
-
-  const serviceIcon = require('../../assets/iconos/Work.png');
-  const searchIcon = require('../../assets/iconos/Search.png');
-
-  const [searchTerm, setSearchTerm] = useState('');
 
   const handleServiceClick = async (service: any) => {
     console.log(`Servicio clickeado con ID: ${service.id}`);
@@ -86,39 +89,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         end={{ x: 0, y: 1 }}
       />
       <View style={styles.contentContainer}>
-        {/* Tarjeta superior */}
-        <View style={styles.tarjetaSuperior}>
-          <View style={styles.fila}>
-            <Image source={require('../../assets/seaJoblogo.png')} style={styles.logo} />
-            <Text style={styles.saludo}>Hola {usuario.nombre}!</Text>
-          </View>
-          <View style={styles.fila}>
-            <Image source={{ uri: usuario.foto }} style={styles.fotoPerfil} />
-            <View style={styles.gananciasContainer}>
-              <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
-              <Text style={styles.gananciaNumero}>39.000 CLP</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* Buscador */}
-        <View style={styles.buscadorContainer}>
-          <TextInput
-            placeholder="¿Qué buscas?"
-            style={styles.buscadorTexto}
-            placeholderTextColor="#AEBFFB"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
-          <TouchableOpacity onPress={() => {
-            console.log('Ícono de búsqueda clickeado');
-            if (searchTerm.trim() !== '') {  // Verifica que searchTerm no esté vacío o solo contenga espacios en blanco
-              navigation.navigate('Buscador', { keyword: searchTerm });  // Navega a BuscadorScreen con searchTerm como parámetro
-            }
-          }}>
-            <Image source={searchIcon} style={styles.iconoLupa} />
-          </TouchableOpacity>
-        </View>
+        <TarjetaSuperiorHome usuario={usuario} />
+
+        <Buscador onSearch={(term) => {
+          console.log('Ícono de búsqueda clickeado');
+          navigation.navigate('Buscador', { keyword: term });
+        }} />
 
         {/* Trabajos destacados */}
         <View style={styles.tarjeta}>
@@ -165,18 +142,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         </View>
 
         {/* Ve los ultimos trabajos */}
-        <TouchableNativeFeedback onPress={() => {
+        <TarjetaUltimosTrabajos onPress={() => {
           navigation.navigate('ListaServicios', { categoria: "" });
-        }}>
-          <View style={styles.tarjetaUltimosTrabajos}>
-            <Text style={styles.saludoUltimosTrabajos}>
-              ¡Ve los últimos {"\n"}
-              servicios {"\n"}
-              publicados!
-            </Text>
-            <Image source={serviceIcon} style={{ ...styles.iconoUltimosTrabajos, tintColor: 'white' }} />
-          </View>
-        </TouchableNativeFeedback>
+        }} />
+
 
       </View>
     </ScrollView>
@@ -189,7 +158,6 @@ const styles = StyleSheet.create({
   // ESTILOS GENERALES
 
   container: {
-    paddingVertical: 0,
     backgroundColor: '#FFFFFF',
   },
 
@@ -214,94 +182,6 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     paddingBottom: 40,
     paddingHorizontal: 20,
-  },
-
-  // TARJETA SUPERIOR
-
-  tarjetaSuperior: {
-    padding: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 6,
-  },
-
-  fila: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-
-  logo: {
-    width: 150,
-    height: 30,
-    resizeMode: 'contain',
-  },
-
-  saludo: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#66638C',
-  },
-
-  fotoPerfil: {
-    width: 110,
-    height: 110,
-    borderRadius: 60,
-    resizeMode: 'cover',
-  },
-
-  gananciasContainer: {
-    marginRight: 16,
-  },
-
-  gananciaTexto: {
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 16,
-    letterSpacing: 0,
-    textAlign: 'left',
-    color: '#0182AB',
-    marginBottom: 8,
-  },
-
-  gananciaNumero: {
-    fontSize: 30,
-    fontWeight: '400',
-    lineHeight: 30,
-    letterSpacing: 0,
-    textAlign: 'left',
-    color: '#47AE64', // Puedes ajustar el tono de verde según prefieras
-  },
-
-  // BUSCADOR
-
-  buscadorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F6FF',
-    borderRadius: 50,
-    marginBottom: 16, // Agregamos un margen inferior para separarlo de los siguientes elementos
-    paddingHorizontal: 30,
-    paddingVertical: 10
-  },
-
-  iconoLupa: {
-    width: 28,
-    height: 28,
-  },
-
-  buscadorTexto: {
-    fontSize: 16,
-    flex: 1,
   },
 
   // TRABAJOS DESTACADOS

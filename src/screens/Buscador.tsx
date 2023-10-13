@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/NavigatorTypes';
 import { ServicioData } from '../resources/service';
 import { UsuarioCasted } from '../resources/user';
 import { getAllServices } from '../services/serviceService';
 import { getAllUsers } from '../services/userService';
-import ServiceCard from '../components/ServiceCard';
+import TarjetaServicioYPerfil from '../components/TarjetaServicioYPerfil';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { getUserIdFromToken } from '../services/authService';
+import Buscador from '../components/Buscador';
 
 type Props = {
     navigation: BuscadorNavigationProp;
@@ -27,9 +28,6 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
     const initialSearchTerm = route.params?.keyword || '';
 
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-    const searchIcon = require('../../assets/iconos/Search.png');
-    const serviceIcon = require('../../assets/iconos/ImageReferencia.png')
-
     const [servicios, setServicios] = useState<ServicioData[]>([]);
     const [usuarios, setUsuarios] = useState<UsuarioCasted[]>([]);
 
@@ -55,7 +53,6 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
 
     const usuariosModificados = usuarios.map(u => ({ ...u, id: `${u._id}` }));
     const serviciosModificados = servicios.map(s => ({ ...s, id: `${s.id}` }));
-
     const allData = [...usuariosModificados, ...serviciosModificados];
     const searchResults = searchTerm.trim() !== ''
         ? allData.filter(item =>
@@ -65,67 +62,62 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
         )
         : [];
 
-        const handleNavigationToResult = async (item: ServicioData | UsuarioCasted) => {
-            if ('nombreServicio' in item) {
-                // Es un servicio
-                navigation.navigate('Servicio', { id: item.id });
-            } else {
-                // Es un usuario
-                const userIdFromToken = await getUserIdFromToken();
-                if (item._id === userIdFromToken) {
-                    // Es el perfil propio
-                    navigation.navigate('Main', {
-                        screen: 'Perfil',
-                        params: { id: item._id },
-                    } as any);
+    const handleNavigationToResult = async (item: ServicioData | UsuarioCasted) => {
+        if ('nombreServicio' in item) {
+            // Es un servicio
+            navigation.navigate('Servicio', { id: item.id });
+        } else {
+            // Es un usuario
+            const userIdFromToken = await getUserIdFromToken();
+            if (item._id === userIdFromToken) {
+                // Es el perfil propio
+                navigation.navigate('Main', {
+                    screen: 'Perfil',
+                    params: { id: item._id },
+                } as any);
 
-                } else {
-                    // Es un perfil ajeno
-                    navigation.navigate('PerfilAjeno', { id: item._id });
-                }
+            } else {
+                // Es un perfil ajeno
+                navigation.navigate('PerfilAjeno', { id: item._id });
             }
-        };
+        }
+    };
 
     return (
         <View style={styles.container}>
             {/* Buscador */}
-            <View style={styles.buscadorContainer}>
-                <TextInput
-                    placeholder={searchTerm || "¿Qué buscas?"}
-                    style={styles.buscadorTexto}
-                    placeholderTextColor="#AEBFFB"
-                    value={searchTerm}
-                    onChangeText={setSearchTerm}
+            <View style={{ paddingHorizontal: 20 }}>
+                <Buscador
+                    onSearch={(term) => {
+                        setSearchTerm(term);
+                        console.log('Ícono de búsqueda clickeado');
+                    }}
+                    initialValue={initialSearchTerm}
                 />
-                <TouchableOpacity onPress={() => {
-                    console.log('Ícono de búsqueda clickeado');
-                }}>
-                    <Image source={searchIcon} style={styles.iconoLupa} />
-                </TouchableOpacity>
             </View>
 
             {/* Resultados */}
             {searchResults.length > 0 ? (
-            <FlatList
-                data={searchResults}
-                renderItem={({ item }) => {
-                    const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
-                    return (
-                        <TouchableOpacity onPress={() => {
-                            console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.nombre);
-                            handleNavigationToResult(item);
-                        }}>
-                            <ServiceCard item={item} type={itemType} />
-                        </TouchableOpacity>
-                    );
-                }}
-                keyExtractor={(item) => item.id}
-            />
-        ) : (
-            <View>
-                <Text style={styles.noResultsText}>No hay resultados</Text>
-            </View>
-        )}
+                <FlatList
+                    data={searchResults}
+                    renderItem={({ item }) => {
+                        const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
+                        return (
+                            <TouchableOpacity onPress={() => {
+                                console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.nombre);
+                                handleNavigationToResult(item);
+                            }}>
+                                <TarjetaServicioYPerfil item={item} type={itemType} />
+                            </TouchableOpacity>
+                        );
+                    }}
+                    keyExtractor={(item) => item.id}
+                />
+            ) : (
+                <View>
+                    <Text style={styles.noResultsText}>No hay resultados</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -133,7 +125,6 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 20,
         backgroundColor: '#FFFFFF',
     },
 
