@@ -8,8 +8,8 @@ import { RootStackParamList } from "../routes/NavigatorTypes";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import CountryPicker from "react-native-country-picker-modal";
-import * as ImagePicker from 'expo-image-picker';
 import { uploadImage } from "../services/imageService";
+import { selectImage } from "../utils/imageUtils";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -92,24 +92,12 @@ const Registro: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleAddProfilePic = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== 'granted') {
-      alert('Necesitamos permisos para acceder a tus fotos.');
-      return;
+    const { uri, base64 } = await selectImage();
+    if (uri) {
+      setProfilePic(uri);
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 0.5,
-      base64: true,
-    });
-
-    if (!result.canceled && result.assets && result.assets[0].base64) {
-      setProfilePicBase64(result.assets[0].base64);
-      setProfilePic(result.assets[0].uri);
+    if (base64) {
+      setProfilePicBase64(base64);
     }
   };
 
