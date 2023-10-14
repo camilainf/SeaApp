@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInputMask } from "react-native-masked-text";
@@ -16,6 +15,7 @@ import { getAllCategories } from "../services/categoryService";
 import { selectImage } from "../utils/imageUtils";
 import { uploadImage } from "../services/imageService";
 import { Image } from "react-native-elements";
+import { crearServicioSchema } from "../utils/validations/crearServicioValidations";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -54,15 +54,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       direccion: "",
       monto: "",
     },
-    validationSchema: Yup.object({
-      nombreServicio: Yup.string().required("Requerido"),
-      categoria: Yup.string().notOneOf([""], "Requerido").required("Requerido"),
-      descripcion: Yup.string().required("Requerido"),
-      fechaSolicitud: Yup.string().required("Requerido"),
-      horaSolicitud: Yup.string().required("Requerido"),
-      direccion: Yup.string().required("Requerido"),
-      monto: Yup.string().required("Requerido"),
-    }),
+    validationSchema: crearServicioSchema,
     onSubmit: async (values) => {
       try {
         const token = await getToken();

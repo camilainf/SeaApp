@@ -6,10 +6,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import CountryPicker from "react-native-country-picker-modal";
 import { uploadImage } from "../services/imageService";
 import { selectImage } from "../utils/imageUtils";
+import { registroSchema } from "../utils/validations/registroValidations";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -30,29 +30,8 @@ const Registro: React.FC<Props> = ({ navigation }) => {
       password: "",
       confirmPassword: "",
       termsAccepted: false,
-      day: "",
-      month: "",
-      year: "",
     },
-    validationSchema: Yup.object({
-      nombre: Yup.string().required("Requerido"),
-      apellidoPaterno: Yup.string().required("Requerido"),
-      apellidoMaterno: Yup.string().required("Requerido"),
-      descripcion: Yup.string()
-        .required("Requerido")
-        .max(250, "La descripción no puede tener más de 250 caracteres."),
-      telefono: Yup.string().required("Requerido"),
-      email: Yup.string()
-        .email("Ingrese un email válido")
-        .required("Debe ingresar un email."),
-      password: Yup.string().required("Requerido"),
-      confirmPassword: Yup.string()
-        .oneOf([Yup.ref("password")], "Las contraseñas deben coincidir")
-        .required("Debe ingresar su contraseña."),
-      termsAccepted: Yup.boolean()
-        .oneOf([true], "Debe aceptar los términos.")
-        .required("Requerido"),
-    }),
+    validationSchema: registroSchema,
     onSubmit: async (values) => {
       console.log("Inicio de onSubmit", values);
       try {
@@ -412,20 +391,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 10,
     backgroundColor: "#F3F6FF",
-  },
-  dateInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-  },
-  dateInputMonth: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginHorizontal: 10,
   },
   buttonsContainer: {
     flexDirection: "row",
