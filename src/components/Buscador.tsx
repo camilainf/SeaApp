@@ -4,11 +4,20 @@ import { View, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-nati
 type BuscadorProps = {
     onSearch: (term: string) => void;
     initialValue?: string;
+    immediateSearch?: boolean; // Nueva prop
 };
 
-const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue }) => {
+const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue, immediateSearch = false }) => {
     const [searchTerm, setSearchTerm] = useState(initialValue || '');
     const searchIcon = require('../../assets/iconos/Search.png');
+
+    // Actualizar el término de búsqueda en tiempo real
+    const handleTextChange = (text: string) => {
+        setSearchTerm(text);
+        if (immediateSearch) { // Si immediateSearch es true, realiza la búsqueda inmediata
+            onSearch(text);
+        }
+    };
 
     return (
         <View style={styles.buscadorContainer}>
@@ -17,7 +26,7 @@ const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue }) => {
                 style={styles.buscadorTexto}
                 placeholderTextColor="#AEBFFB"
                 value={searchTerm}
-                onChangeText={setSearchTerm}
+                onChangeText={handleTextChange} // Usar la función handleTextChange
             />
             <TouchableOpacity onPress={() => {
                 if (searchTerm.trim() !== '') {

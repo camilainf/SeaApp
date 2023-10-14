@@ -10,6 +10,7 @@ import TarjetaServicioYPerfil from '../components/TarjetaServicioYPerfil';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { getUserIdFromToken } from '../services/authService';
 import Buscador from '../components/Buscador';
+import { getLastResults, storeLastResults } from '../utils/storeUtils';
 
 type Props = {
     navigation: BuscadorNavigationProp;
@@ -30,8 +31,27 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [servicios, setServicios] = useState<ServicioData[]>([]);
     const [usuarios, setUsuarios] = useState<UsuarioCasted[]>([]);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    const getUserId = async () => {
+        try {
+            const id = await getUserIdFromToken();
+            setUserId(id);
+        } catch (error) {
+            console.error("Error al obtener el userId:", error);
+        }
+    }
 
     useEffect(() => {
+        getUserId();
+
+        // Obtener los últimos resultados del almacenamiento local
+        if (userId) {
+            getLastResults(userId).then(results => {
+                setLastSelectedResults(results);
+            });
+        }
+
         // Obtener todos los servicios
         getAllServices()
             .then(data => {
@@ -49,7 +69,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
             .catch(error => {
                 console.error("Error al obtener los usuarios:", error);
             });
-    }, []); // El array vacío indica que este useEffect se ejecutará solo una vez, cuando el componente se monte
+    }, [userId]); // El array vacío indica que este useEffect se ejecutará solo una vez, cuando el componente se monte
 
     const usuariosModificados = usuarios.map(u => ({ ...u, id: `${u._id}` }));
     const serviciosModificados = servicios.map(s => ({ ...s, id: `${s.id}` }));
@@ -72,7 +92,33 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
         ? allData.filter(filterBySearchTerm)
         : [];
 
+    const [lastSelectedResults, setLastSelectedResults] = useState<(ServicioData | UsuarioCasted)[]>([]);
+
     const handleNavigationToResult = async (item: ServicioData | UsuarioCasted) => {
+
+        setLastSelectedResults(prevResults => {
+            // Filtrar el item existente si ya está en la lista
+            const filteredResults = prevResults.filter(existingItem => {
+                if ('nombreServicio' in existingItem && 'nombreServicio' in item) {
+                    return existingItem.id !== item.id;
+                }
+                if (!('nombreServicio' in existingItem) && !('nombreServicio' in item)) {
+                    return existingItem._id !== item._id;
+                }
+                return true;
+            });
+
+            // Añadir el nuevo item al principio de la lista
+            const updatedResults = [item, ...filteredResults];
+
+            // Guardar los resultados en el almacenamiento local
+            if (userId) {
+                storeLastResults(userId, updatedResults.slice(0, 5));
+            }
+
+            return updatedResults.slice(0, 5); // Mantener solo los últimos 5 resultados
+        });
+
         if ('nombreServicio' in item) {
             // Es un servicio
             navigation.navigate('Servicio', { id: item.id });
@@ -93,6 +139,8 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    const displayedResults = searchTerm.trim() === '' ? lastSelectedResults : searchResults;
+
     return (
         <View style={styles.container}>
             {/* Buscador */}
@@ -103,13 +151,14 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
                         console.log('Ícono de búsqueda clickeado');
                     }}
                     initialValue={initialSearchTerm}
+                    immediateSearch={true} // Realizar búsqueda inmediata en BuscadorScreen
                 />
             </View>
 
             {/* Resultados */}
-            {searchResults.length > 0 ? (
+            {displayedResults.length > 0 ? (
                 <FlatList
-                    data={searchResults}
+                    data={displayedResults}
                     renderItem={({ item }) => {
                         const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
                         return (
@@ -121,7 +170,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
                             </TouchableOpacity>
                         );
                     }}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => 'nombreServicio' in item ? item.id : item._id}
                 />
             ) : (
                 <View>

@@ -92,10 +92,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         <TarjetaSuperiorHome usuario={usuario} />
 
-        <Buscador onSearch={(term) => {
-          console.log('Ícono de búsqueda clickeado');
-          navigation.navigate('Buscador', { keyword: term });
-        }} />
+        <Buscador
+          onSearch={(term) => {
+            console.log('Ícono de búsqueda clickeado');
+            navigation.navigate('Buscador', { keyword: term });
+          }}
+          immediateSearch={false} // No realizar búsqueda inmediata desde Home
+        />
 
         {/* Trabajos destacados */}
         <View style={styles.tarjeta}>
