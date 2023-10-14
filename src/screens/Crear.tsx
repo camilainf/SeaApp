@@ -13,6 +13,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { Categoria } from "../resources/category";
 import { getAllCategories } from "../services/categoryService";
+import { selectImage } from "../utils/imageUtils";
+import { uploadImage } from "../services/imageService";
+import { Image } from "react-native-elements";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -23,15 +26,14 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [showInfo, setShowInfo] = useState(false);
   const [montoSinFormato, setMontoSinFormato] = useState<number | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-
+  const [serviceReferencePic, setServiceReferencePic] = useState<string | null>(null);
+  const [serviceReferencePicBase64, setServiceReferencePicBase64] = useState<string | null>(null);
   const montoInputRef = useRef<TextInputMask>(null);
-
 
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
         const data = await getAllCategories();
-        // Ordenar las categorías en orden alfabético decreciente
         const sortedData = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
         setCategorias(sortedData);
       } catch (error) {
@@ -66,20 +68,26 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         const token = await getToken();
 
         if (!token) {
-          // Estrategia 1: Redirigir al usuario a la pantalla de inicio de sesión
           navigation.navigate("Auth");
-
-          return; // Termina la ejecución aquí si no hay token
+          return;
         }
+
         const decodedToken = decodeToken(token) as DecodedToken;
         const idCreador = decodedToken.id;
         console.log("monto sin formato: ", montoSinFormato);
+        let imageUrl = serviceReferencePic;
+        if (serviceReferencePicBase64) {
+          imageUrl = await uploadImage(`data:image/jpeg;base64,${serviceReferencePicBase64}`);
+        }
+
         const servicio = {
           idCreador,
           ...values,
           monto: montoSinFormato,
           estado: 1,
+          imagen: imageUrl || "",
         };
+
         const newService = await createService(servicio);
         console.log('Servicio creado:', newService);
         Alert.alert(
@@ -117,11 +125,23 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           onPress: () => {
             formik.resetForm();
             setShowInfo(false);
+            setServiceReferencePic(null);
+            setServiceReferencePicBase64(null);
             navigation.goBack();
           },
         },
       ]
     );
+  };
+
+  const handleAddServiceReferencePic = async () => {
+    const { uri, base64 } = await selectImage();
+    if (uri) {
+      setServiceReferencePic(uri);
+    }
+    if (base64) {
+      setServiceReferencePicBase64(base64);
+    }
   };
 
   return (
@@ -306,12 +326,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         ]}
       />
 
+      {/* Seleccionar imagen de referencia */}
       <Text style={styles.label}>
         Imagen de servicio{"  "}
         <FontAwesome name="image" size={16} color="#4E479A" />
       </Text>
       <TouchableOpacity
-        onPress={() => console.log("Se presionó botón de imagen")}
+        onPress={handleAddServiceReferencePic}
         style={{
           backgroundColor: "#80AAD4",
           paddingVertical: 10,
@@ -319,7 +340,35 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           borderRadius: 10,
         }}
       >
-        <Text style={{ color: "white" }}>Selecciona una imagen</Text>
+        {serviceReferencePic && (
+          <View style={{ position: 'relative' }}>
+            <Image
+              source={{ uri: serviceReferencePic }}
+              style={{ width: '100%', height: 200, marginBottom: 10, alignSelf: 'center' }}
+              resizeMode="cover"
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: 5, 
+                right: 5, 
+                backgroundColor: 'white', 
+                borderRadius: 15,
+                width: 30,
+                height: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => {
+                setServiceReferencePic(null);
+                setServiceReferencePicBase64(null);
+              }}
+            >
+              <FontAwesome name="times" size={20} color="red" />
+            </TouchableOpacity>
+          </View>
+        )}
+        <Text style={{ color: "white", alignSelf: 'center' }}>Selecciona una imagen de referencia</Text>
       </TouchableOpacity>
 
       <View style={styles.buttonContainer}>
@@ -357,24 +406,23 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   headerContainer: {
-    flexDirection: "row", // Alinea los elementos en una fila horizontal
-    alignItems: "center", // Centra verticalmente los elementos
-    justifyContent: 'space-between', // Alinea los elementos en el espacio disponible
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: 'space-between',
 
   },
-  header: { // Permite que el texto ocupe todo el espacio disponible
+  header: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#4E479A",
-    //marginStart:50
   },
   infoIcon: {
     marginLeft: 10,
-    padding: 10, // Añade un padding
+    padding: 10,
   },
 
   infoBox: {
-    backgroundColor: "#F3F6FF", // Cambia esto al color de fondo deseado
+    backgroundColor: "#F3F6FF",
     padding: 10,
     borderRadius: 5,
   },
@@ -384,28 +432,28 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: "#D3D3D8", // Color más sutil para el separador.
+    backgroundColor: "#D3D3D8",
     marginVertical: 20,
   },
   label: {
     fontWeight: "600",
-    marginBottom: 10, // Un poco menos de espacio entre el label y el input.
+    marginBottom: 10,
     fontSize: 16,
-    color: "#4E479A", // Color más oscuro para los labels.
+    color: "#4E479A",
   },
   input: {
     height: 50,
-    borderColor: "#E1E1E6", // Borde más sutil.
+    borderColor: "#E1E1E6",
     borderWidth: 1,
-    paddingHorizontal: 12, // Un poco más de padding horizontal.
+    paddingHorizontal: 12,
     borderRadius: 10,
     marginBottom: 20,
     backgroundColor: "#F3F6FF",
-    color: "#6B6B7D", // Color para el texto dentro de los inputs.
+    color: "#6B6B7D",
   },
   picker: {
-    flex: 1, // Ocupa todo el espacio vertical disponible
-    color: "#6B6B7D", // Color para el texto dentro del picker.
+    flex: 1,
+    color: "#6B6B7D",
   },
   row: {
     flexDirection: "row",
@@ -429,7 +477,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   roundedButton: {
-    borderRadius: 10, // Ajusta el valor según la cantidad de redondeo deseada
+    borderRadius: 10,
   },
   bold: {
     fontWeight: "bold",
@@ -439,16 +487,15 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     height: 50,
-    borderColor: "#E1E1E6", // Borde más sutil.
+    borderColor: "#E1E1E6",
     borderWidth: 1,
-    paddingHorizontal: 0, // Un poco más de padding horizontal.
+    paddingHorizontal: 0,
     borderRadius: 10,
     marginBottom: 20,
     backgroundColor: "#F3F6FF",
-    color: "#6B6B7D", // Asegúrate de que tenga los mismos estilos que los TextInput
-    justifyContent: 'center', // Para centrar el contenido verticalmente
+    color: "#6B6B7D",
+    justifyContent: 'center',
   },
-
 });
 
 export default Crear;
