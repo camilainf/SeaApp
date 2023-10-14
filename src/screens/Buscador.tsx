@@ -54,12 +54,22 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
     const usuariosModificados = usuarios.map(u => ({ ...u, id: `${u._id}` }));
     const serviciosModificados = servicios.map(s => ({ ...s, id: `${s.id}` }));
     const allData = [...usuariosModificados, ...serviciosModificados];
+
+    const filterBySearchTerm = (item: ServicioData | UsuarioCasted) => {
+        const term = searchTerm.toLowerCase();
+        if ('nombreServicio' in item) {
+            // Es un servicio
+            const serviceNameMatches = item.nombreServicio.toLowerCase().includes(term);
+            const categoryMatches = item.categoria.toLowerCase().includes(term);
+            return serviceNameMatches || categoryMatches;
+        } else {
+            // Es un usuario
+            return item.nombre.toLowerCase().includes(term);
+        }
+    };
+
     const searchResults = searchTerm.trim() !== ''
-        ? allData.filter(item =>
-            'nombreServicio' in item
-                ? item.nombreServicio.toLowerCase().includes(searchTerm.toLowerCase())
-                : item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        ? allData.filter(filterBySearchTerm)
         : [];
 
     const handleNavigationToResult = async (item: ServicioData | UsuarioCasted) => {
