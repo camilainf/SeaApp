@@ -70,3 +70,25 @@ export const getUserById = async (id: string): Promise<UsuarioCasted> => {
   const userData: UsuarioCasted = await response.json();
   return userData;
 };
+
+export const updateUserProfilePic = async (userId: string, newImageUrl: string) => {
+  console.log(URL);
+  try {
+    const response = await fetch(`${URL}/${userId}/updateProfilePic`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageUrl: newImageUrl }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error en la respuesta del servidor');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al actualizar la foto de perfil:", error);
+  }
+};
