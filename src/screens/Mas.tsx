@@ -8,7 +8,6 @@ import { selectImage } from '../utils/imageUtils';
 import { uploadImage } from '../services/imageService';
 import { getUserById, updateUserProfilePic } from '../services/userService';
 import { UsuarioCasted } from '../resources/user';
-
 interface Props {
   navigation: any;
 }
@@ -42,7 +41,9 @@ const Mas: React.FC<Props> = ({ navigation }) => {
       Alert.alert(title);
     }
   };
-
+  
+  /* Esta funcion es temporal, falta agregar un mensaje de confirmacion,
+    para ahi recien subir la foto a cloudinary */
   const handleEditProfilePic = async () => {
     // 1. Selecciona la imagen
     const { uri, base64 } = await selectImage();
@@ -52,11 +53,12 @@ const Mas: React.FC<Props> = ({ navigation }) => {
         // 2. Sube la imagen a Cloudinary
         const newImageUrl = await uploadImage(`data:image/jpeg;base64,${base64}`);
 
-        // 3. Actualiza la base de datos con la nueva URL (aquí necesitas una función para hacerlo)
-        await updateUserProfilePic(user._id, newImageUrl); // Asumiendo que tienes una función así
+        // 3. Actualiza la base de datos con la nueva URL
+        await updateUserProfilePic(user._id, newImageUrl);
 
         // 4. Actualiza el estado local (opcional)
         setUser(prevState => ({ ...prevState, imagenDePerfil: newImageUrl } as UsuarioCasted));
+
       } catch (error) {
         console.error("Error al editar la foto de perfil:", error);
         Alert.alert("Error al editar la foto de perfil.");

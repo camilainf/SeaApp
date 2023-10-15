@@ -1,4 +1,3 @@
-
 import { BASE_URL } from "@env";
 
 const URL = BASE_URL + '/image';
