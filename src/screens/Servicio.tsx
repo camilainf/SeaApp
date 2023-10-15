@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  TextInput,
-  Alert,
-  ActivityIndicator,
-  RefreshControl,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha } from "../utils/randomService";
@@ -25,6 +13,7 @@ import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
+import { Icon } from "react-native-elements";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -43,23 +32,19 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad del modal
   const [crearOfertaModalVisible, setCrearOfertaModalVisible] = useState(false);
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
+  const [isDescriptionVisible, setDescriptionVisibility] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
+  //Datos importantes
   const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
-  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(
-    null
-  );
-  const [confirmModalVisible, setConfirmModalVisible] =
-    useState<boolean>(false);
-
-  const [usuariosOfertantes, setUsuariosOfertantes] = useState<
-    Record<string, UsuarioCasted>
-  >({});
+  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
+  const [usuariosOfertantes, setUsuariosOfertantes] = useState<Record<string, UsuarioCasted>>({});
   const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
   const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
   const [esDueno, setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
   const [userToken, setUserToken] = useState<string | null>("");
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
-  const [ofertaSeleccionada, setOfertaSeleccionada] = useState<Oferta | null>(null);
+  const [usuarioOferta, setUsuarioOferta] = useState<UsuarioCasted | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
@@ -86,9 +71,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         const fetchedOffer = await getOffersByServiceId(idServicio);
         setOfertasCargadas(fetchedOffer);
         //Carga de todos los usuarios ofertantes
-        const userPromises = fetchedOffer.map((offer) =>
-          getUserById(offer.idCreadorOferta)
-        );
+        const userPromises = fetchedOffer.map((offer) => getUserById(offer.idCreadorOferta));
         const ofertantes = await Promise.all(userPromises);
         const usuariosOfertantesMap: Record<string, UsuarioCasted> = {};
         ofertantes.forEach((offerUser) => {
@@ -96,16 +79,15 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         });
         setUsuariosOfertantes(usuariosOfertantesMap);
         //Carga de la oferta seleccionada
-        const fetchedOfferSelected = await getOfferAcceptedByServiceId(idServicio)
-        setOfertaSeleccionada(fetchedOfferSelected); 
-      
+        const fetchedOfferSelected = await getOfferAcceptedByServiceId(idServicio);
+        if (fetchedOfferSelected && fetchedOfferSelected.idCreadorOferta) {
+          const fetchedUserSelected = await getUserById(fetchedOfferSelected.idCreadorOferta);
+          setUsuarioOferta(fetchedUserSelected);
+        }
       }
     } catch (error) {
       console.error("Hubo un error:", error);
-      Alert.alert(
-        "Error",
-        "No se pudo obtener la información. Por favor, intenta de nuevo."
-      );
+      Alert.alert("Error", "No se pudo obtener la información. Por favor, intenta de nuevo.");
     } finally {
       setIsLoading(false); // Termina la carga
     }
@@ -128,15 +110,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     fetchData();
   };
 
-  
-
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-      }
-    >
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
       <View style={styles.header}></View>
       {/* Barra de Usuario */}
       {!esDueno && (
@@ -148,34 +123,18 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               navigation.navigate("PerfilAjeno", {
                 id: servicioCargado?.idCreador || "",
               });
-            }}
-          >
-            <Image
-              source={
-                userCreador?.imagenDePerfil
-                  ? { uri: userCreador?.imagenDePerfil }
-                  : require("./../../assets/iconos/UserProfile.png")
-              }
-              style={styles.userImage}
-            />
+            }}>
+            <Image source={userCreador?.imagenDePerfil ? { uri: userCreador?.imagenDePerfil } : require("./../../assets/iconos/UserProfile.png")} style={styles.userImage} />
             <View style={styles.userNameContainer}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={styles.userName}
-              >
-                {userCreador?.nombre} {userCreador?.apellidoPaterno}{" "}
-                {userCreador?.apellidoMaterno}
+              <Text numberOfLines={2} ellipsizeMode="tail" style={styles.userName}>
+                {userCreador?.nombre} {userCreador?.apellidoPaterno} {userCreador?.apellidoMaterno}
               </Text>
             </View>
           </TouchableOpacity>
 
           {/* Botón de contactar */}
           {userCreador && (
-            <TouchableOpacity
-              style={styles.contactButton}
-              onPress={() => setModalVisible(true)}
-            >
+            <TouchableOpacity style={styles.contactButton} onPress={() => setModalVisible(true)}>
               <Text style={styles.contactButtonText}>Contactar</Text>
             </TouchableOpacity>
           )}
@@ -188,8 +147,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
-        }}
-      >
+        }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Los datos del usuario son:</Text>
@@ -201,10 +159,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               <FontAwesome name="phone" size={24} color="#003366" />
               <Text style={styles.contactText}> {userCreador?.telefono}</Text>
             </View>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
           </View>
@@ -215,19 +170,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.title}>{servicioCargado?.nombreServicio}</Text>
       {/* Imagen del servicio */}
       <View>
-        <Image
-          source={
-            servicioCargado?.imagen
-              ? { uri: servicioCargado?.imagen }
-              : defaultImage
-          }
-          style={styles.image}
-        />
+        <Image source={servicioCargado?.imagen ? { uri: servicioCargado?.imagen } : defaultImage} style={styles.image} />
         {/* Estado y categoria */}
         <View style={{ marginTop: 25, marginBottom: 10 }}>
-          <Text style={styles.estadoText}>
-            Estado: {obtenerTextoEstado(servicioCargado?.estado)}
-          </Text>
+          <Text style={styles.estadoText}>Estado: {obtenerTextoEstado(servicioCargado?.estado)}</Text>
 
           <Text style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
         </View>
@@ -235,9 +181,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       {/* Descripcion de servicio */}
       <View style={styles.descriptionContainer}>
         <Text style={styles.descriptionTitle}>Descripción:</Text>
-        <Text style={styles.descriptionText}>
-          {servicioCargado?.descripcion}
-        </Text>
+        <Text style={styles.descriptionText}>{servicioCargado?.descripcion}</Text>
       </View>
       <View>
         {/*Fecha de solicitud */}
@@ -259,8 +203,25 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         {"  "}
         {servicioCargado?.direccion}
       </Text>
-      {/*Texto de mongo, y el valor */}
-      <Text style={styles.amount}>Monto: ${servicioCargado?.monto}</Text>
+      {/* SECCION DEL MONTO */}
+      {usuarioOferta ? (
+        <TouchableOpacity
+          style={styles.offerUserContainer}
+          onPress={() => {
+            navigation.navigate("PerfilAjeno", {
+              id: usuarioOferta._id,
+            });
+          }}>
+          <Image source={usuarioOferta.imagenDePerfil ? { uri: usuarioOferta.imagenDePerfil } : require("./../../assets/iconos/UserProfile.png")} style={styles.offerUserImage} />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.offerUserName}>
+            {usuarioOferta.nombre} {usuarioOferta.apellidoPaterno} {usuarioOferta.apellidoMaterno}
+          </Text>
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#003366" }}>${servicioCargado?.monto} CLP</Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={styles.amount}>Monto: ${servicioCargado?.monto} CLP </Text>
+      )}
+
       {/*Boton oferta/veroferta/valorar*/}
       <View style={{ paddingHorizontal: 30 }}>
         {servicioCargado?.estado === 1 && (
@@ -272,70 +233,78 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               } else {
                 setCrearOfertaModalVisible(true);
               }
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {esDueno ? "Ver ofertas" : "Ofertar"}
-            </Text>
+            }}>
+            <Text style={styles.buttonText}>{esDueno ? "Ver ofertas" : "Ofertar"}</Text>
           </TouchableOpacity>
         )}
 
-        {servicioCargado?.estado === 2 && (
+        {servicioCargado?.estado === 2 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ?(
           <TouchableOpacity
             style={esDueno ? styles.buttonYellow : styles.button}
             onPress={() => {
               if (esDueno) {
-                Alert.alert(
-                  "Por iniciar",
-                  "Debes esperar que el trabajador inicie el servicio"
-                );
+                Alert.alert("Por iniciar", "Debes esperar que el trabajador inicie el servicio");
               } else {
-                Alert.alert(
-                  "Comenzar",
-                  "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉"
-                );
+                Alert.alert("Comenzar", "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
               }
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {esDueno ? "Por iniciar" : "Comenzar"}
-            </Text>
+            }}>
+            {esDueno ? (
+              <Text style={styles.buttonText}>
+                Por iniciar <FontAwesome name="clock-o" size={20} color="white" />
+              </Text>
+            ) : (
+              <Text style={styles.buttonText}>Comenzar</Text>
+            )}
           </TouchableOpacity>
-        )}
+        ): (
+          <Text style={{color: "#003366"}}>
+          Esta solicitud ya fue tomada por otro usuario
+          </Text>)
+        }
 
-        {servicioCargado?.estado === 3 && (
+        {servicioCargado?.estado === 3 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
           <TouchableOpacity
             style={esDueno ? styles.buttonGray : styles.button}
             onPress={() => {
               if (esDueno) {
-                Alert.alert(
-                  "En proceso",
-                  "El trabajador sigue en proceso con este servicio, espera a que este termine"
-                );
+                Alert.alert("En proceso", "El trabajador sigue en proceso con este servicio, espera a que este termine");
               } else {
-                Alert.alert(
-                  "Terminar",
-                  "Se ha terminado el servicio, comunicate con el contratador para avisarle"
-                );
+                Alert.alert("Terminar", "Se ha terminado el servicio, comunicate con el contratador para avisarle");
               }
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {esDueno ? "En proceso" : "Terminar"}
-            </Text>
+            }}>
+            <Text style={styles.buttonText}>{esDueno ? "En proceso" : "Terminar"}</Text>
           </TouchableOpacity>
-        )}
+        ): (
+          <Text style={{color: "#003366"}}>
+          Esta solicitud ya fue tomada por otro usuario
+          </Text>)
+        }
 
-        {servicioCargado?.estado === 4 && (
+        {servicioCargado?.estado === 4 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
               setValorarModalVisible(true);
-            }}
-          >
+            }}>
             <Text style={styles.buttonText}>Valorar</Text>
           </TouchableOpacity>
-        )}
+        ): (
+          <Text style={{color: "#003366"}}>
+          Esta solicitud ya fue tomada por otro usuario
+          </Text>)
+          }
+        {servicioCargado?.estado && servicioCargado?.estado>4 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              Alert.alert("El servicio ya se encuentra finalizado 👌🏻")
+            }}>
+            <Text style={styles.buttonText}>Terminado</Text>
+          </TouchableOpacity>
+        ): (
+          <Text style={{color: "#003366"}}>
+          Esta solicitud ya fue tomada por otro usuario
+          </Text>)}  
       </View>
 
       {/*Modal de Creacion de oferta*/}
@@ -345,12 +314,32 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         visible={crearOfertaModalVisible}
         onRequestClose={() => {
           setCrearOfertaModalVisible(false);
-        }}
-      >
+        }}>
         <View style={styles.centeredView}>
           <View style={{ ...styles.modalView, backgroundColor: "white" }}>
-            <Text style={styles.modalTitle}>Crear oferta</Text>
-
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
+              <Text style={styles.modalTitle}>Crear oferta   </Text>
+              <TouchableOpacity style={{marginBottom:5}} onPress={() => setDescriptionVisibility(!isDescriptionVisible)}>
+                <FontAwesome name="question-circle" size={22} color="#2E86C1" />
+              </TouchableOpacity>
+            </View>
+            {isDescriptionVisible && (
+              <Text
+                style={{
+                  marginBottom: 15,
+                  fontSize: 14,
+                  color: "#003366",
+                  paddingHorizontal: 10,
+                  textAlign: "justify",
+                }}>
+                Ingrese el valor de la oferta para participar en la solicitud. Asegúrese de ofrecer un precio justo y competitivo.
+              </Text>
+            )}
             <View
               style={{
                 flexDirection: "row",
@@ -358,8 +347,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 borderWidth: 1,
                 borderColor: "gray",
                 borderRadius: 8,
-              }}
-            >
+              }}>
               <Text style={{ padding: 10 }}>CLP</Text>
               <TextInput
                 style={{ flex: 1, height: 40, paddingHorizontal: 10 }}
@@ -375,18 +363,18 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => {
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
-                }}
-              >
+                }}>
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.createButton}
+                style={[styles.createButton, ofertaValue ? {} : { opacity: 0.5 }]} // Opcional: Agrega un estilo cuando esté deshabilitado.
                 onPress={() => {
-                  handlePublicarOfertas(idServicio,ofertaValue,userToken);
-
+                  handlePublicarOfertas(idServicio, ofertaValue, userToken);
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
+                  onRefresh();
                 }}
+                disabled={!ofertaValue} // Desactiva el botón si ofertaValue está vacío o nulo.
               >
                 <Text style={styles.createButtonText}>Crear</Text>
               </TouchableOpacity>
@@ -401,13 +389,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         visible={verOfertasModalVisible}
         onRequestClose={() => {
           setVerOfertasModalVisible(false);
-        }}
-      >
+        }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>
-              <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas
-              publicadas
+              <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas publicadas
             </Text>
             {ofertasCargadas.length > 0 ? (
               ofertasCargadas.map((oferta, index) => (
@@ -417,13 +403,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     alignItems: "center",
                     marginBottom: 10,
                   }}
-                  key={index}
-                >
+                  key={index}>
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate("PerfilAjeno", {
-                        id:
-                          usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
+                        id: usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
                       });
                       setVerOfertasModalVisible(false);
                     }}
@@ -431,40 +415,29 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       flexDirection: "row",
                       alignItems: "center",
                       flex: 1,
-                    }}
-                  >
+                    }}>
                     <Image
                       source={
-                        usuariosOfertantes[oferta.idCreadorOferta]
-                          ?.imagenDePerfil
+                        usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                           ? {
-                              uri: usuariosOfertantes[oferta.idCreadorOferta]
-                                ?.imagenDePerfil,
+                              uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
                             }
                           : require("../../assets/iconos/UserProfile.png")
                       }
                       style={styles.ofertaImage}
                     />
-                    <Text
-                      style={{ marginRight: 3, maxWidth: 120 }}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {usuariosOfertantes[oferta.idCreadorOferta]?.nombre ||
-                        "Cargando..."}
+                    <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
+                      {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
                     </Text>
                   </TouchableOpacity>
 
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={{ marginRight: 10, fontWeight: "bold" }}>
-                      CLP ${oferta.montoOfertado.toLocaleString()}
-                    </Text>
+                    <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
                     <TouchableOpacity
                       onPress={() => {
                         setSelectedOferta(oferta);
                         setConfirmModalVisible(true);
-                      }}
-                    >
+                      }}>
                       {/* Aquí puedes reemplazar el ícono por el de tu elección */}
                       <MaterialIcons name="check" size={24} color="green" />
                     </TouchableOpacity>
@@ -477,17 +450,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   flexDirection: "row",
                   alignItems: "center",
                   marginBottom: 10,
-                }}
-              >
-                <Text style={{ marginRight: 10, color: "grey" }}>
-                  No hay ofertas disponibles por el momento...
-                </Text>
+                }}>
+                <Text style={{ marginRight: 10, color: "grey" }}>No hay ofertas disponibles por el momento...</Text>
               </View>
             )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setVerOfertasModalVisible(false)}
-            >
+            <TouchableOpacity style={styles.closeButton} onPress={() => setVerOfertasModalVisible(false)}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
           </View>
@@ -500,37 +467,28 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         visible={confirmModalVisible}
         onRequestClose={() => {
           setConfirmModalVisible(false);
-        }}
-      >
+        }}>
         <View style={styles.centeredViewModal}>
           <View style={styles.modalViewModal}>
-            <Text style={styles.descripcionModal}>
-              Quieres aceptar la oferta por el monto de:
-            </Text>
-            <Text style={styles.amountText}>
-              CLP {selectedOferta?.montoOfertado.toLocaleString()}
-            </Text>
+            <Text style={styles.descripcionModal}>Quieres aceptar la oferta por el monto de:</Text>
+            <Text style={styles.amountText}>CLP {selectedOferta?.montoOfertado.toLocaleString()}</Text>
             <View style={styles.modalButtonsModal}>
               <TouchableOpacity
                 style={[styles.buttonModall, styles.cancelButtonModal]}
                 onPress={() => {
                   setConfirmModalVisible(false);
-                }}
-              >
+                }}>
                 <Text style={styles.buttonTextModal}>No</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.buttonModall, styles.createButtonModal]}
                 onPress={() => {
-                  console.log(
-                    "Oferta aceptada:",
-                    selectedOferta?.montoOfertado
-                  );
+                  console.log("Oferta aceptada:", selectedOferta?.montoOfertado);
                   handleAceptarOferta(selectedOferta);
+                  onRefresh();
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
-                }}
-              >
+                }}>
                 <Text style={styles.buttonTextModal}>Sí</Text>
               </TouchableOpacity>
             </View>
@@ -545,8 +503,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         visible={valorarModalVisible}
         onRequestClose={() => {
           setValorarModalVisible(false);
-        }}
-      >
+        }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Calificar Usuario</Text>
@@ -567,8 +524,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 // Por ejemplo, enviarla al servidor
                 // Luego, cierra el modal
                 setValorarModalVisible(false);
-              }}
-            >
+              }}>
               <Text style={styles.createButtonText}>Enviar Valoración</Text>
             </TouchableOpacity>
           </View>
@@ -625,6 +581,24 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: "#343a40",
     marginBottom: 15,
+  },
+  // ESTILO DE MONTO SECTION
+  offerUserContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 35,
+  },
+  offerUserImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  offerUserName: {
+    flex: 1, // Para que ocupe el espacio restante y los puntos suspensivos funcionen.
+    fontWeight: "400",
+    fontSize: 18,
+    color: "#003366",
   },
   //MODAL CONFIRMACION
   modalButtonsModal: {
@@ -707,6 +681,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#3D86CE",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  buttonFinished: {
+    backgroundColor: "green",
     padding: 15,
     borderRadius: 12,
     alignItems: "center",
@@ -807,7 +793,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 5,
     color: "#2E86C1",
   },
   contactInfo: {
@@ -887,7 +873,7 @@ const styles = StyleSheet.create({
   //   borderRadius: 8,
   // },
   buttonYellow: {
-    backgroundColor: "#FFC700",
+    backgroundColor: "#DB912C",
     padding: 15,
     borderRadius: 12,
     alignItems: "center",
