@@ -1,13 +1,12 @@
 import { Alert } from "react-native";
 import { Oferta, Postoferta } from "../resources/offer";
 import { updateServiceStatus } from "./serviceService";
+import { BASE_URL } from "@env";
 
-// const BASE_URL = 'http://10.0.2.2:9000/api/offers';
-// const BASE_URL = 'http://192.168.0.112:9000/api/offers';
-const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/offers';
+const URL = BASE_URL + '/offers';
 
 export const getOffersByServiceId = async (serviceId: string) : Promise<Oferta[]>=> {
-    const response = await fetch(BASE_URL+"/getOfferOfService/"+serviceId);
+    const response = await fetch(URL+"/getOfferOfService/"+serviceId);
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al obtener las ofertas de este servicio");
@@ -23,7 +22,7 @@ export const getOffersByServiceId = async (serviceId: string) : Promise<Oferta[]
     return offers;
 }
 export const getOfferAcceptedByServiceId = async (serviceId: string): Promise<Oferta>=> {
-    const response = await fetch(BASE_URL + '/getOfferAceptedOfService/' + serviceId);
+    const response = await fetch(URL + '/getOfferAceptedOfService/' + serviceId);
     if (!response.ok){
         console.log("Servicio sin oferta aceptada o no la encuentra");
     }
@@ -33,7 +32,7 @@ export const getOfferAcceptedByServiceId = async (serviceId: string): Promise<Of
 
 export const postOffer = async (offer: any) => {
     try {
-        const response = await fetch(BASE_URL + '/createOffer', {
+        const response = await fetch(URL + '/createOffer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -61,7 +60,7 @@ export const handleAceptarOferta = async (Offerta : Oferta | null) => {
         throw new Error("Id de oferta inválido");
     }
     try {
-        const response = await fetch(BASE_URL + '/acceptAnOffer/'+Offerta.id , {
+        const response = await fetch(URL + '/acceptAnOffer/'+Offerta.id , {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

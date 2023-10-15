@@ -1,12 +1,10 @@
 import { ServicioData, ServicioDataNew } from "../resources/service";
+import { BASE_URL } from "@env";
 
-// const BASE_URL = 'http://10.0.2.2:9000/api/services';
-//const BASE_URL = 'http://localhost:9000/api/services';
-// const BASE_URL = 'http://192.168.0.112:9000/api/services';
-const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/services';
+const URL = BASE_URL + '/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
-  const response = await fetch(BASE_URL);
+  const response = await fetch(URL);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -28,12 +26,12 @@ export const getAllServices = async (): Promise<ServicioData[]> => {
     estado: serv.estado,
     fechaCreacion: serv.fechaCreacion
   }));
-  
+
   return servicios;
 };
 
 export const createService = async (service: any) => {
-  const response = await fetch(BASE_URL, {
+  const response = await fetch(URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -51,7 +49,7 @@ export const createService = async (service: any) => {
 };
 
 export const getServicesByCategory = async (categoria: string): Promise<ServicioData[]> => {
-  const response = await fetch(`${BASE_URL}/byCategory?categoria=${encodeURIComponent(categoria)}`);
+  const response = await fetch(`${URL}/byCategory?categoria=${encodeURIComponent(categoria)}`);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -81,7 +79,7 @@ export const getLastServices = async (skip: number = 0, categoria?: string): Pro
 
   // Si se proporciona una categoría, añadirla a la URL, de lo contrario, no hacer nada
   const categoryQuery = categoria ? `&categoria=${categoria}` : '';
-  const response = await fetch(`${BASE_URL}/lastServices?skip=${skip}${categoryQuery}`);
+  const response = await fetch(`${URL}/lastServices?skip=${skip}${categoryQuery}`);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -109,7 +107,7 @@ export const getLastServices = async (skip: number = 0, categoria?: string): Pro
 
 
 export const getServicesByUser = async (idUsuario: string): Promise<ServicioData[]> => {
-  const response = await fetch(`${BASE_URL}/byUser?idCreador=${encodeURIComponent(idUsuario)}`);
+  const response = await fetch(`${URL}/byUser?idCreador=${encodeURIComponent(idUsuario)}`);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -134,7 +132,7 @@ export const getServicesByUser = async (idUsuario: string): Promise<ServicioData
 };
 
 export const getServiceById = async (id: string): Promise<ServicioData> => {
-  const response = await fetch(BASE_URL + '/' + id, {
+  const response = await fetch(URL + '/' + id, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -151,7 +149,7 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
 };
 
 export const updateServiceStatus = async (id: string, estado: number) => {
-  const response = await fetch(BASE_URL + '/' + id, {
+  const response = await fetch(URL + '/' + id, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -170,7 +168,7 @@ export const updateServiceStatus = async (id: string, estado: number) => {
 
 
 export const incrementServiceClick = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/incrementClick/${id}`, {
+  const response = await fetch(`${URL}/incrementClick/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -187,7 +185,7 @@ export const incrementServiceClick = async (id: string) => {
 }
 
 export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
-  const response = await fetch(BASE_URL + '/topOfWeek');
+  const response = await fetch(URL + '/topOfWeek');
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -209,7 +207,7 @@ export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
     estado: serv.estado,
     fechaCreacion: serv.fechaCreacion
   }));
-  
+
   return servicios;
 };
 

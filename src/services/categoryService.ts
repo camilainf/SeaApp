@@ -1,12 +1,10 @@
 import { Categoria, CategoriaPopular } from "../resources/category";
+import { BASE_URL } from "@env";
 
-// const BASE_URL = 'http://10.0.2.2:9000/api/categories';
-//const BASE_URL = 'http://localhost:9000/api/categories';
-// const BASE_URL = 'http://192.168.0.112:9000/api/categories';
-const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/categories';
+const URL = BASE_URL + '/categories';
 
 export const getAllCategories = async (): Promise<Categoria[]> => {
-  const response = await fetch(BASE_URL);
+  const response = await fetch(URL);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -23,7 +21,7 @@ export const getAllCategories = async (): Promise<Categoria[]> => {
 };
 
 export const getPopularCategories = async (): Promise<CategoriaPopular[]> => {
-  const response = await fetch(BASE_URL + '/popular');
+  const response = await fetch(URL + '/popular');
 
   if (!response.ok) {
     const errorData = await response.json();

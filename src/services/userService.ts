@@ -1,12 +1,10 @@
 import { UsuarioCasted } from "../resources/user";
+import { BASE_URL } from "@env";
 
-// const BASE_URL = 'http://10.0.2.2:9000/api/users';
-//const BASE_URL = 'http://localhost:9000/api/users';
-// const BASE_URL = 'http://192.168.0.112:9000/api/users';
-const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/users';
+const URL = BASE_URL + '/users';
 
 export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
-  const response = await fetch(BASE_URL);
+  const response = await fetch(URL);
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -19,7 +17,7 @@ export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
 };
 
 export const createUser = async (user: any) => {
-  const response = await fetch(BASE_URL, {
+  const response = await fetch(URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +35,7 @@ export const createUser = async (user: any) => {
 };
 
 export const loginUser = async (credentials: any) => {
-  const response = await fetch(BASE_URL + '/login', {
+  const response = await fetch(URL + '/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -58,7 +56,7 @@ export const logout = () => {
 }
 
 export const getUserById = async (id: string): Promise<UsuarioCasted> => {
-  const response = await fetch(BASE_URL + '/' + id, {
+  const response = await fetch(URL + '/' + id, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

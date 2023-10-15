@@ -1,13 +1,11 @@
 
+import { BASE_URL } from "@env";
 
-// const BASE_URL = 'http://10.0.2.2:9000/api/image';
-//const BASE_URL = 'http://localhost:9000/api/image';
-// const BASE_URL = 'http://192.168.0.112:9000/api/image';
-const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/image';
+const URL = BASE_URL + '/image';
 
 export const uploadImage = async (base64Image: string) => {
     try {
-      const response = await fetch(BASE_URL + '/upload', {
+      const response = await fetch(URL + '/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
