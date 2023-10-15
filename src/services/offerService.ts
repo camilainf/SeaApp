@@ -2,8 +2,9 @@ import { Alert } from "react-native";
 import { Oferta, Postoferta } from "../resources/offer";
 import { updateServiceStatus } from "./serviceService";
 
-const BASE_URL = 'http://10.0.2.2:9000/api/offers';
+// const BASE_URL = 'http://10.0.2.2:9000/api/offers';
 // const BASE_URL = 'http://192.168.0.112:9000/api/offers';
+const BASE_URL = 'https://seajob-2a7634f714d7.herokuapp.com/api/offers';
 
 export const getOffersByServiceId = async (serviceId: string) : Promise<Oferta[]>=> {
     const response = await fetch(BASE_URL+"/getOfferOfService/"+serviceId);
