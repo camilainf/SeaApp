@@ -21,6 +21,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
   const formik = useFormik({
     initialValues: {
+      imagenDePerfil: "",
       nombre: "",
       apellidoPaterno: "",
       apellidoMaterno: "",
@@ -34,19 +35,26 @@ const Registro: React.FC<Props> = ({ navigation }) => {
     validationSchema: registroSchema,
     onSubmit: async (values) => {
       console.log("Inicio de onSubmit", values);
+    
+      if (!profilePic) {
+        // Si no se ha seleccionado una foto de perfil, muestra un Alert
+        Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");
+        return; // Evita que la solicitud se envíe
+      }
+    
       try {
         let imageUrl = profilePic;
         if (profilePicBase64) {
           imageUrl = await uploadImage(`data:image/jpeg;base64,${profilePicBase64}`);
         }
-
+    
         const user = {
           ...values,
           telefono: `+56${values.telefono}`,
           calificacion: 0,
           imagenDePerfil: imageUrl || "",
         };
-
+    
         const newUser = await createUser(user);
         console.log("Usuario creado:", newUser);
         Alert.alert("Usuario creado con éxito.", "", [
@@ -107,6 +115,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
             <View style={styles.profilePicContainer}>
               <Image
+                
                 source={profilePic ? { uri: profilePic } : require("../../assets/iconos/UserProfileRegistro.png")}
                 style={styles.profilePic}
               />

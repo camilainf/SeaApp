@@ -9,7 +9,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { UsuarioCasted } from "../resources/user";
 import { getUserById } from "../services/userService";
 import { ServicioData } from "../resources/service";
-import { getServiceById, obtenerTextoEstado } from "../services/serviceService";
+import { getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
@@ -237,74 +237,71 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.buttonText}>{esDueno ? "Ver ofertas" : "Ofertar"}</Text>
           </TouchableOpacity>
         )}
-
-        {servicioCargado?.estado === 2 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ?(
-          <TouchableOpacity
-            style={esDueno ? styles.buttonYellow : styles.button}
-            onPress={() => {
-              if (esDueno) {
-                Alert.alert("Por iniciar", "Debes esperar que el trabajador inicie el servicio");
-              } else {
-                Alert.alert("Comenzar", "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
-              }
-            }}>
-            {esDueno ? (
-              <Text style={styles.buttonText}>
-                Por iniciar <FontAwesome name="clock-o" size={20} color="white" />
-              </Text>
-            ) : (
-              <Text style={styles.buttonText}>Comenzar</Text>
+        {/* Verificar primero si el usuario tiene permiso basado en el token y la oferta/creador. */}
+        {servicioCargado && servicioCargado.estado >= 2 && (userToken === usuarioOferta?._id || userToken === servicioCargado?.idCreador) ? (
+          <>
+            {servicioCargado?.estado === 2 && (
+              <TouchableOpacity
+                style={esDueno ? styles.buttonYellow : styles.button}
+                onPress={() => {
+                  const message = esDueno ? "Por iniciar" : "Comenzar";
+                  if (!esDueno) {
+                    updateServiceStatus(idServicio, 3); 
+                  }
+                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
+                }}>
+                <Text style={styles.buttonText}>
+                  {esDueno ? (
+                    <>
+                      Por iniciar <FontAwesome name="clock-o" size={20} color="white" />
+                    </>
+                  ) : (
+                    "Comenzar"
+                  )}
+                </Text>
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
-        ): (
-          <Text style={{color: "#003366"}}>
-          Esta solicitud ya fue tomada por otro usuario
-          </Text>)
-        }
 
-        {servicioCargado?.estado === 3 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
-          <TouchableOpacity
-            style={esDueno ? styles.buttonGray : styles.button}
-            onPress={() => {
-              if (esDueno) {
-                Alert.alert("En proceso", "El trabajador sigue en proceso con este servicio, espera a que este termine");
-              } else {
-                Alert.alert("Terminar", "Se ha terminado el servicio, comunicate con el contratador para avisarle");
-              }
-            }}>
-            <Text style={styles.buttonText}>{esDueno ? "En proceso" : "Terminar"}</Text>
-          </TouchableOpacity>
-        ): (
-          <Text style={{color: "#003366"}}>
-          Esta solicitud ya fue tomada por otro usuario
-          </Text>)
-        }
+            {servicioCargado?.estado === 3 && (
+              <TouchableOpacity
+                style={esDueno ? styles.buttonGray : styles.button}
+                onPress={() => {
+                  const message = esDueno ? "En proceso" : "Terminar";
+                  if (!esDueno) {
+                    updateServiceStatus(idServicio, 4); 
+                  }
+                  Alert.alert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
+                }}>
+                <Text style={styles.buttonText}>{esDueno ? "En proceso" : "Terminar"}</Text>
+              </TouchableOpacity>
+            )}
 
-        {servicioCargado?.estado === 4 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setValorarModalVisible(true);
-            }}>
-            <Text style={styles.buttonText}>Valorar</Text>
-          </TouchableOpacity>
-        ): (
-          <Text style={{color: "#003366"}}>
-          Esta solicitud ya fue tomada por otro usuario
-          </Text>)
-          }
-        {servicioCargado?.estado && servicioCargado?.estado>4 && (userToken === usuarioOferta?._id  || userToken === servicioCargado?.idCreador) ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              Alert.alert("El servicio ya se encuentra finalizado 👌🏻")
-            }}>
-            <Text style={styles.buttonText}>Terminado</Text>
-          </TouchableOpacity>
-        ): (
-          <Text style={{color: "#003366"}}>
-          Esta solicitud ya fue tomada por otro usuario
-          </Text>)}  
+            {servicioCargado?.estado === 4 && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  setValorarModalVisible(true);
+                }}>
+                <Text style={styles.buttonText}>Valorar</Text>
+              </TouchableOpacity>
+            )}
+
+            {servicioCargado && servicioCargado?.estado > 4 && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  Alert.alert("El servicio ya se encuentra finalizado 👌🏻");
+                }}>
+                <Text style={styles.buttonText}>Terminado</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        ) : (
+          
+          <>
+          { servicioCargado && servicioCargado?.estado !== 1 && (<Text style={{ color: "#003366" , fontSize:20, marginBottom:20}}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>)} 
+          </>
+        )}
       </View>
 
       {/*Modal de Creacion de oferta*/}
@@ -323,8 +320,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}>
-              <Text style={styles.modalTitle}>Crear oferta   </Text>
-              <TouchableOpacity style={{marginBottom:5}} onPress={() => setDescriptionVisibility(!isDescriptionVisible)}>
+              <Text style={styles.modalTitle}>Crear oferta </Text>
+              <TouchableOpacity style={{ marginBottom: 5 }} onPress={() => setDescriptionVisibility(!isDescriptionVisible)}>
                 <FontAwesome name="question-circle" size={22} color="#2E86C1" />
               </TouchableOpacity>
             </View>
@@ -349,13 +346,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 borderRadius: 8,
               }}>
               <Text style={{ padding: 10 }}>CLP</Text>
-              <TextInput
-                style={{ flex: 1, height: 40, paddingHorizontal: 10 }}
-                placeholder="Ingrese el valor de la oferta"
-                keyboardType="number-pad"
-                maxLength={10}
-                onChangeText={(text) => setOfertaValue(text)}
-              />
+              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={10} onChangeText={(text) => setOfertaValue(text)} />
             </View>
             <View style={{ ...styles.modalButtons, marginTop: 20 }}>
               <TouchableOpacity
@@ -437,6 +428,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       onPress={() => {
                         setSelectedOferta(oferta);
                         setConfirmModalVisible(true);
+                        
                       }}>
                       {/* Aquí puedes reemplazar el ícono por el de tu elección */}
                       <MaterialIcons name="check" size={24} color="green" />
@@ -485,9 +477,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => {
                   console.log("Oferta aceptada:", selectedOferta?.montoOfertado);
                   handleAceptarOferta(selectedOferta);
-                  onRefresh();
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
+                  onRefresh();
                 }}>
                 <Text style={styles.buttonTextModal}>Sí</Text>
               </TouchableOpacity>
@@ -524,6 +516,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 // Por ejemplo, enviarla al servidor
                 // Luego, cierra el modal
                 setValorarModalVisible(false);
+                onRefresh();
               }}>
               <Text style={styles.createButtonText}>Enviar Valoración</Text>
             </TouchableOpacity>

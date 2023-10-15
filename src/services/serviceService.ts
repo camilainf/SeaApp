@@ -130,6 +130,44 @@ export const getServicesByUser = async (idUsuario: string): Promise<ServicioData
   }));
   return servicios;
 };
+export const getServicesAcceptedByUser = async (idUsuario: string): Promise<ServicioData[]> => {
+  try {
+    const response = await fetch(`${URL}/acceptedByUser/${idUsuario}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const serviciosData: any[] = await response.json();
+    //console.log("QUE OBTENGO:", serviciosData);
+
+    const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
+      id: serv._id,
+      idCreador: serv.idCreador,
+      nombreServicio: serv.nombreServicio,
+      categoria: serv.categoria,
+      descripcion: serv.descripcion,
+      fechaSolicitud: serv.fechaSolicitud,
+      horaSolicitud: serv.horaSolicitud,
+      direccion: serv.direccion,
+      monto: serv.monto,
+      imagen: serv.imagen,
+      estado: serv.estado,
+      fechaCreacion: serv.fechaCreacion,
+    }));
+
+    return servicios;
+  } catch (error) {
+    console.error("Hubo un problema con la petición Fetch:");
+    return []; // Retorna un arreglo vacío en caso de error
+  }
+};
+
 
 export const getServiceById = async (id: string): Promise<ServicioData> => {
   const response = await fetch(URL + '/' + id, {
@@ -148,7 +186,10 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
   return servicioData;
 };
 
-export const updateServiceStatus = async (id: string, estado: number) => {
+export const updateServiceStatus = async (id: string| null, estado: number) => {
+  if (!id) {
+    throw new Error("No se proporcionó un id válido para actualizar el estado del servicio");
+  }
   const response = await fetch(URL + '/' + id, {
     method: 'PATCH',
     headers: {

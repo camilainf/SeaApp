@@ -26,7 +26,7 @@ import { getUserIdFromToken } from "../services/authService";
 import SinSolicitudes from "../components/SinSolicitudes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { getServicesByUser } from "../services/serviceService";
+import { getServicesAcceptedByUser, getServicesByUser } from "../services/serviceService";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -44,13 +44,13 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   //Variables de la vista
   const [usuarioData, setUsuarioData] = useState<UsuarioCasted | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
-  const [serviciosTerminados, setServiciosTerminados] = useState<ServicioData[]>([]);
+  const [solicitudesAceptadas, setSolicitudesAceptadas] = useState<ServicioData[]>([]);
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
-  const numeroSolicitudesAceptadas = serviciosTerminados.length; //Valor de solicitudes recibidas
+  const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
   //Por ver  
-  const gananciaDinero = 4300; //
-  const solicitudesAceptadas: ServicioData[] = [];
+  const gananciaDinero = 4300; // 
+  //const solicitudesAceptadas: ServicioData[] = [];
   
 
   useFocusEffect(
@@ -72,10 +72,12 @@ const Profile: React.FC<Props> = ({ navigation }) => {
 
           const data = await getUserById(userId);
           setUsuarioData(data);
-
+          //Servicios creados por este usuario
           const fetchedServices = await getServicesByUser(userId);
           setServiciosPropios(fetchedServices);
-
+          //Servicios Aceptados para trabajar por este usuario
+          const fetchedServicesAceptados = await getServicesAcceptedByUser(userId);
+          setSolicitudesAceptadas(fetchedServicesAceptados); //
           setLoading(false);
         } catch (err) {
           console.log(err)
@@ -207,7 +209,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     </Text>
                   </View>
                   <Text style={styles.textoSolicitudes}>
-                    Solicitudes Agendadas
+                    Solicitudes aceptadas
                   </Text>
                 </View>
               </View>
@@ -288,7 +290,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             />
           )}
         </View>
-        {/* LISTADO DE SOLICITUDES REALIZADAS */}
+        {/* LISTADO DE SOLICITUDES Aceptadas */}
         <View
           style={{
             height: 2,
@@ -327,14 +329,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                   }}
                 >
                   <Image
-                    source={{ uri: item.imagen }}
+                    source={require("../../assets/iconos/ImageReferencia.png")}
                     style={styles.imagenTrabajo}
                   />
                   <View style={{ marginEnd: 90 }}>
                     <Text
                       numberOfLines={1}
                       ellipsizeMode="tail"
-                      style={{ color: "#4E479A", fontWeight: "bold" }}
+                      style={{ color: "#50719D", fontWeight: "bold" }}
                     >
                       {item.nombreServicio}
                     </Text>
@@ -483,7 +485,7 @@ const styles = StyleSheet.create({
   numberText: {
     color: "#0676C6",
     fontWeight: "400",
-    fontSize: 30,
+    fontSize: 27,
     paddingHorizontal: 10,
   },
   gananciaDineroTexto: {

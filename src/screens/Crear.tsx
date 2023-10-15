@@ -248,7 +248,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         onBlur={formik.handleBlur("descripcion")}
         multiline
         numberOfLines={4}
-        maxLength={120}
+        maxLength={300}
         style={[
           styles.input,
           formik.touched.descripcion && formik.errors.descripcion ? styles.inputError : null

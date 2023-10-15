@@ -1,10 +1,11 @@
 import * as ImagePicker from 'expo-image-picker';
+import { Alert } from 'react-native';
 
 export const selectImage = async (): Promise<{ uri: string | null, base64: string | null }> => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (status !== 'granted') {
-        alert('Necesitamos permisos para acceder a tus fotos.');
+        Alert.alert('Necesitamos permisos para acceder a tus fotos.');
         return { uri: null, base64: null };
     }
 

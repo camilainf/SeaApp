@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 
 export const registroSchema = Yup.object({
+    //profilePic: Yup.string().required("Requerido"),
     nombre: Yup.string().required("Requerido"),
     apellidoPaterno: Yup.string().required("Requerido"),
     apellidoMaterno: Yup.string().required("Requerido"),
