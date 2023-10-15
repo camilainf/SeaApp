@@ -63,7 +63,6 @@ export const getUserById = async (id: string): Promise<UsuarioCasted> => {
       'Content-Type': 'application/json',
     },
   });
-
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se encontró o cargo el usuario");
