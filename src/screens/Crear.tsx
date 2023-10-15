@@ -16,6 +16,7 @@ import { selectImage } from "../utils/imageUtils";
 import { uploadImage } from "../services/imageService";
 import { Image } from "react-native-elements";
 import { crearServicioSchema } from "../utils/validations/crearServicioValidations";
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -29,6 +30,12 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [serviceReferencePic, setServiceReferencePic] = useState<string | null>(null);
   const [serviceReferencePicBase64, setServiceReferencePicBase64] = useState<string | null>(null);
   const montoInputRef = useRef<TextInputMask>(null);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const currentDate = new Date();
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -90,7 +97,10 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               text: "OK",
               onPress: () => {
                 formik.resetForm();
+                setSelectedDate(new Date());
                 setShowInfo(false);
+                setServiceReferencePic(null);
+                setServiceReferencePicBase64(null);
                 navigation.navigate("Main", { screen: "Home" });
               },
             },
@@ -116,6 +126,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           text: "OK",
           onPress: () => {
             formik.resetForm();
+            setSelectedDate(new Date());
             setShowInfo(false);
             setServiceReferencePic(null);
             setServiceReferencePicBase64(null);
@@ -133,6 +144,25 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     }
     if (base64) {
       setServiceReferencePicBase64(base64);
+    }
+  };
+
+  const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
+    setShowDatePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      // const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear().toString().substr(-2)}`;
+      formik.setFieldValue("fechaSolicitud", formattedDate);
+    }
+  };
+
+  const handleTimeChange = (event: DateTimePickerEvent, date?: Date) => {
+    setShowTimePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      const formattedTime = `${date.getHours()}:${date.getMinutes()}`;
+      formik.setFieldValue("horaSolicitud", formattedTime);
     }
   };
 
@@ -227,46 +257,50 @@ const Crear: React.FC<Props> = ({ navigation }) => {
 
       {/* Horario */}
       <View style={styles.row}>
+
+        {/* Fecha */}
         <View style={styles.column}>
           <Text style={styles.label}>
             Fecha{"  "}
             <FontAwesome name="calendar" size={16} color="#4E479A" />
           </Text>
-          <TextInputMask
-            type={"datetime"}
-            options={{
-              format: "DD/MM/YY",
-            }}
-            placeholder="DD/MM/YY"
-            value={formik.values.fechaSolicitud}
-            onChangeText={(value) => formik.setFieldValue("fechaSolicitud", value)}
-            onBlur={formik.handleBlur("fechaSolicitud")}
-            style={[
-              styles.input,
-              formik.touched.fechaSolicitud && formik.errors.fechaSolicitud ? styles.inputError : null
-            ]}
-          />
+          <View style={styles.dateTimePickerContainer}>
+            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+              <Text>{formik.values.fechaSolicitud || "Selecciona una fecha"}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+                minimumDate={currentDate}
+              />
+            )}
+          </View>
         </View>
+
+        {/* Hora */}
         <View style={styles.column}>
           <Text style={styles.label}>
             Hora{"  "}
             <FontAwesome name="clock-o" size={16} color="#4E479A" />
           </Text>
-          <TextInputMask
-            type={"datetime"}
-            options={{
-              format: "HH:MM",
-            }}
-            placeholder="HH:MM"
-            value={formik.values.horaSolicitud}
-            onChangeText={(value) => formik.setFieldValue("horaSolicitud", value)}
-            onBlur={formik.handleBlur("horaSolicitud")}
-            style={[
-              styles.input,
-              formik.touched.horaSolicitud && formik.errors.horaSolicitud ? styles.inputError : null
-            ]}
-          />
+          <View style={styles.dateTimePickerContainer}>
+            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+              <Text>{formik.values.horaSolicitud || "Selecciona una hora"}</Text>
+            </TouchableOpacity>
+            {showTimePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="time"
+                display="default"
+                onChange={handleTimeChange}
+              />
+            )}
+          </View>
         </View>
+
       </View>
 
       {/* Dirección */}
@@ -342,9 +376,9 @@ const Crear: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity
               style={{
                 position: 'absolute',
-                top: 5, 
-                right: 5, 
-                backgroundColor: 'white', 
+                top: 5,
+                right: 5,
+                backgroundColor: 'white',
                 borderRadius: 15,
                 width: 30,
                 height: 30,
@@ -482,6 +516,17 @@ const styles = StyleSheet.create({
     borderColor: "#E1E1E6",
     borderWidth: 1,
     paddingHorizontal: 0,
+    borderRadius: 10,
+    marginBottom: 20,
+    backgroundColor: "#F3F6FF",
+    color: "#6B6B7D",
+    justifyContent: 'center',
+  },
+  dateTimePickerContainer: {
+    height: 50,
+    borderColor: "#E1E1E6",
+    borderWidth: 1,
+    paddingHorizontal: 12,
     borderRadius: 10,
     marginBottom: 20,
     backgroundColor: "#F3F6FF",
