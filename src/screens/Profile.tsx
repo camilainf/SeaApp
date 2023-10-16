@@ -154,13 +154,13 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             onPress={() =>
               Alert.alert(
                 "Información de contacto",
-                `📧  ${usuarioData?.email}\n📞  ${usuarioData?.telefono}`,
+                `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`,
                 [{ text: "OK" }]
               )
             }
           >
-            <FontAwesome name="envelope" size={15} color="white" />
-            <Text style={styles.contactButtonText}>Contacto</Text>
+            <FontAwesome name="info-circle" size={15} color="white" />
+            <Text style={styles.contactButtonText}>Informacion</Text>
           </TouchableOpacity>
         </View>
 
