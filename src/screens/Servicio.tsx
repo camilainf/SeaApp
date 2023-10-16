@@ -247,8 +247,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   const message = esDueno ? "Por iniciar" : "Comenzar";
                   if (!esDueno) {
                     updateServiceStatus(idServicio, 3); 
+                    onRefresh();
                   }
-                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
+                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio, si ves necesario, puedes comunicarte con el trabajador 😉" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
                 }}>
                 <Text style={styles.buttonText}>
                   {esDueno ? (
@@ -269,6 +270,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   const message = esDueno ? "En proceso" : "Terminar";
                   if (!esDueno) {
                     updateServiceStatus(idServicio, 4); 
+                    onRefresh();
                   }
                   Alert.alert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
                 }}>
@@ -281,6 +283,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 style={styles.button}
                 onPress={() => {
                   setValorarModalVisible(true);
+                  onRefresh();
                 }}>
                 <Text style={styles.buttonText}>Valorar</Text>
               </TouchableOpacity>

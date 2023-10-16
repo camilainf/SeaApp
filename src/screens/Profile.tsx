@@ -260,10 +260,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.tarjetaTrabajo}
                   onPress={() => {
-                    console.log(
-                      "Tarjeta Trabajo clickeada:",
-                      item.nombreServicio
-                    );
+                    
                     navigation.navigate("Servicio", item);
                   }}
                 >
@@ -321,10 +318,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.tarjetaTrabajo}
                   onPress={() => {
-                    console.log(
-                      "Tarjeta Trabajo clickeada:",
-                      item.nombreServicio
-                    );
+                    
                     navigation.navigate("Servicio", item);
                   }}
                 >
