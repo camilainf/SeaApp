@@ -252,6 +252,8 @@ export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
   return servicios;
 };
 
+
+
 export const obtenerTextoEstado = (estado: number | undefined) => {
   if (estado === undefined) {
     return "Estado no disponible";
