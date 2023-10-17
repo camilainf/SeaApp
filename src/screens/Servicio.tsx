@@ -7,14 +7,14 @@ import { useRoute, RouteProp } from "@react-navigation/native";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UsuarioCasted } from "../resources/user";
-import { getUserById } from "../services/userService";
+import { getUserById, handleEnviarValoracion } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
 import { Icon } from "react-native-elements";
-import { crearValoracion, obtenerValoracionesServicio } from "../services/valoracion";
+import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracion";
 import { Valoracion } from "../resources/valoration";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
@@ -47,7 +47,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
   const [usuarioOferta, setUsuarioOferta] = useState<UsuarioCasted | null>(null);
-  const [valoracionController, setValoracionController] = useState<Valoracion |null >(null);
+  const [valoracionController, setValoracionController] = useState<Valoracion | null>(null);
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
 
@@ -56,7 +56,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       if (idServicio) {
         const fetchedServicio = await getServiceById(idServicio);
         setServicioCargado(fetchedServicio);
-
         // 2. Usando el servicio obtenido, cargar datos del usuario creador
         if (fetchedServicio && fetchedServicio.idCreador) {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
@@ -86,6 +85,15 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           const fetchedUserSelected = await getUserById(fetchedOfferSelected.idCreadorOferta);
           setUsuarioOferta(fetchedUserSelected);
         }
+        //Cargar Proceso de calificacion
+
+        if (fetchedServicio.estado >= 4) {
+          const valoracionData = await obtenerValoracionesServicio(idServicio);
+          setValoracionController(valoracionData);
+          if (valoracionData.dueñoValoro && valoracionData.trabajadorValoro) {
+            updateServiceStatus(idServicio, 5);
+          }
+        }
       }
     } catch (error) {
       console.error("Hubo un error:", error);
@@ -111,6 +119,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     setIsRefreshing(true);
     fetchData();
   };
+
+  
 
   return (
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
@@ -236,7 +246,17 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 setCrearOfertaModalVisible(true);
               }
             }}>
-            <Text style={styles.buttonText}>{esDueno ? "Ver ofertas" : "Ofertar"}</Text>
+            <Text style={styles.buttonText}>
+              {esDueno ? (
+                <>
+                  Ver ofertas <FontAwesome name="eye" size={20} color="white" />
+                </>
+              ) : (
+                <>
+                  Ofertar <FontAwesome name="gavel" size={20} color="white" />
+                </>
+              )}
+            </Text>
           </TouchableOpacity>
         )}
         {/* Verificar primero si el usuario tiene permiso basado en el token y la oferta/creador. */}
@@ -245,10 +265,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             {servicioCargado?.estado === 2 && (
               <TouchableOpacity
                 style={esDueno ? styles.buttonYellow : styles.button}
-                onPress={() => {
+                onPress={async () => {
                   const message = esDueno ? "Por iniciar" : "Comenzar";
                   if (!esDueno) {
-                    updateServiceStatus(idServicio, 3);
+                    await updateServiceStatus(idServicio, 3);
                     onRefresh();
                   }
                   Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio, si ves necesario, puedes comunicarte con el trabajador 😉" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
@@ -259,7 +279,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       Por iniciar <FontAwesome name="clock-o" size={20} color="white" />
                     </>
                   ) : (
-                    "Comenzar"
+                    <>
+                      Comenzar <FontAwesome name="play" size={20} color="white" />
+                    </>
                   )}
                 </Text>
               </TouchableOpacity>
@@ -267,42 +289,59 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
 
             {servicioCargado?.estado === 3 && (
               <TouchableOpacity
-                style={esDueno ? styles.buttonGray : styles.button}
-                onPress={() => {
+                style={esDueno ? styles.buttonGray : styles.buttonTerminar}
+                onPress={async () => {
                   const message = esDueno ? "En proceso" : "Terminar";
                   if (!esDueno) {
-                    updateServiceStatus(idServicio, 4);
+                    await updateServiceStatus(idServicio, 4);
+                    await crearValoracion(idServicio, servicioCargado.idCreador, userCreador?._id);
                     onRefresh();
                   }
                   Alert.alert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
                 }}>
-                <Text style={styles.buttonText}>{esDueno ? "En proceso" : "Terminar"}</Text>
+                <Text style={styles.buttonText}>
+                  {esDueno ? (
+                    <>
+                      {" "}
+                      En proceso <FontAwesome name="hand-paper-o" size={20} color="white" />
+                    </>
+                  ) : (
+                    <>
+                      Terminar <FontAwesome name="rocket" size={17} color="white" />
+                    </>
+                  )}
+                </Text>
               </TouchableOpacity>
             )}
 
             {servicioCargado?.estado === 4 && (
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => {
+                onPress={ () => {
                   setValorarModalVisible(true);
                   onRefresh();
                 }}>
-                <Text style={styles.buttonText}>Valorar</Text>
+                <Text style={styles.buttonText}>
+                  Valorar <FontAwesome name="handshake-o" size={20} color="white" />
+                </Text>
               </TouchableOpacity>
             )}
 
             {servicioCargado && servicioCargado?.estado > 4 && (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  Alert.alert("El servicio ya se encuentra finalizado 👌🏻");
-                }}>
-                <Text style={styles.buttonText}>Terminado</Text>
-              </TouchableOpacity>
+              // <TouchableOpacity
+              //   style={styles.button}
+              //   onPress={() => {
+              //     Alert.alert("El servicio ya se encuentra finalizado 👌🏻");
+              //   }}>
+              //   <Text style={styles.buttonText}>Terminado</Text>
+              // </TouchableOpacity>
+              <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 15 }}>
+                El servicio actual ya se encuentra <Text style={{ fontWeight: "bold" }}>finalizado</Text> y <Text style={{ fontWeight: "bold" }}>valorado </Text> por ambos usuarios! ✅
+              </Text>
             )}
           </>
         ) : (
-          <>{servicioCargado && servicioCargado?.estado !== 1 && <Text style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>}</>
+          <>{servicioCargado && servicioCargado?.estado !== 1 && <Text style={{ color: "#00162D", fontSize: 20, marginBottom: 20 }}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>}</>
         )}
       </View>
 
@@ -489,7 +528,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Modal de valoración */}
+      {/* Modal de valoración valorar */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -500,31 +539,39 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Calificar Usuario</Text>
-            <Text>Valoración:</Text>
-            <Slider
-              minimumValue={1.0}
-              maximumValue={5.0}
-              step={0.1}
-              value={valoracion}
-              onValueChange={(value) => setValoracion(value)}
-              style={{ width: 300, marginBottom: 20 }} // Ajusta la longitud de la barra
-            />
-            <Text>{valoracion.toFixed(1)}</Text>
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => {
-                // Aquí puedes realizar la lógica para enviar la valoración
-                // Por ejemplo, enviarla al servidor
-                // Luego, cierra el modal
-                setValorarModalVisible(false);
-                onRefresh();
-              }}>
-              <Text style={styles.createButtonText}>Enviar Valoración</Text>
-            </TouchableOpacity>
+            <Text style={styles.modalInstruction}>Desliza para seleccionar una valoración al usuario entre 1.0 y 5.0,</Text>
+            <Slider minimumValue={1.0} maximumValue={5.0} step={0.1} value={valoracion} onValueChange={(value) => setValoracion(value)} style={{ width: 300, marginBottom: 20 }} />
+            <Text style={styles.valoracionText}>{valoracion.toFixed(1)}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.cancelButtonValoration}
+                onPress={() => {
+                  setValorarModalVisible(false);
+                }}>
+                <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 19, textAlign: "center" }}>Cancelar Valoracion</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={()=>{
+                  {esDueno ?  handleEnviarValoracion(userCreador?._id,valoracion) :  handleEnviarValoracion(usuarioOferta?._id,valoracion)}
+                }
+                }
+              >
+                <Text style={{ color: "#FFFFFF", textAlign: "center", fontSize: 19, fontWeight: "bold" }}>Enviar Valoración</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
-      
+
+      {/* Boton de testing
+      <TouchableOpacity
+          style={{marginTop: 20}}
+          onPress={()=>{
+            actualizarValoracion("652dcc0bde2cfc29ec85173d",true,null);
+          }}>
+            <Text style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Test</Text>
+          </TouchableOpacity> */}
     </ScrollView>
   );
 };
@@ -686,6 +733,18 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
+  buttonTerminar: {
+    backgroundColor: "green",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
   buttonFinished: {
     backgroundColor: "green",
     padding: 15,
@@ -786,7 +845,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
     marginBottom: 5,
     color: "#2E86C1",
@@ -890,6 +949,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 5,
+  },
+  //Estilos modal valoracion
+    modalInstruction: {
+      color: '#555',
+      marginBottom: 10,
+  },
+  valoracionText: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      color: '#2E86C1',
+      marginBottom:20,
+  },
+  buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+  },
+  cancelButtonValoration: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    marginLeft: 5,
+    backgroundColor: '#FB6865',
+    alignItems: 'center',
+    
   },
 });
 
