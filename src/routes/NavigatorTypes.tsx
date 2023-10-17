@@ -1,4 +1,3 @@
-import {ServicioData} from '../resources/service'
 export type RootStackParamList = {
     Auth: undefined;
     Registro: undefined;
@@ -16,6 +15,9 @@ export type RootStackParamList = {
     };
     PerfilAjeno: {
         id: string;
+    };
+    EditarPerfil: {
+        userId: string;
     };
 };
 

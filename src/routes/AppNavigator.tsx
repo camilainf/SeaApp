@@ -10,6 +10,7 @@ import ServicioScreen from '../screens/Servicio';
 import TerminosCondiciones from '../screens/TerminosCondiciones';
 import Profile from '../screens/Profile';
 import ListaServicios from '../screens/ListaServicios';
+import EditarPerfil from '../screens/EditarPerfil';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -60,7 +61,18 @@ const AppNavigator: React.FC = () => {
                         headerShown: true, // Muestra la barra superior
                         headerBackTitleVisible: false, // Oculta el título de volver atrás
                         headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
-                        
+
+                    }}
+                />
+
+                <Stack.Screen
+                    name="EditarPerfil"
+                    component={EditarPerfil}
+                    options={{
+                        headerShown: true, // Muestra la barra superior
+                        headerBackTitleVisible: false, // Oculta el título de volver atrás
+                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+
                     }}
                 />
 
@@ -69,14 +81,14 @@ const AppNavigator: React.FC = () => {
                     component={TabGroup}
                 />
                 <Stack.Screen
-        name="PerfilAjeno"
-        component={Profile}
-        options={{
-            headerShown: true,
-            headerBackTitleVisible: false,
-            headerTitle: 'Perfil Ajeno',
-        }}
-    />
+                    name="PerfilAjeno"
+                    component={Profile}
+                    options={{
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: 'Perfil Ajeno',
+                    }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

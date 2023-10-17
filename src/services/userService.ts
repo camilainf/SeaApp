@@ -10,7 +10,7 @@ export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
     const errorData = await response.json();
     throw new Error(errorData.message || "Error al obtener los usuarios");
   }
-  
+
 
   const users: UsuarioCasted[] = await response.json();
   return users;
@@ -66,7 +66,7 @@ export const getUserById = async (id: string): Promise<UsuarioCasted> => {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se encontró o cargo el usuario");
   }
-  
+
   const userData: UsuarioCasted = await response.json();
   return userData;
 };
@@ -90,5 +90,28 @@ export const updateUserProfilePic = async (userId: string, newImageUrl: string) 
     return data;
   } catch (error) {
     console.error("Error al actualizar la foto de perfil:", error);
+  }
+};
+
+export const updateUserProfile = async (userId: string, profileData: any) => {
+  try {
+    const url = `${URL}/${userId}`;
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+
+  } catch (error) {
+    console.error("Hubo un problema con la operación fetch: ", error);
+    throw error;
   }
 };
