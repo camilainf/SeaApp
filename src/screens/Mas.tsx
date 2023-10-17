@@ -62,7 +62,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
         navigation.navigate("Auth");
         break;
       case "Editar datos personales":
-        navigation.navigate("EditarPerfil");
         navigation.navigate('EditarPerfil', { userId: userId });
         break;
       default:
