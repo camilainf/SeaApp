@@ -1,14 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, Alert, RefreshControl, ScrollView } from 'react-native';
-// ... (otros imports)
-
 import { Avatar, Button, Card, Title } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { getUserIdFromToken, logout } from '../services/authService';
-import { selectImage } from '../utils/imageUtils';
-import { uploadImage } from '../services/imageService';
-import { getUserById, updateUserProfilePic } from '../services/userService';
+import { getUserById } from '../services/userService';
 import { UsuarioCasted } from '../resources/user';
 
 interface Props {
@@ -45,8 +39,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      // Aquí, llama a cualquier función de carga de datos necesaria para actualizar tu vista.
-      // Por ejemplo, si necesitas recargar los datos del usuario:
       await obtenerUsuarioActual();
     } catch (error) {
       console.error('Error al refrescar:', error);
@@ -86,7 +78,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
             <Title style={styles.userName}>{user?.nombre}</Title>
           </Card.Content>
         </Card>
-
         <Button
           style={styles.button}
           mode="contained"
@@ -97,25 +88,10 @@ const Mas: React.FC<Props> = ({ navigation }) => {
         <Button
           style={styles.button}
           mode="contained"
-          icon="delete"
-          onPress={() => handleButtonPress('Eliminar servicio')}>
-          Eliminar servicio
-        </Button>
-        <Button
-          style={styles.button}
-          mode="contained"
-          icon="pencil"
-          onPress={() => handleButtonPress('Editar servicio')}>
-          Editar servicio
-        </Button>
-        <Button
-          style={styles.button}
-          mode="contained"
           icon="account-remove"
-          onPress={() => handleButtonPress('Eliminar cuenta')}>
+          onPress={() => handleButtonPress('Desactivar cuenta')}>
           Eliminar cuenta
         </Button>
-
         <Button
           style={styles.button}
           mode="contained"
@@ -135,19 +111,12 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white'
   },
-
   userCard: {
     flexDirection: 'row',
     marginBottom: 20,
     elevation: 5,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   userContent: {
     flexDirection: 'row',
