@@ -14,8 +14,16 @@ export const obtenerValoracionesServicio = async (idSolicitud: string | null) =>
     const errorData = await response.json();
     throw new Error(errorData.message || "No se ha encontrado proceso de valoracion");
   }
-  const valoracionData: Valoracion = await response.json();
-  return valoracionData;
+  const valoracionData: any = await response.json();
+  const valoracion: Valoracion = {
+      id: valoracionData._id,
+      idServicio: valoracionData.idServicio,
+      idDueñoServicio: valoracionData.idDueñoServicio,
+      idTrabajadorServicio: valoracionData.idTrabajadorServicio,
+      dueñoValoro: valoracionData.dueñoValoro,
+      trabajadorValoro: valoracionData.trabajadorValoro
+  };
+  return valoracion;
 };
 
 export const crearValoracion = async (idSolicitud: string | null, idCreador: string | undefined, idTrabajadorServicio: string | undefined) => {
@@ -46,7 +54,7 @@ export const crearValoracion = async (idSolicitud: string | null, idCreador: str
 };
 
 export const actualizarValoracion = async (
-  idValoracion: string,
+  idValoracion: string | undefined,
   dueñoValoro: boolean | null,
   trabajadorValoro: boolean | null
 ): Promise<any> => {

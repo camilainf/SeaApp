@@ -14,7 +14,7 @@ import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
 import { Icon } from "react-native-elements";
-import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracion";
+import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
@@ -119,8 +119,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     setIsRefreshing(true);
     fetchData();
   };
-
-  
 
   return (
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
@@ -280,7 +278,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </>
                   ) : (
                     <>
-                      Comenzar <FontAwesome name="play" size={20} color="white" />
+                      Comenzar <FontAwesome name="play" size={16} color="white" />
                     </>
                   )}
                 </Text>
@@ -315,16 +313,23 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             )}
 
             {servicioCargado?.estado === 4 && (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={ () => {
-                  setValorarModalVisible(true);
-                  onRefresh();
-                }}>
-                <Text style={styles.buttonText}>
-                  Valorar <FontAwesome name="handshake-o" size={20} color="white" />
-                </Text>
-              </TouchableOpacity>
+              <>
+                {(esDueno ? !valoracionController?.dueñoValoro : !valoracionController?.trabajadorValoro) ? (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      setValorarModalVisible(true);
+                      onRefresh();
+                    }}>
+                    <Text style={styles.buttonText}>
+                      Valorar <FontAwesome name="handshake-o" size={16} color="white" />
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{color:"#00162D", fontSize:17, marginBottom:20}}>Ya haz <Text style={{fontWeight:"bold"}}>evaluado</Text> al usuario, Si ves necesario, <Text style={{fontWeight:"bold"}}>comunicate</Text> con el otro usuario para la <Text style={{fontWeight:"bold"}}>finalizacion</Text> del servicio. ✅</Text>
+                )}
+              </>
+              //
             )}
 
             {servicioCargado && servicioCargado?.estado > 4 && (
@@ -515,7 +520,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={[styles.buttonModall, styles.createButtonModal]}
                 onPress={() => {
-                  console.log("Oferta aceptada:", selectedOferta?.montoOfertado);
                   handleAceptarOferta(selectedOferta);
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
@@ -552,11 +556,17 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.createButton}
-                onPress={()=>{
-                  {esDueno ?  handleEnviarValoracion(userCreador?._id,valoracion) :  handleEnviarValoracion(usuarioOferta?._id,valoracion)}
-                }
-                }
-              >
+                onPress={async () => {
+                  {
+                    esDueno ? await handleEnviarValoracion(usuarioOferta?._id, valoracion) : await handleEnviarValoracion(userCreador?._id, valoracion);
+                  }
+                  {
+                    esDueno ? await actualizarValoracion(valoracionController?.id, true, null) : await actualizarValoracion(valoracionController?.id, null, true);
+                  }
+                  await setValorarModalVisible(false);
+                  onRefresh();
+                  Alert.alert("Valoracion enviada", "Gracias por valorar al usuario ⭐");
+                }}>
                 <Text style={{ color: "#FFFFFF", textAlign: "center", fontSize: 19, fontWeight: "bold" }}>Enviar Valoración</Text>
               </TouchableOpacity>
             </View>
@@ -951,29 +961,28 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   //Estilos modal valoracion
-    modalInstruction: {
-      color: '#555',
-      marginBottom: 10,
+  modalInstruction: {
+    color: "#555",
+    marginBottom: 10,
   },
   valoracionText: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      color: '#2E86C1',
-      marginBottom:20,
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#2E86C1",
+    marginBottom: 20,
   },
   buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   cancelButtonValoration: {
     flex: 1,
     padding: 10,
     borderRadius: 8,
     marginLeft: 5,
-    backgroundColor: '#FB6865',
-    alignItems: 'center',
-    
+    backgroundColor: "#FB6865",
+    alignItems: "center",
   },
 });
 

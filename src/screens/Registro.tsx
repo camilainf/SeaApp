@@ -51,7 +51,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
         const user = {
           ...values,
           telefono: `+56${values.telefono}`,
-          calificacion: 0,
+          calificacion: [],
           imagenDePerfil: imageUrl || "",
         };
     

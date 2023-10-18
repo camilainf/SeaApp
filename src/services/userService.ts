@@ -73,7 +73,7 @@ export const getUserById = async (id: string): Promise<UsuarioCasted> => {
 };
 
 export const updateUserProfilePic = async (userId: string, newImageUrl: string) => {
-  console.log(URL);
+
   try {
     const response = await fetch(`${URL}/${userId}/updateProfilePic`, {
       method: 'PUT',
@@ -119,7 +119,8 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
 
 export const handleEnviarValoracion = async (idUsuario: string |undefined, valoracion: number) => {
   try {
-      const response = await fetch(`http://localhost:9000/api/users/uptateCalification/${idUsuario}`, {
+
+      const response = await fetch(`${URL}/uptateCalification/${idUsuario}`, {
           method: 'PATCH',
           headers: {
               'Content-Type': 'application/json',
