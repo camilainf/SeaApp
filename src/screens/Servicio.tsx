@@ -14,6 +14,8 @@ import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
 import { Icon } from "react-native-elements";
+import { crearValoracion, obtenerValoracionesServicio } from "../services/valoracion";
+import { Valoracion } from "../resources/valoration";
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -45,7 +47,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
   const [usuarioOferta, setUsuarioOferta] = useState<UsuarioCasted | null>(null);
-
+  const [valoracionController, setValoracionController] = useState<Valoracion |null >(null);
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
 
@@ -246,9 +248,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => {
                   const message = esDueno ? "Por iniciar" : "Comenzar";
                   if (!esDueno) {
-                    updateServiceStatus(idServicio, 3); 
+                    updateServiceStatus(idServicio, 3);
+                    onRefresh();
                   }
-                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
+                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio, si ves necesario, puedes comunicarte con el trabajador 😉" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
                 }}>
                 <Text style={styles.buttonText}>
                   {esDueno ? (
@@ -268,7 +271,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => {
                   const message = esDueno ? "En proceso" : "Terminar";
                   if (!esDueno) {
-                    updateServiceStatus(idServicio, 4); 
+                    updateServiceStatus(idServicio, 4);
+                    onRefresh();
                   }
                   Alert.alert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
                 }}>
@@ -281,6 +285,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 style={styles.button}
                 onPress={() => {
                   setValorarModalVisible(true);
+                  onRefresh();
                 }}>
                 <Text style={styles.buttonText}>Valorar</Text>
               </TouchableOpacity>
@@ -297,10 +302,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             )}
           </>
         ) : (
-          
-          <>
-          { servicioCargado && servicioCargado?.estado !== 1 && (<Text style={{ color: "#003366" , fontSize:20, marginBottom:20}}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>)} 
-          </>
+          <>{servicioCargado && servicioCargado?.estado !== 1 && <Text style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>}</>
         )}
       </View>
 
@@ -428,7 +430,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       onPress={() => {
                         setSelectedOferta(oferta);
                         setConfirmModalVisible(true);
-                        
                       }}>
                       {/* Aquí puedes reemplazar el ícono por el de tu elección */}
                       <MaterialIcons name="check" size={24} color="green" />
@@ -523,6 +524,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      
     </ScrollView>
   );
 };
