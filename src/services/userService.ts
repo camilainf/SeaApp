@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
 import { BASE_URL } from "@env";
 
@@ -73,7 +74,7 @@ export const getUserById = async (id: string): Promise<UsuarioCasted> => {
 };
 
 export const updateUserProfilePic = async (userId: string, newImageUrl: string) => {
-  console.log(URL);
+
   try {
     const response = await fetch(`${URL}/${userId}/updateProfilePic`, {
       method: 'PUT',
@@ -115,4 +116,25 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
     console.error("Hubo un problema con la operación fetch: ", error);
     throw error;
   }
+};
+
+export const handleEnviarValoracion = async (idUsuario: string |undefined, valoracion: number) => {
+  try {
+
+      const response = await fetch(`${URL}/uptateCalification/${idUsuario}`, {
+          method: 'PATCH',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ calificacion: valoracion }),
+      });
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'No se pudo enviar la valoración.');
+      }
+
+  } catch (error) {
+      console.error('Error al enviar valoración:', error);
+      Alert.alert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
+  } 
 };

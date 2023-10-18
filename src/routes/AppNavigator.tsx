@@ -86,7 +86,7 @@ const AppNavigator: React.FC = () => {
                     options={{
                         headerShown: true,
                         headerBackTitleVisible: false,
-                        headerTitle: 'Perfil Ajeno',
+                        headerTitle: 'Perfil Usuario',
                     }}
                 />
             </Stack.Navigator>
