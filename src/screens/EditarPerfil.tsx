@@ -125,44 +125,53 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
-                <Text>Nombre:</Text>
+                <Text style={styles.textLabel} >Nombre:</Text>
                 <TextInput
-                    placeholder="Nombree"
-                    style={styles.input}
+                    placeholder="Nombre"
+                    style={[styles.input, formik.touched.nombre && formik.errors.nombre ? styles.errorInput : null]}
                     value={formik.values.nombre}
                     onChangeText={formik.handleChange('nombre')}
                     onBlur={formik.handleBlur('nombre')}
+                    maxLength={40}
                 />
+                {formik.touched.nombre && formik.errors.nombre ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.nombre}</Text>) : null}
 
-                <Text>Apellido paterno:</Text>
+                <Text style={styles.textLabel} >Apellido paterno:</Text>
                 <TextInput
                     placeholder="Apellido paterno"
-                    style={styles.input}
-                    value={formik.values.apellidoPaterno} // vinculado al valor de Formik
+                    style={[styles.input, formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? styles.errorInput : null]}
+                    value={formik.values.apellidoPaterno}
                     onChangeText={formik.handleChange('apellidoPaterno')}
                     onBlur={formik.handleBlur('apellidoPaterno')}
+                    maxLength={30}
                 />
+                {formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.apellidoPaterno}</Text>) : null}
 
-                <Text>Apellido materno:</Text>
+                <Text style={styles.textLabel} >Apellido materno:</Text>
                 <TextInput
                     placeholder="Apellido materno"
-                    style={styles.input}
-                    value={formik.values.apellidoMaterno} // vinculado al valor de Formik
+                    style={[styles.input, formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? styles.errorInput : null]}
+                    value={formik.values.apellidoMaterno}
                     onChangeText={formik.handleChange('apellidoMaterno')}
                     onBlur={formik.handleBlur('apellidoMaterno')}
+                    maxLength={30}
                 />
+                {formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.apellidoMaterno}</Text>) : null}
 
-                <Text>Descripción:</Text>
+                <Text style={styles.textLabel} >Descripción:</Text>
                 <TextInput
                     placeholder="Descripción"
-                    style={styles.input}
-                    multiline
-                    value={formik.values.descripcion} // vinculado al valor de Formik
+                    style={[styles.input, styles.textArea, formik.touched.descripcion && formik.errors.descripcion ? styles.errorInput : null]}
+                    maxLength={250}
+                    multiline={true}
+                    numberOfLines={4}
+                    value={formik.values.descripcion}
                     onChangeText={formik.handleChange('descripcion')}
                     onBlur={formik.handleBlur('descripcion')}
                 />
+                {formik.touched.descripcion && formik.errors.descripcion ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.descripcion}</Text>) : null}
 
-                <Text>Número telefónico:</Text>
+                <Text style={styles.textLabel} >Número telefónico:</Text>
                 <View style={styles.telefonoContainer}>
                     <View pointerEvents="none">
                         <CountryPicker
@@ -180,12 +189,13 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     <TextInput
                         maxLength={9}
                         keyboardType="number-pad"
-                        style={styles.inputTelefono}
-                        value={formik.values.telefono} // vinculado al valor de Formik
+                        style={[styles.inputTelefono, formik.touched.telefono && formik.errors.telefono ? styles.errorInput : null]}
+                        value={formik.values.telefono}
                         onChangeText={formik.handleChange('telefono')}
                         onBlur={formik.handleBlur('telefono')}
                     />
                 </View>
+                {formik.touched.telefono && formik.errors.telefono ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.telefono}</Text>) : null}
 
                 <View style={styles.buttonsContainer}>
                     <View style={[styles.button, styles.roundedButton]}>
@@ -210,6 +220,9 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    textLabel: {
+        marginTop: 8,
+    },
     container: {
         flex: 1,
         padding: 16,
@@ -223,7 +236,7 @@ const styles = StyleSheet.create({
     },
     profilePicContainer: {
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
     },
     profilePic: {
         width: 100,
@@ -242,7 +255,6 @@ const styles = StyleSheet.create({
         borderColor: "#ccc",
         borderRadius: 5,
         padding: 10,
-        marginBottom: 20,
         backgroundColor: "#F3F6FF",
         maxWidth: "100%",
         flexShrink: 1,
@@ -275,6 +287,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ccc",
         overflow: "hidden",
+    },
+    errorInput: {
+        borderColor: 'red',
+    },
+    errorText: {
+        fontSize: 12,
+        color: 'red',
+    },
+    textArea: {
+        height: 80,
+        textAlignVertical: 'top',
     },
 });
 

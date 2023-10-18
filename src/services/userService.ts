@@ -35,6 +35,7 @@ export const createUser = async (user: any) => {
 };
 
 export const loginUser = async (credentials: any) => {
+  console.log("base_url", BASE_URL);
   const response = await fetch(URL + '/login', {
     method: 'POST',
     headers: {

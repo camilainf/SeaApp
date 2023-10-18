@@ -37,9 +37,8 @@ const Registro: React.FC<Props> = ({ navigation }) => {
       console.log("Inicio de onSubmit", values);
     
       if (!profilePic) {
-        // Si no se ha seleccionado una foto de perfil, muestra un Alert
         Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");
-        return; // Evita que la solicitud se envíe
+        return;
       }
     
       try {
