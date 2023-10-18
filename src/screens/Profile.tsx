@@ -19,7 +19,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { ServicioData, ServicioDataNew } from "../resources/service";
-import { getUserById } from "../services/userService";
+import { getUserById, obtenerDieneroGanadoUsuario } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { getUserIdFromToken } from "../services/authService";
@@ -48,8 +48,9 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
-  //Por ver  
-  const gananciaDinero = 4300; // 
+  //Por ver
+  const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
+
   //const solicitudesAceptadas: ServicioData[] = [];
   
 
@@ -77,13 +78,17 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           setServiciosPropios(fetchedServices);
           //Servicios Aceptados para trabajar por este usuario
           const fetchedServicesAceptados = await getServicesAcceptedByUser(userId);
-          setSolicitudesAceptadas(fetchedServicesAceptados); //
+          setSolicitudesAceptadas(fetchedServicesAceptados);
+          //Dinero ganado por el usuario
+          const fetchedGanancia = await obtenerDieneroGanadoUsuario(userId);
+          setGananaciaDinero(fetchedGanancia);
           setLoading(false);
         } catch (err) {
           console.log(err)
           const error = err as { message?: string };
           setError(error.message || "Ocurrió un error al cargar los datos.");
           setLoading(false);
+          
         }
       };
 

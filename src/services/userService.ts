@@ -138,3 +138,36 @@ export const handleEnviarValoracion = async (idUsuario: string |undefined, valor
       Alert.alert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
   } 
 };
+
+
+
+export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined): Promise<number> => {
+  // Verificando si el idUsuario es válido
+  if (!idUsuario) {
+    console.error('No se proporcionó un idUsuario válido');
+    return 0;
+  }
+
+  try {
+    // Definiendo la URL del endpoint
+    const URL = 'http://localhost:9000/api/users';  // Asegúrate de reemplazar esta URL con la URL de tu servidor
+    const endpoint = `${URL}/getMoneyEarnUser/${idUsuario}`;
+
+    // Haciendo la solicitud al back-end
+    const response = await fetch(endpoint);
+
+    // Verificando si la respuesta es exitosa
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'No se pudo obtener el monto ganado');
+    }
+
+    // Parseando la respuesta a JSON
+    const data: number = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error('Error al obtener el monto ganado:', (error as Error).message);
+    return 0;
+  }
+};
