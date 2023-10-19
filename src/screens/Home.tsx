@@ -9,7 +9,7 @@ import { getServicesTopOfWeek, incrementServiceClick } from '../services/service
 import { ServicioData } from '../resources/service';
 import { UsuarioCasted } from '../resources/user';
 import { getUserIdFromToken } from '../services/authService';
-import { getUserById } from '../services/userService';
+import { getUserById, obtenerDieneroGanadoUsuario } from '../services/userService';
 import TarjetaSuperiorHome from '../components/TarjetaSuperiorHome';
 import Buscador from '../components/Buscador';
 import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
@@ -25,7 +25,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [serviciosDestacados, setServiciosDestacados] = useState<ServicioData[]>([]);
   const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-
+  const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
 
   useEffect(() => {
     loadData();
@@ -46,7 +46,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       }
 
       setUsuario(await getUserById(userId));
-
+      //Dinero ganado:
+      const fetchedGanancia = await obtenerDieneroGanadoUsuario(userId);
+      setGananaciaDinero(fetchedGanancia);
+      //Ser categorias populares
       setCategoriasPopulares(categorias.map(cat => ({
         ...cat,
       })));
@@ -90,7 +93,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       />
       <View style={styles.contentContainer}>
 
-        <TarjetaSuperiorHome usuario={usuario} />
+        <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
 
         <Buscador
           onSearch={(term) => {
