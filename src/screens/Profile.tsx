@@ -50,8 +50,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
   //Por ver
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
-
-  //const solicitudesAceptadas: ServicioData[] = [];
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<ServicioData[]>([]);
   
 
   useFocusEffect(
@@ -112,7 +112,10 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     return <Text>Error: {error}</Text>;
   }
   
-  
+  const handleVerMas = (list: ServicioData[], title: string) => {
+    setModalContent(list);
+    setIsModalVisible(true);
+  };
   return (
     <ScrollView style={styles.container}>
       {/* INFORMACION USUARIO */}
@@ -260,7 +263,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             <SinSolicitudes />
           ) : (
             <FlatList
-              data={serviciosPropios}
+              data={serviciosPropios.slice(0, 5)}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.tarjetaTrabajo}
@@ -290,6 +293,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               keyExtractor={(item) => String(item.id)}
               scrollEnabled={false}
             />
+            
           )}
         </View>
         {/* LISTADO DE SOLICITUDES Aceptadas */}

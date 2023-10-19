@@ -2,7 +2,7 @@ import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/users';
+const URL = "http://10.0.2.2:9000/api" + '/users';
 
 export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
   const response = await fetch(URL);
@@ -147,14 +147,18 @@ export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined)
     console.error('No se proporcionó un idUsuario válido');
     return 0;
   }
-
+  
   try {
     // Definiendo la URL del endpoint
-    const URL = 'http://localhost:9000/api/users';  // Asegúrate de reemplazar esta URL con la URL de tu servidor
-    const endpoint = `${URL}/getMoneyEarnUser/${idUsuario}`;
-
+    
+    
     // Haciendo la solicitud al back-end
-    const response = await fetch(endpoint);
+    const response = await fetch(URL + '/getMoneyEarnUser/' + idUsuario, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });;
 
     // Verificando si la respuesta es exitosa
     if (!response.ok) {
@@ -163,11 +167,12 @@ export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined)
     }
 
     // Parseando la respuesta a JSON
-    const data: number = await response.json();
-
-    return data;
+    const data: any = await response.json();
+    const montoGanado: number = data.totalEarnings;
+    return montoGanado;
   } catch (error) {
     console.error('Error al obtener el monto ganado:', (error as Error).message);
     return 0;
   }
 };
+

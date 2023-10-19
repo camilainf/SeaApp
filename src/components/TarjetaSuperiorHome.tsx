@@ -4,13 +4,14 @@ import { UsuarioCasted } from '../resources/user';
 
 type TarjetaSuperiorHomeProps = {
     usuario: UsuarioCasted | undefined;
+    ganancia: number;
 };
 
-const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario }) => {
+const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario , ganancia}) => {
     const defaultFotoPerfil = require('../../assets/iconos/UserProfileRegistro.png');
     const imagenPerfil = usuario?.imagenDePerfil ? { uri: usuario.imagenDePerfil } : defaultFotoPerfil;
     const logo = require('../../assets/seaJoblogo.png');
-
+    
     return (
         <View style={styles.tarjeta}>
             {/* Logo y foto de perfil */}
@@ -31,7 +32,7 @@ const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario }) =>
 
                 <View style={styles.containerGanancias}>
                     <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
-                    <Text style={styles.gananciaNumero}>$39.000 CLP</Text>
+                    <Text style={styles.gananciaNumero}>${ganancia}CLP</Text>
                 </View>
             </View>
         </View>
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     saludo: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#66638C',
+        color: '#003366',
     },
     containerFoto: {
         width: '40%',
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
         lineHeight: 30,
         letterSpacing: 0,
         textAlign: 'left',
-        color: '#47AE64',
+        color: 'green',
     },
 });
 
