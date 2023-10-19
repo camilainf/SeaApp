@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Alert,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,7 +7,6 @@ import * as authService from "../services/authService";
 import { getToken } from "../services/storageService";
 import { decodeToken } from "../services/tokenService";
 import { DecodedToken } from "../types/auth";
-
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -30,7 +21,6 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const handleLogin = async () => {
     try {
       const data = await authService.login({ email, password });
@@ -43,14 +33,13 @@ const Login: React.FC<Props> = ({ navigation }) => {
         }
       }
       console.log(data);
-      
+
       Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
       navigation.navigate("Main", { screen: "Home" });
     } catch (error) {
       Alert.alert("Error", "Hubo un problema al iniciar sesión.");
     }
   };
-
 
   const handleNavigationToRegister = () => {
     navigation.navigate("Registro");
@@ -66,9 +55,9 @@ const Login: React.FC<Props> = ({ navigation }) => {
       <View style={styles.card}>
         <View style={styles.logoImagen}>
           <Image
-            source={require("../../assets/seaJoblogo.png")} // Ajusta la ruta de acuerdo a tu estructura de directorios
-            style={styles.logo} // Ajusta el tamaño de acuerdo a tus necesidades
-            resizeMode="contain" // Esto asegura que la imagen se ajuste manteniendo la relación de aspecto
+            source={require("../../assets/seaJoblogo.png")}
+            style={styles.logo}
+            resizeMode="contain"
           />
         </View>
 
@@ -113,9 +102,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logoImagen: {
-    // Esto hace que el contenedor ocupe todo el espacio disponible en la pantalla
-    justifyContent: 'center', // Centra verticalmente
-    alignItems: 'center', // Centra horizontalmente
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   card: {
     width: "80%",
@@ -131,8 +119,6 @@ const styles = StyleSheet.create({
   textoBienvenidos: {
     fontSize: 20,
     textAlign: "center",
-
-
   },
   label: {
     fontSize: 16,

@@ -10,6 +10,7 @@ import { editarPerfilSchema } from "../utils/validations/editarPerfilValidations
 import { getUserById, updateUserProfile } from "../services/userService";
 import { UsuarioCasted } from "../resources/user";
 import { ActivityIndicator } from "react-native-paper";
+import { uploadImage } from "../services/imageService";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -20,6 +21,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     const userId = route.params?.userId;
 
     const [profilePic, setProfilePic] = useState<string | null>(null);
+    const [profilePicBase64, setProfilePicBase64] = useState<string | null>(null);
     const [countryCode, setCountryCode] = useState<CountryCode>("CL");
     const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
     const [initialValues, setInitialValues] = useState<UsuarioCasted>({
@@ -83,19 +85,32 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     }, [userId]);
 
     const handleAddProfilePic = async () => {
-        const { uri } = await selectImage();
-        if (uri) {
-            setProfilePic(uri);
+        const { uri, base64 } = await selectImage();
+        if (uri && base64) {
+            setProfilePic(uri); // Previsualización.
+            setProfilePicBase64(base64); // Carga cuando se guarde.
         }
     };
 
     const handleGuardarCambios = async (values: UsuarioCasted) => {
         try {
+            let finalProfilePic = profilePic; // Si no se selecciona una nueva imagen, se mantiene la actual.
+    
+            if (profilePicBase64) {
+                const uploadedImageUrl = await uploadImage(`data:image/jpeg;base64,${profilePicBase64}`);
+                if (uploadedImageUrl) {
+                    finalProfilePic = uploadedImageUrl; // La URL de la imagen de Cloudinary.
+                } else {
+                    throw new Error('Error al subir la imagen a Cloudinary.');
+                }
+            }
+    
             const profileData = {
                 ...values,
                 telefono: `+56${values.telefono}`,
-                imagenDePerfil: profilePic,
+                imagenDePerfil: finalProfilePic, 
             };
+    
             await updateUserProfile(userId, profileData);
             Alert.alert("Perfil actualizado", "Tus cambios han sido guardados exitosamente.");
         } catch (error) {
