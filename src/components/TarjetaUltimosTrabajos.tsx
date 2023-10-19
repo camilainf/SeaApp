@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: '#66AFFF', // Color de fondo de la tarjeta
+        backgroundColor: '#02B3FF', // Color de fondo de la tarjeta
         borderRadius: 8,
         marginBottom: 20,
         elevation: 6,

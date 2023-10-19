@@ -148,7 +148,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
                 <Buscador
                     onSearch={(term) => {
                         setSearchTerm(term);
-                        console.log('Ícono de búsqueda clickeado');
+                        
                     }}
                     initialValue={initialSearchTerm}
                     immediateSearch={true} // Realizar búsqueda inmediata en BuscadorScreen
@@ -163,7 +163,6 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
                         const itemType = 'nombreServicio' in item ? 'servicio' : 'usuario';
                         return (
                             <TouchableOpacity onPress={() => {
-                                console.log('Resultado clickeado:', 'nombreServicio' in item ? item.nombreServicio : item.nombre);
                                 handleNavigationToResult(item);
                             }}>
                                 <TarjetaServicioYPerfil item={item} type={itemType} />

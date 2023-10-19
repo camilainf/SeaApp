@@ -144,7 +144,6 @@ export const getServicesAcceptedByUser = async (idUsuario: string): Promise<Serv
     }
 
     const serviciosData: any[] = await response.json();
-    //console.log("QUE OBTENGO:", serviciosData);
 
     const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
       id: serv._id,
@@ -198,7 +197,7 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
     fechaCreacion: servicioData.fechaCreacion
   };
 
-  console.log("Servicio desde el getServiceById", servicio);
+  
   return servicio;
 };
 
@@ -271,7 +270,6 @@ export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
 export const updateService = async (serviceId: string, serviceData: any) => {
   try {
     const url = `${URL}/${serviceId}`;
-    console.log("updateService", url);
 
     const requestOptions = {
       method: 'PUT',

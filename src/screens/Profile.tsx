@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TouchableNativeFeedback,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback, Alert, ActivityIndicator, Modal } from "react-native";
 import { Rating, Card } from "react-native-elements";
 import { calcularPromedioCalificaciones, convertirFecha } from "../utils/randomService";
 import { UsuarioCasted } from "../resources/user";
@@ -31,10 +19,7 @@ import { getServicesAcceptedByUser, getServicesByUser } from "../services/servic
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
-type PerfilRouteProp = RouteProp<
-  RootStackParamList & MainTabParamList,
-  "Perfil" | "PerfilAjeno"
->;
+type PerfilRouteProp = RouteProp<RootStackParamList & MainTabParamList, "Perfil" | "PerfilAjeno">;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
   //Variables independientes
@@ -52,7 +37,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ServicioData[]>([]);
-  
+
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
@@ -83,11 +68,10 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           setGananaciaDinero(fetchedGanancia);
           setLoading(false);
         } catch (err) {
-          console.log(err)
+          console.log(err);
           const error = err as { message?: string };
           setError(error.message || "Ocurrió un error al cargar los datos.");
           setLoading(false);
-          
         }
       };
 
@@ -101,16 +85,16 @@ const Profile: React.FC<Props> = ({ navigation }) => {
 
   if (loading) {
     return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <ActivityIndicator size="large" color="#0000ff" />
-        </View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     );
-}
+  }
 
   if (error) {
     return <Text>Error: {error}</Text>;
   }
-  
+
   const handleVerMas = (list: ServicioData[], title: string) => {
     setModalContent(list);
     setIsModalVisible(true);
@@ -134,38 +118,13 @@ const Profile: React.FC<Props> = ({ navigation }) => {
         />
         <View style={styles.profileCard}>
           <View style={styles.imageContainer}>
-            {usuarioData?.imagenDePerfil ? (
-              <Image
-                source={{ uri: usuarioData?.imagenDePerfil }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <Image
-                source={require("../../assets/iconos/usericon.png")}
-                style={styles.profileImage}
-              />
-            )}
-            <Rating
-              imageSize={20}
-              readonly
-              startingValue={calcularPromedioCalificaciones(usuarioData?.calificacion)}
-              style={styles.rating}
-            />
+            {usuarioData?.imagenDePerfil ? <Image source={{ uri: usuarioData?.imagenDePerfil }} style={styles.profileImage} /> : <Image source={require("../../assets/iconos/usericon.png")} style={styles.profileImage} />}
+            <Rating imageSize={20} readonly startingValue={calcularPromedioCalificaciones(usuarioData?.calificacion)} style={styles.rating} />
           </View>
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
-            {usuarioData?.nombre} {usuarioData?.apellidoPaterno}{" "}
-            {usuarioData?.apellidoMaterno}
+            {usuarioData?.nombre} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
           </Text>
-          <TouchableOpacity
-            style={styles.contactButton}
-            onPress={() =>
-              Alert.alert(
-                "Información de contacto",
-                `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`,
-                [{ text: "OK" }]
-              )
-            }
-          >
+          <TouchableOpacity style={styles.contactButton} onPress={() => Alert.alert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`, [{ text: "OK" }])}>
             <FontAwesome name="info-circle" size={15} color="white" />
             <Text style={styles.contactButtonText}>Informacion</Text>
           </TouchableOpacity>
@@ -181,8 +140,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                   fontWeight: "bold",
                   color: "#415C80",
                   paddingLeft: 15,
-                }}
-              >
+                }}>
                 Resumen
               </Text>
             </View>
@@ -194,42 +152,23 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     flexDirection: "row",
                     alignItems: "center",
                     marginBottom: 8,
-                  }}
-                >
+                  }}>
                   <View style={styles.numberContainer}>
-                    <Text style={styles.numberText}>
-                      {numeroSolicitudesCreadas > 99
-                        ? "+99"
-                        : numeroSolicitudesCreadas}
-                    </Text>
+                    <Text style={styles.numberText}>{numeroSolicitudesCreadas > 99 ? "+99" : numeroSolicitudesCreadas}</Text>
                   </View>
-                  <Text style={styles.textoSolicitudes}>
-                    Solicitudes creadas
-                  </Text>
+                  <Text style={styles.textoSolicitudes}>Solicitudes creadas</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <View style={styles.numberContainer}>
-                    <Text style={styles.numberText}>
-                      {numeroSolicitudesAceptadas > 99
-                        ? "+99"
-                        : numeroSolicitudesAceptadas}
-                    </Text>
+                    <Text style={styles.numberText}>{numeroSolicitudesAceptadas > 99 ? "+99" : numeroSolicitudesAceptadas}</Text>
                   </View>
-                  <Text style={styles.textoSolicitudes}>
-                    Solicitudes aceptadas
-                  </Text>
+                  <Text style={styles.textoSolicitudes}>Solicitudes aceptadas</Text>
                 </View>
               </View>
               {/*Derecha*/}
               <View style={styles.columnaDerecha}>
-                <Text style={styles.gananciaDineroTexto}>
-                  Ganancias de dinero 💰
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={styles.gananciaNumero}
-                >
+                <Text style={styles.gananciaDineroTexto}>Ganancias de dinero 💰</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.gananciaNumero}>
                   {gananciaDinero} CLP
                 </Text>
               </View>
@@ -244,8 +183,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             backgroundColor: "#EEF2FF", // Color gris claro
             marginVertical: 8, // Margen vertical para espacio arriba y abajo
             marginHorizontal: 30,
-          }}
-        ></View>
+          }}></View>
         <View style={{ marginHorizontal: 20 }}>
           <Text
             style={{
@@ -254,45 +192,40 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               marginBottom: 8,
               paddingLeft: 15,
               color: "#415C80",
-            }}
-          >
+            }}>
             Solicitudes creadas
           </Text>
           {serviciosPropios.length === 0 ? (
             <SinSolicitudes />
           ) : (
-            <FlatList
-              data={serviciosPropios.slice(0, 5)}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.tarjetaTrabajo}
-                  onPress={() => {
-                    
-                    navigation.navigate("Servicio", item);
-                  }}
-                >
-                  <Image
-                    source={require("../../assets/iconos/ImageReferencia.png")}
-                    style={styles.imagenTrabajo}
-                  />
-                  <View style={{ marginEnd: 90 }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{ color: "#50719D", fontWeight: "bold" }}
-                    >
-                      {item.nombreServicio}
-                    </Text>
-                    <Text style={{ color: "#50719D" }}>
-                      <FontAwesome name="calendar" size={15} color="#50719D" /> {" "} {convertirFecha(item.fechaSolicitud)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => String(item.id)}
-              scrollEnabled={false}
-            />
-            
+            <View>
+              {/* Arreglo solicitudes Creadas */}
+              <FlatList
+                data={serviciosPropios.slice(0, 5)}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.tarjetaTrabajo}
+                    onPress={() => {
+                      navigation.navigate("Servicio", item);
+                    }}>
+                    <Image source={require("../../assets/iconos/ImageReferencia.png")} style={styles.imagenTrabajo} />
+                    <View style={{ marginEnd: 90 }}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
+                        {item.nombreServicio}
+                      </Text>
+                      <Text style={{ color: "#50719D" }}>
+                        <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => String(item.id)}
+                scrollEnabled={false}
+              />
+              <TouchableOpacity onPress={() => handleVerMas(serviciosPropios, "Solicitudes Creadas")}>
+                <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
         {/* LISTADO DE SOLICITUDES Aceptadas */}
@@ -303,8 +236,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             marginVertical: 8, // Margen vertical para espacio arriba y abajo
             //width: "100%",
             marginHorizontal: 30,
-          }}
-        ></View>
+          }}></View>
         <View style={{ marginBottom: 20, marginHorizontal: 20 }}>
           <Text
             style={{
@@ -313,47 +245,98 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               marginBottom: 10,
               paddingLeft: 15,
               color: "#3B5373",
-            }}
-          >
+            }}>
             Solicitudes Aceptadas
           </Text>
           {solicitudesAceptadas.length === 0 ? (
             <SinSolicitudes />
           ) : (
-            <FlatList
-              data={solicitudesAceptadas}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.tarjetaTrabajo}
-                  onPress={() => {
-                    
-                    navigation.navigate("Servicio", item);
-                  }}
-                >
-                  <Image
-                    source={require("../../assets/iconos/ImageReferencia.png")}
-                    style={styles.imagenTrabajo}
-                  />
-                  <View style={{ marginEnd: 90 }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{ color: "#50719D", fontWeight: "bold" }}
-                    >
-                      {item.nombreServicio}
-                    </Text>
-                    <Text style={{ color: "#50719D" }}>
-                    <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => String(item.id)}
-              scrollEnabled={false}
-            />
+            <View>
+              {/* Arreglo solicitudes Aceptadas */}
+              <FlatList
+                data={solicitudesAceptadas.slice(0, 5)}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.tarjetaTrabajo}
+                    onPress={() => {
+                      navigation.navigate("Servicio", item);
+                    }}>
+                    <Image source={require("../../assets/iconos/ImageReferencia.png")} style={styles.imagenTrabajo} />
+                    <View style={{ marginEnd: 90 }}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
+                        {item.nombreServicio}
+                      </Text>
+                      <Text style={{ color: "#50719D" }}>
+                        <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => String(item.id)}
+                scrollEnabled={false}
+              />
+              <TouchableOpacity onPress={() => handleVerMas(solicitudesAceptadas, "Solicitudes Aceptadas")}>
+                <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </View>
+      {/* Modal de ver mas solicitudes */}
+      <Modal
+  transparent={true}
+  animationType="slide"
+  visible={isModalVisible}
+  onRequestClose={() => {
+    setIsModalVisible(!isModalVisible);
+  }}
+>
+  <View style={styles.centeredView}>
+    <View style={styles.modalView}>
+      <Text style={styles.modalTitle}>Solicitudes</Text>
+      <FlatList
+        data={modalContent}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.tarjetaTrabajo}
+            onPress={() => {
+              navigation.navigate("Servicio", item);
+              setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
+            }}
+          >
+            {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
+            <Image
+              source={require("../../assets/iconos/ImageReferencia.png")}
+              style={styles.imagenTrabajo}
+            />
+            <View style={{ marginEnd: 90 }}>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ color: "#50719D", fontWeight: "bold" }}
+              >
+                {item.nombreServicio}
+              </Text>
+              <Text style={{ color: "#50719D" }}>
+                <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <TouchableOpacity
+        style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+        onPress={() => {
+          setIsModalVisible(!isModalVisible);
+        }}
+      >
+        <Text style={styles.textStyle}>Cerrar</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </ScrollView>
   );
 };
@@ -521,6 +504,45 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 8,
     marginRight: 16,
+  },
+  // Estilos modal de ver mas
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalTitle: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });
 export default Profile;

@@ -66,7 +66,6 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleServiceClick = async (service: any) => {
-        console.log(`Servicio clickeado con ID: ${service.id}`);
 
         // Incrementar el contador de clics
         try {

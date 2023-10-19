@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha } from "../utils/randomService";
@@ -16,8 +16,9 @@ import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta,
 import { Icon } from "react-native-elements";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
-const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
+//import ViewPager from '@react-native-community/viewpager';
 
+const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
 
 type Props = {
@@ -36,6 +37,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [verOfertasModalVisible, setVerOfertasModalVisible] = useState(false);
   const [isDescriptionVisible, setDescriptionVisibility] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
   //Datos importantes
   const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
   const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
@@ -130,27 +134,49 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           onPress: () => {
             console.log("Cancelado");
           },
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Eliminar",
           onPress: async () => {
             try {
               const response = await deleteService(serviceId);
-              navigation.navigate('Main', {
-                screen: 'Perfil',
+              navigation.navigate("Main", {
+                screen: "Perfil",
                 params: { id: userCreador?._id },
               } as any);
               console.log(response);
             } catch (error) {
               console.error("No se pudo eliminar el servicio:", error);
             }
-          }
-        }
+          },
+        },
       ],
       { cancelable: false }
     );
   };
+
+  const getPaginatedOffers = () => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return ofertasCargadas.slice(startIndex, endIndex);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage * ITEMS_PER_PAGE < ofertasCargadas.length) {
+
+      setCurrentPage((prevPage) => prevPage + 1);
+
+    
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+  const paginatedOffers = ofertasCargadas.slice(0, currentPage * ITEMS_PER_PAGE);
 
   return (
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
@@ -358,20 +384,15 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text style={{ color: "#00162D", fontSize: 17, marginBottom: 20 }}>Ya haz <Text style={{ fontWeight: "bold" }}>evaluado</Text> al usuario, Si ves necesario, <Text style={{ fontWeight: "bold" }}>comunicate</Text> con el otro usuario para la <Text style={{ fontWeight: "bold" }}>finalizacion</Text> del servicio. ✅</Text>
+                  <Text style={{ color: "#00162D", fontSize: 17, marginBottom: 20 }}>
+                    Ya haz <Text style={{ fontWeight: "bold" }}>evaluado</Text> al usuario, Si ves necesario, <Text style={{ fontWeight: "bold" }}>comunicate</Text> con el otro usuario para la <Text style={{ fontWeight: "bold" }}>finalizacion</Text> del servicio. ✅
+                  </Text>
                 )}
               </>
               //
             )}
 
             {servicioCargado && servicioCargado?.estado > 4 && (
-              // <TouchableOpacity
-              //   style={styles.button}
-              //   onPress={() => {
-              //     Alert.alert("El servicio ya se encuentra finalizado 👌🏻");
-              //   }}>
-              //   <Text style={styles.buttonText}>Terminado</Text>
-              // </TouchableOpacity>
               <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 15 }}>
                 El servicio actual ya se encuentra <Text style={{ fontWeight: "bold" }}>finalizado</Text> y <Text style={{ fontWeight: "bold" }}>valorado </Text> por ambos usuarios! ✅
               </Text>
@@ -461,68 +482,80 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>
+            <Text style={styles.modalTitle2}>
               <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas publicadas
             </Text>
-            {ofertasCargadas.length > 0 ? (
-              ofertasCargadas.map((oferta, index) => (
+
+            <FlatList
+              data={getPaginatedOffers()}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item: oferta, index }) => (
                 <View
                   style={{
                     flexDirection: "row",
-                    alignItems: "center",
+                    justifyContent: "space-between", // Alineación horizontal
+                    alignItems: "center", // Alineación vertical
                     marginBottom: 10,
+                    paddingHorizontal: 10, // Padding horizontal
                   }}
                   key={index}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("PerfilAjeno", {
-                        id: usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
-                      });
-                      setVerOfertasModalVisible(false);
-                    }}
+                  <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      flex: 1,
-                    }}>
-                    <Image
-                      source={
-                        usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
-                          ? {
-                            uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                          }
-                          : require("../../assets/iconos/UserProfile.png")
-                      }
-                      style={styles.ofertaImage}
-                    />
-                    <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
-                      {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
-                    </Text>
-                  </TouchableOpacity>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
+                      marginBottom: 10,
+                    }}
+                    key={index}>
                     <TouchableOpacity
                       onPress={() => {
-                        setSelectedOferta(oferta);
-                        setConfirmModalVisible(true);
+                        navigation.navigate("PerfilAjeno", {
+                          id: usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
+                        });
+                        setVerOfertasModalVisible(false);
+                      }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        flex: 1,
                       }}>
-                      {/* Aquí puedes reemplazar el ícono por el de tu elección */}
-                      <MaterialIcons name="check" size={24} color="green" />
+                      <Image
+                        source={
+                          usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
+                            ? {
+                                uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                              }
+                            : require("../../assets/iconos/UserProfile.png")
+                        }
+                        style={styles.ofertaImage}
+                      />
+                      <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
+                        {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
+                      </Text>
                     </TouchableOpacity>
+
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedOferta(oferta);
+                          setConfirmModalVisible(true);
+                        }}>
+                        <MaterialIcons name="check" size={24} color="green" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              ))
-            ) : (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}>
-                <Text style={{ marginRight: 10, color: "grey" }}>No hay ofertas disponibles por el momento...</Text>
-              </View>
-            )}
+              )}
+            />
+            
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
+              <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
+                <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleNextPage} disabled={currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length}>
+                <Text style={{ color: currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length ? "grey" : "#2E86C1" }}>Siguiente</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.closeButton} onPress={() => setVerOfertasModalVisible(false)}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
@@ -551,8 +584,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.buttonModall, styles.createButtonModal]}
-                onPress={() => {
-                  handleAceptarOferta(selectedOferta);
+                onPress={async() => {
+                  await handleAceptarOferta(selectedOferta);
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
                   onRefresh();
@@ -595,7 +628,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   {
                     esDueno ? await actualizarValoracion(valoracionController?.id, true, null) : await actualizarValoracion(valoracionController?.id, null, true);
                   }
-                  await setValorarModalVisible(false);
+                  setValorarModalVisible(false);
                   onRefresh();
                   Alert.alert("Valoracion enviada", "Gracias por valorar al usuario ⭐");
                 }}>
@@ -609,25 +642,22 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       {esDueno && (
         <View>
           <TouchableOpacity
-            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15 }}
             onPress={() => {
-              console.log("Boton editar servicio");
-              if (idServicio) navigation.navigate('EditarServicio', { servicioId: idServicio});
+              if (idServicio) navigation.navigate("EditarServicio", { servicioId: idServicio });
             }}>
             <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Editar servicio</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15 }}
             onPress={() => {
-              console.log("Boton eliminar servicio");
               if (idServicio) handleDeleteService(idServicio);
             }}>
             <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Eliminar servicio</Text>
           </TouchableOpacity>
         </View>
       )}
-
     </ScrollView>
   );
 };
@@ -906,6 +936,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: "#2E86C1",
   },
+  modalTitle2: {
+    fontSize: 25,
+    fontWeight: "bold",
+    marginBottom: 25,
+    color: "#2E86C1",
+  },
   contactInfo: {
     flexDirection: "row",
     alignItems: "center",
@@ -972,16 +1008,6 @@ const styles = StyleSheet.create({
     borderRadius: 25, // Esto hace que la imagen sea redonda, puedes ajustar según necesites
     marginRight: 10,
   },
-
-  // ofertaItem: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   alignItems: "center",
-  //   backgroundColor: "#EEF2FF",
-  //   padding: 10,
-  //   marginBottom: 10,
-  //   borderRadius: 8,
-  // },
   buttonYellow: {
     backgroundColor: "#DB912C",
     padding: 15,

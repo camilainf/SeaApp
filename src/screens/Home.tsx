@@ -97,7 +97,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         <Buscador
           onSearch={(term) => {
-            console.log('Ícono de búsqueda clickeado');
             navigation.navigate('Buscador', { keyword: term });
           }}
           immediateSearch={false} // No realizar búsqueda inmediata desde Home
@@ -116,7 +115,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
                   style={styles.imagenTrabajo}
                 />
-                <Text>{item.nombreServicio}</Text>
+                <View style={{maxWidth: "91%"}}><Text numberOfLines={1} ellipsizeMode="tail" style={{color:"#50719D",fontWeight: '500',}}>{item.nombreServicio}</Text></View>
+                
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}
@@ -141,6 +141,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
                   style={styles.imagenCategoria}
                 />
+                
                 <Text style={styles.tituloCategoria}>{item.nombre}</Text>
               </TouchableOpacity>
             )}
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#66638C',
+    color: '#415C80',
   },
 
   tarjetaTrabajo: {
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
   tarjetaCategoria: {
     flex: 1,
     padding: 16,
+
     backgroundColor: '#FFF',
     borderRadius: 8,
     margin: 8,

@@ -95,7 +95,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         monto: servicioCargado.monto.toString(),
       });
       if (servicioCargado.imagen) {
-        console.log("IMAGEN DEL SERVICIO CARGADO", servicioCargado.imagen);
+        
         setServiceReferencePic(servicioCargado.imagen);
       }
     }
@@ -144,7 +144,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         };
 
         if (isEditMode && servicioCargado) {
-          console.log("servicio", servicio);
+          
           await updateService(servicioCargado.id, servicio);
           Alert.alert(
             "Servicio actualizado con éxito.",
@@ -165,7 +165,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           );
         } else {
           const newService = await createService(servicio);
-          console.log('Servicio creado:', newService);
+          
           Alert.alert(
             "Servicio creado con éxito.",
             "",

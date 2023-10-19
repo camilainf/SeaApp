@@ -34,7 +34,6 @@ const Registro: React.FC<Props> = ({ navigation }) => {
     },
     validationSchema: registroSchema,
     onSubmit: async (values) => {
-      console.log("Inicio de onSubmit", values);
     
       if (!profilePic) {
         Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");

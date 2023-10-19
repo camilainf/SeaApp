@@ -20,7 +20,7 @@ const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario , gan
                     <Image source={logo} style={styles.logo} />
                 </View>
                 <View style={styles.containerSaludo}>
-                    <Text style={styles.saludo}>Hola {usuario?.nombre}!</Text>
+                    <Text style={styles.saludo}>Hola <Text style={{fontWeight:"bold"}}>{usuario?.nombre}</Text>!</Text>
                 </View>
             </View>
 
@@ -32,7 +32,7 @@ const TarjetaSuperiorHome: React.FC<TarjetaSuperiorHomeProps> = ({ usuario , gan
 
                 <View style={styles.containerGanancias}>
                     <Text style={styles.gananciaTexto}>Ganancias de dinero</Text>
-                    <Text style={styles.gananciaNumero}>${ganancia}CLP</Text>
+                    <Text style={styles.gananciaNumero}>${ganancia} CLP</Text>
                 </View>
             </View>
         </View>
@@ -64,11 +64,11 @@ const styles = StyleSheet.create({
     },
     containerSaludo: {
         width: '60%',
-        alignItems: 'center',
+        alignItems: 'flex-end',
     },
     saludo: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '400',
         color: '#003366',
     },
     containerFoto: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     gananciaNumero: {
-        fontSize: 30,
+        fontSize: 25,
         fontWeight: '400',
         lineHeight: 30,
         letterSpacing: 0,
