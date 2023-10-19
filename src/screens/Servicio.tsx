@@ -16,7 +16,6 @@ import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta,
 import { Icon } from "react-native-elements";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
-//import ViewPager from '@react-native-community/viewpager';
 
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
