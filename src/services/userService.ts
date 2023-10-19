@@ -113,7 +113,7 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
     return await response.json();
 
   } catch (error) {
-    console.error("Hubo un problema con la operación fetch: ", error);
+    console.error("Hubo un problema al actualizar los datos personales: ", error);
     throw error;
   }
 };

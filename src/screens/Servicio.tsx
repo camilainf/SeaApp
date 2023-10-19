@@ -9,7 +9,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { UsuarioCasted } from "../resources/user";
 import { getUserById, handleEnviarValoracion } from "../services/userService";
 import { ServicioData } from "../resources/service";
-import { getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
+import { deleteService, getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
 import { Oferta, Postoferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
@@ -118,6 +118,38 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const onRefresh = () => {
     setIsRefreshing(true);
     fetchData();
+  };
+
+  const handleDeleteService = async (serviceId: string) => {
+    Alert.alert(
+      "Eliminar servicio",
+      "¿Estás seguro de que quieres eliminar este servicio?",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => {
+            console.log("Cancelado");
+          },
+          style: "cancel"
+        },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            try {
+              const response = await deleteService(serviceId);
+              navigation.navigate('Main', {
+                screen: 'Perfil',
+                params: { id: userCreador?._id },
+              } as any);
+              console.log(response);
+            } catch (error) {
+              console.error("No se pudo eliminar el servicio:", error);
+            }
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -326,7 +358,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text style={{color:"#00162D", fontSize:17, marginBottom:20}}>Ya haz <Text style={{fontWeight:"bold"}}>evaluado</Text> al usuario, Si ves necesario, <Text style={{fontWeight:"bold"}}>comunicate</Text> con el otro usuario para la <Text style={{fontWeight:"bold"}}>finalizacion</Text> del servicio. ✅</Text>
+                  <Text style={{ color: "#00162D", fontSize: 17, marginBottom: 20 }}>Ya haz <Text style={{ fontWeight: "bold" }}>evaluado</Text> al usuario, Si ves necesario, <Text style={{ fontWeight: "bold" }}>comunicate</Text> con el otro usuario para la <Text style={{ fontWeight: "bold" }}>finalizacion</Text> del servicio. ✅</Text>
                 )}
               </>
               //
@@ -457,8 +489,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       source={
                         usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                           ? {
-                              uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                            }
+                            uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                          }
                           : require("../../assets/iconos/UserProfile.png")
                       }
                       style={styles.ofertaImage}
@@ -574,14 +606,23 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Boton de testing
       <TouchableOpacity
-          style={{marginTop: 20}}
-          onPress={()=>{
-            actualizarValoracion("652dcc0bde2cfc29ec85173d",true,null);
-          }}>
-            <Text style={{ color: "#003366", fontSize: 20, marginBottom: 20 }}>Test</Text>
-          </TouchableOpacity> */}
+        style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+        onPress={() => {
+          console.log("Boton editar servicio");
+        }}>
+        <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Editar servicio</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+        onPress={() => {
+          console.log("Boton eliminar servicio");
+          if (idServicio) handleDeleteService(idServicio);
+        }}>
+        <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Eliminar servicio</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 };

@@ -163,7 +163,7 @@ export const getServicesAcceptedByUser = async (idUsuario: string): Promise<Serv
 
     return servicios;
   } catch (error) {
-    console.error("Hubo un problema con la petición Fetch:");
+    console.error("Hubo un problema al obtener los servicios aceptados:", error);
     return []; // Retorna un arreglo vacío en caso de error
   }
 };
@@ -186,7 +186,7 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
   return servicioData;
 };
 
-export const updateServiceStatus = async (id: string| null, estado: number) => {
+export const updateServiceStatus = async (id: string | null, estado: number) => {
   if (!id) {
     throw new Error("No se proporcionó un id válido para actualizar el estado del servicio");
   }
@@ -252,6 +252,50 @@ export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
   return servicios;
 };
 
+export const updateService = async (serviceId: string, serviceData: any) => {
+  try {
+    const url = `${URL}/${serviceId}`;
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(serviceData),
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+
+  } catch (error) {
+    console.error("Hubo un problema al actualizar el servicio: ", error);
+    throw error;
+  }
+};
+
+export const deleteService = async (serviceId: string) => {
+  try {
+    const response = await fetch(`${URL}/${serviceId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al eliminar el servicio.');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Hubo un problema al eliminar el servicio:", error);
+    throw error;
+  }
+};
 
 
 export const obtenerTextoEstado = (estado: number | undefined) => {
