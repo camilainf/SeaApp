@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useFormik } from "formik";
 import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -7,9 +7,9 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { getToken } from "../services/storageService";
 import { decodeToken } from "../services/tokenService";
 import { DecodedToken } from "../types/auth";
-import { createService } from "../services/serviceService";
+import { createService, getServiceById, updateService } from "../services/serviceService";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../routes/NavigatorTypes";
+import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
 import { Categoria } from "../resources/category";
 import { getAllCategories } from "../services/categoryService";
 import { selectImage } from "../utils/imageUtils";
@@ -17,12 +17,20 @@ import { uploadImage } from "../services/imageService";
 import { Image } from "react-native-elements";
 import { crearServicioSchema } from "../utils/validations/crearServicioValidations";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { ServicioData } from "../resources/service";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
 
+type ServiceRouteProp = RouteProp<
+  RootStackParamList & MainTabParamList,
+  "EditarServicio" | "Crear"
+>;
+
 const Crear: React.FC<Props> = ({ navigation }) => {
+  const route = useRoute<ServiceRouteProp>();
 
   const [showInfo, setShowInfo] = useState(false);
   const [montoSinFormato, setMontoSinFormato] = useState<number | null>(null);
@@ -34,12 +42,34 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const currentDate = new Date();
 
   useEffect(() => {
+
+    const fetchService = async () => {
+      if (route.params?.servicioId) {
+        setIsLoading(true); // Establecer la carga antes de la solicitud
+        try {
+          const servicio = await getServiceById(route.params.servicioId);
+          setServicioCargado(servicio);
+          setIsEditMode(true);
+          setIsLoading(false); // Quitar la carga después de obtener los datos
+        } catch (error) {
+          console.error("Error al obtener información del servicio:", error);
+          setIsLoading(false); // Asegúrate de manejar el estado de carga incluso en caso de error
+        }
+      } else {
+        setIsLoading(false); // No estamos cargando si no hay servicioId
+      }
+    };
+
     const fetchCategorias = async () => {
       try {
+
         const data = await getAllCategories();
         const sortedData = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
         setCategorias(sortedData);
@@ -49,7 +79,28 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     };
 
     fetchCategorias();
-  }, []);
+    fetchService();
+
+  }, [route.params?.servicioId]);
+
+  useEffect(() => {
+    if (isEditMode && servicioCargado) {
+      formik.setValues({
+        nombreServicio: servicioCargado.nombreServicio,
+        categoria: servicioCargado.categoria,
+        descripcion: servicioCargado.descripcion,
+        fechaSolicitud: servicioCargado.fechaSolicitud,
+        horaSolicitud: servicioCargado.horaSolicitud,
+        direccion: servicioCargado.direccion,
+        monto: servicioCargado.monto.toString(),
+      });
+      if (servicioCargado.imagen) {
+        console.log("IMAGEN DEL SERVICIO CARGADO", servicioCargado.imagen);
+        setServiceReferencePic(servicioCargado.imagen);
+      }
+    }
+  }, [isEditMode, servicioCargado]);
+
 
   const formik = useFormik({
     initialValues: {
@@ -73,42 +124,69 @@ const Crear: React.FC<Props> = ({ navigation }) => {
 
         const decodedToken = decodeToken(token) as DecodedToken;
         const idCreador = decodedToken.id;
-        console.log("monto sin formato: ", montoSinFormato);
+
         let imageUrl = serviceReferencePic;
         if (serviceReferencePicBase64) {
           imageUrl = await uploadImage(`data:image/jpeg;base64,${serviceReferencePicBase64}`);
         }
 
+        let montoFinal = montoSinFormato;
+        if (montoSinFormato === null && servicioCargado) {
+          montoFinal = servicioCargado.monto; // usar el monto original si no se ha cambiado
+        }
+
         const servicio = {
           idCreador,
           ...values,
-          monto: montoSinFormato,
-          estado: 1,
+          monto: montoFinal,
+          estado: 1, // Puede que quieras manejar esto de manera diferente para la edición.
           imagen: imageUrl || "",
         };
 
-        const newService = await createService(servicio);
-        console.log('Servicio creado:', newService);
-        Alert.alert(
-          "Servicio creado con éxito.",
-          "",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                formik.resetForm();
-                setSelectedDate(new Date());
-                setShowInfo(false);
-                setServiceReferencePic(null);
-                setServiceReferencePicBase64(null);
-                navigation.navigate("Main", { screen: "Home" });
+        if (isEditMode && servicioCargado) {
+          console.log("servicio", servicio);
+          await updateService(servicioCargado.id, servicio);
+          Alert.alert(
+            "Servicio actualizado con éxito.",
+            "",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  formik.resetForm();
+                  setSelectedDate(new Date());
+                  setShowInfo(false);
+                  setServiceReferencePic(null);
+                  setServiceReferencePicBase64(null);
+                  navigation.goBack();
+                },
               },
-            },
-          ]
-        );
+            ]
+          );
+        } else {
+          const newService = await createService(servicio);
+          console.log('Servicio creado:', newService);
+          Alert.alert(
+            "Servicio creado con éxito.",
+            "",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  formik.resetForm();
+                  setSelectedDate(new Date());
+                  setShowInfo(false);
+                  setServiceReferencePic(null);
+                  setServiceReferencePicBase64(null);
+                  navigation.navigate("Main", { screen: "Home" });
+                },
+              },
+            ]
+          );
+        }
       } catch (error) {
         console.error("Error al enviar la solicitud:", error);
-        Alert.alert("Error al crear el servicio.");
+        Alert.alert("Error al procesar el servicio.");
       }
     },
   });
@@ -169,10 +247,17 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Creación de servicio</Text>
-        <TouchableOpacity onPress={toggleInfo} style={styles.infoIcon}>
-          <FontAwesome name="info-circle" size={24} color="#44B1EE" />
-        </TouchableOpacity>
+        {isEditMode
+          ? <Text style={styles.header}>Edición de servicio</Text>
+          : <Text style={styles.header}>Creación de servicio</Text>
+        }
+        {!isEditMode
+          ? <TouchableOpacity onPress={toggleInfo} style={styles.infoIcon}>
+            <FontAwesome name="info-circle" size={24} color="#44B1EE" />
+          </TouchableOpacity>
+          : null
+        }
+
       </View>
 
       {/* Más Información */}
@@ -344,6 +429,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
             setMontoSinFormato(numericValue);
           } else {
             console.log("Error al convertir el monto a un número:", rawValue);
+            // Aquí, podrías optar por establecer un valor predeterminado o manejar el error de otra manera.
           }
         }}
         style={[

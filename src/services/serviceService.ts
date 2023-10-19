@@ -182,8 +182,24 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
     throw new Error(errorData.message || "No se encontro o cargo el servicio");
   }
 
-  const servicioData: ServicioData = await response.json();
-  return servicioData;
+  const servicioData = await response.json();
+  const servicio: ServicioData = {
+    id: servicioData._id,
+    idCreador: servicioData.idCreador,
+    nombreServicio: servicioData.nombreServicio,
+    categoria: servicioData.categoria,
+    descripcion: servicioData.descripcion,
+    fechaSolicitud: servicioData.fechaSolicitud,
+    horaSolicitud: servicioData.horaSolicitud,
+    direccion: servicioData.direccion,
+    monto: servicioData.monto,
+    imagen: servicioData.imagen,
+    estado: servicioData.estado,
+    fechaCreacion: servicioData.fechaCreacion
+  };
+
+  console.log("Servicio desde el getServiceById", servicio);
+  return servicio;
 };
 
 export const updateServiceStatus = async (id: string | null, estado: number) => {
@@ -255,6 +271,7 @@ export const getServicesTopOfWeek = async (): Promise<ServicioData[]> => {
 export const updateService = async (serviceId: string, serviceData: any) => {
   try {
     const url = `${URL}/${serviceId}`;
+    console.log("updateService", url);
 
     const requestOptions = {
       method: 'PUT',

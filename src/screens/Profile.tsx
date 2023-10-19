@@ -53,7 +53,6 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ServicioData[]>([]);
   
-
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {

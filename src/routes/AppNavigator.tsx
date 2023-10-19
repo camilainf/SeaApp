@@ -11,6 +11,7 @@ import TerminosCondiciones from '../screens/TerminosCondiciones';
 import Profile from '../screens/Profile';
 import ListaServicios from '../screens/ListaServicios';
 import EditarPerfil from '../screens/EditarPerfil';
+import Crear from '../screens/Crear';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -33,9 +34,9 @@ const AppNavigator: React.FC = () => {
                     name="Buscador"
                     component={BuscadorScreen}
                     options={{
-                        headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: 'Buscador', // Establece el título en una cadena vacía para ocultarlo
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: 'Buscador',
                     }}
                 />
 
@@ -48,9 +49,9 @@ const AppNavigator: React.FC = () => {
                     name="Servicio"
                     component={ServicioScreen}
                     options={{
-                        headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: '',
                     }}
                 />
 
@@ -58,9 +59,9 @@ const AppNavigator: React.FC = () => {
                     name="ListaServicios"
                     component={ListaServicios}
                     options={{
-                        headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: '',
 
                     }}
                 />
@@ -69,17 +70,13 @@ const AppNavigator: React.FC = () => {
                     name="EditarPerfil"
                     component={EditarPerfil}
                     options={{
-                        headerShown: true, // Muestra la barra superior
-                        headerBackTitleVisible: false, // Oculta el título de volver atrás
-                        headerTitle: '', // Establece el título en una cadena vacía para ocultarlo
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: '',
 
                     }}
                 />
 
-                <Stack.Screen
-                    name="Main"
-                    component={TabGroup}
-                />
                 <Stack.Screen
                     name="PerfilAjeno"
                     component={Profile}
@@ -88,6 +85,22 @@ const AppNavigator: React.FC = () => {
                         headerBackTitleVisible: false,
                         headerTitle: 'Perfil Usuario',
                     }}
+                />
+
+                <Stack.Screen
+                    name="EditarServicio"
+                    component={Crear}
+                    options={{
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: '',
+
+                    }}
+                />
+
+                <Stack.Screen
+                    name="Main"
+                    component={TabGroup}
                 />
             </Stack.Navigator>
         </NavigationContainer>

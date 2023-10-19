@@ -606,22 +606,27 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </Modal>
 
-      <TouchableOpacity
-        style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
-        onPress={() => {
-          console.log("Boton editar servicio");
-        }}>
-        <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Editar servicio</Text>
-      </TouchableOpacity>
+      {esDueno && (
+        <View>
+          <TouchableOpacity
+            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+            onPress={() => {
+              console.log("Boton editar servicio");
+              if (idServicio) navigation.navigate('EditarServicio', { servicioId: idServicio});
+            }}>
+            <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Editar servicio</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
-        onPress={() => {
-          console.log("Boton eliminar servicio");
-          if (idServicio) handleDeleteService(idServicio);
-        }}>
-        <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Eliminar servicio</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15, }}
+            onPress={() => {
+              console.log("Boton eliminar servicio");
+              if (idServicio) handleDeleteService(idServicio);
+            }}>
+            <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Eliminar servicio</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
     </ScrollView>
   );

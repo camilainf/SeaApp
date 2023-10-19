@@ -4,7 +4,9 @@ export type RootStackParamList = {
     Buscador: {
         keyword: string;
     };
-    Servicio: {id:string};
+    Servicio: {
+        id: string
+    };
     Main: { screen: keyof MainTabParamList };
     TerminosCondiciones: undefined;
     ServiciosPorCategoria: {
@@ -16,6 +18,9 @@ export type RootStackParamList = {
     PerfilAjeno: {
         id: string;
     };
+    EditarServicio: {
+        servicioId: string;
+    }
     EditarPerfil: {
         userId: string;
     };
