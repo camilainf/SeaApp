@@ -44,7 +44,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isEditMode, setIsEditMode] = useState(false);
   const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   const currentDate = new Date();
 
@@ -52,18 +51,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
 
     const fetchService = async () => {
       if (route.params?.servicioId) {
-        setIsLoading(true); // Establecer la carga antes de la solicitud
         try {
           const servicio = await getServiceById(route.params.servicioId);
           setServicioCargado(servicio);
           setIsEditMode(true);
-          setIsLoading(false); // Quitar la carga después de obtener los datos
         } catch (error) {
           console.error("Error al obtener información del servicio:", error);
-          setIsLoading(false); // Asegúrate de manejar el estado de carga incluso en caso de error
         }
-      } else {
-        setIsLoading(false); // No estamos cargando si no hay servicioId
       }
     };
 
@@ -95,7 +89,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         monto: servicioCargado.monto.toString(),
       });
       if (servicioCargado.imagen) {
-        
+
         setServiceReferencePic(servicioCargado.imagen);
       }
     }
@@ -144,7 +138,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         };
 
         if (isEditMode && servicioCargado) {
-          
+
           await updateService(servicioCargado.id, servicio);
           Alert.alert(
             "Servicio actualizado con éxito.",
@@ -165,7 +159,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           );
         } else {
           const newService = await createService(servicio);
-          
+
           Alert.alert(
             "Servicio creado con éxito.",
             "",
@@ -413,8 +407,8 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         ref={montoInputRef}
         type={"money"}
         options={{
-          precision: 0, // Sin decimales
-          separator: '.', // Separador de miles
+          precision: 0,
+          separator: '.', 
           unit: '$',
           suffixUnit: ''
         }}
@@ -423,13 +417,12 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         value={formik.values.monto}
         onChangeText={(text) => {
           formik.setFieldValue("monto", text);
-          const rawValue = text.replace(/[^0-9]/g, ''); // Esto elimina todos los caracteres que no sean dígitos
+          const rawValue = text.replace(/[^0-9]/g, ''); 
           const numericValue = parseFloat(rawValue);
           if (!isNaN(numericValue)) {
             setMontoSinFormato(numericValue);
           } else {
             console.log("Error al convertir el monto a un número:", rawValue);
-            // Aquí, podrías optar por establecer un valor predeterminado o manejar el error de otra manera.
           }
         }}
         style={[

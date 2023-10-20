@@ -77,27 +77,36 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
         navigation.navigate("Servicio", service);
     };
 
+    const ListHeader = () => {
+        return (
+            <>
+
+
+                {/* Info List */}
+                {!categoria && (
+                    <View style={styles.infoCard}>
+                        <Text style={styles.infoText}>
+                            <Text style={styles.boldText}>Descubre</Text> los últimos servicios publicados en
+                            <Text style={styles.boldText}> Seajob</Text> y encuentra el que mejor se
+                            <Text style={styles.boldText}> adapte</Text> a lo que estás
+                            <Text style={styles.boldText}> buscando</Text> 📌.
+                        </Text>
+                    </View>
+                )}
+            </>
+        );
+    };
 
     return (
         <View style={styles.container}>
-
+            
             {/* Titulo */}
             <Text style={styles.title}>{title}</Text>
-
-            {!categoria && (
-                <View style={styles.infoCard}>
-                    <Text style={styles.infoText}>
-                        <Text style={styles.boldText}>Descubre</Text> los últimos servicios publicados en
-                        <Text style={styles.boldText}> Seajob</Text> y encuentra el que mejor se
-                        <Text style={styles.boldText}> adapte</Text> a lo que estás
-                        <Text style={styles.boldText}> buscando</Text> 📌.
-                    </Text>
-                </View>
-            )}
 
             <FlatList
                 ref={flatListRef}
                 data={services}
+                ListHeaderComponent={ListHeader}  // Aquí se añade el componente de encabezado
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleServiceClick(item)}>
                         <TarjetaServicioYPerfil item={item} type="servicio" />
