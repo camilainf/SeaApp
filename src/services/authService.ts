@@ -2,6 +2,7 @@ import { loginUser as apiLoginUser } from './userService';
 import { storeToken, removeToken, getToken } from './storageService';
 import { DecodedToken } from '../types/auth';
 import { decodeToken } from './tokenService';
+import { HttpError } from '../resources/httpError';
 
 export const login = async (credentials: any) => {
     try {
@@ -9,7 +10,7 @@ export const login = async (credentials: any) => {
         await storeToken(data.token);
         return data;
     } catch (error) {
-        throw error;
+        throw error as HttpError;
     }
 };
 export const getUserIdFromToken = async () => {

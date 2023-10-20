@@ -13,6 +13,7 @@ import { getUserById, obtenerDieneroGanadoUsuario } from '../services/userServic
 import TarjetaSuperiorHome from '../components/TarjetaSuperiorHome';
 import Buscador from '../components/Buscador';
 import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
+import { ActivityIndicator } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 
 type Props = {
@@ -26,31 +27,26 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [serviciosDestacados, setServiciosDestacados] = useState<ServicioData[]>([]);
   const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
+  const [gananciaDinero, setGananaciaDinero] = useState<number>(0);
   const [initialLoading, setInitialLoading] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchData = async () => {
-        if (initialLoading) {
-          // Si es la carga inicial, muestra el indicador de carga.
-          await loadData();
-          setInitialLoading(false); // Indica que la carga inicial se ha completado.
-        } else {
-          // Si no es la carga inicial, actualiza los datos en segundo plano.
-          loadData();
-        }
-      };
+      // Establecer el estado de carga inicial en true cada vez que la pantalla esté en foco
+      setInitialLoading(true);
+      loadData().then(() => {
+        // Una vez que los datos se cargan, establecer la carga inicial en false
+        setInitialLoading(false);
+      });
 
-      fetchData();
-
-      return () => { }; // Retorna una función de limpieza vacía (no hay nada que limpiar en este caso).
-    }, [initialLoading]) // Dependencia en initialLoading para saber si es la carga inicial o no.
+      // Cuando la pantalla pierde foco (el usuario se va de la pantalla), no necesitas hacer nada especial aquí
+      return () => { };
+    }, []) // Las dependencias están vacías, lo que significa que este efecto se ejecuta una vez cada vez que la pantalla gana el foco.
   );
 
   const loadData = async () => {
     try {
-      setIsRefreshing(true); // Solo se usa para el control de "pull-to-refresh".
+      setIsRefreshing(true);
 
       const [categorias, servicios] = await Promise.all([
         getPopularCategories(),
@@ -72,109 +68,111 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       })));
 
       setServiciosDestacados(servicios);
-
     } catch (error) {
       console.error("Error al cargar los datos:", error);
     } finally {
-      setIsRefreshing(false); // Finaliza el "pull-to-refresh" si está activo.
+      setIsRefreshing(false);
     }
   };
 
   const handleServiceClick = async (service: any) => {
-    console.log(`Servicio clickeado con ID: ${service.id}`);
     try {
       await incrementServiceClick(service.id);
-    } catch (error) {
-      console.error("Error al incrementar el contador de clics:", error);
-    }
-
+    } catch (error) { console.error("Error al incrementar el contador de clics:", error); }
     navigation.navigate("Servicio", service);
   };
 
   return (
-    <ScrollView style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={loadData}
-        />
-      }>
-
-      <LinearGradient
-        colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
-        style={styles.gradientBackground}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-      />
-      <View style={styles.contentContainer}>
-
-        <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
-
-        <Buscador
-          onSearch={(term) => {
-            navigation.navigate('Buscador', { keyword: term });
-          }}
-          immediateSearch={false}
-        />
-
-        {/* Trabajos destacados */}
-        <View style={styles.tarjeta}>
-          <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
-          <FlatList
-            data={serviciosDestacados}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                handleServiceClick(item)
-              }}>
-                <Image
-                  source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
-                  style={styles.imagenTrabajo}
-                />
-                <View style={{ maxWidth: "91%" }}><Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: '500', }}>{item.nombreServicio}</Text></View>
-
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-
-        </View>
-
-        {/* Categorias destacadas */}
-        <View style={styles.tarjeta}>
-          <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
-          <FlatList
-            data={categoriasPopulares}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.tarjetaCategoria}
-                onPress={() => {
-                  navigation.navigate('ListaServicios', { categoria: item.nombre });
-                }}
-              >
-                <Image
-                  source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
-                  style={styles.imagenCategoria}
-                />
-
-                <Text style={styles.tituloCategoria}>{item.nombre}</Text>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-          />
-        </View>
-
-
-        {/* Ve los ultimos trabajos */}
-        <TarjetaUltimosTrabajos onPress={() => {
-          navigation.navigate('ListaServicios', { categoria: "" });
-        }} />
-
+    initialLoading ? (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    </ScrollView>
+    ) : (
+      <ScrollView style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={loadData}
+          />
+        }>
 
+        <LinearGradient
+          colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
+          style={styles.gradientBackground}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
+        <View style={styles.contentContainer}>
+
+          <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
+
+          <Buscador
+            onSearch={(term) => {
+              navigation.navigate('Buscador', { keyword: term });
+            }}
+            immediateSearch={false} // No realizar búsqueda inmediata desde Home
+          />
+
+          {/* Trabajos destacados */}
+          <View style={styles.tarjeta}>
+            <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
+            <FlatList
+              data={serviciosDestacados}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
+                  handleServiceClick(item)
+                }}>
+                  <Image
+                    source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
+                    style={styles.imagenTrabajo}
+                  />
+                  <View style={{ maxWidth: "91%" }}><Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: '500', }}>{item.nombreServicio}</Text></View>
+
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
+
+          </View>
+
+          {/* Categorias destacadas */}
+          <View style={styles.tarjeta}>
+            <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
+            <FlatList
+              data={categoriasPopulares}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.tarjetaCategoria}
+                  onPress={() => {
+                    navigation.navigate('ListaServicios', { categoria: item.nombre });
+                  }}
+                >
+                  <Image
+                    source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
+                    style={styles.imagenCategoria}
+                  />
+
+                  <Text style={styles.tituloCategoria}>{item.nombre}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+              scrollEnabled={false}
+            />
+          </View>
+
+
+          {/* Ve los ultimos trabajos */}
+          <TarjetaUltimosTrabajos onPress={() => {
+            navigation.navigate('ListaServicios', { categoria: "" });
+          }} />
+
+
+        </View>
+      </ScrollView>
+
+    )
   );
 };
 
@@ -286,6 +284,13 @@ const styles = StyleSheet.create({
     marginRight: 16,
     tintColor: 'white', // Color del icono
   },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
 });
 
 export default HomeScreen;

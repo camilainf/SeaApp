@@ -7,6 +7,7 @@ import * as authService from "../services/authService";
 import { getToken } from "../services/storageService";
 import { decodeToken } from "../services/tokenService";
 import { DecodedToken } from "../types/auth";
+import { HttpError } from "../resources/httpError";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -32,12 +33,22 @@ const Login: React.FC<Props> = ({ navigation }) => {
           console.log("ID del usuario:", decodedInfo.id);
         }
       }
-      console.log(data);
+      console.log("handleLogin, Login.tsx, Data:", data);
 
       Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
       navigation.navigate("Main", { screen: "Home" });
     } catch (error) {
-      Alert.alert("Error", "Hubo un problema al iniciar sesión.");
+      const httpError = error as HttpError;
+
+      let errorMessage = 'Hubo un problema al iniciar sesión.';
+
+      if (httpError.status === 400) {
+        errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
+      } else if (httpError.status >= 500) {
+        errorMessage = 'Problemas del servidor. Por favor, intenta más tarde.';
+      }
+
+      Alert.alert("Error", errorMessage);
     }
   };
 

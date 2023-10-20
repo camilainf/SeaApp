@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
 import { BASE_URL } from "@env";
+import { HttpError } from "../resources/httpError";
 
 const URL = "http://10.0.2.2:9000/api" + '/users';
 
@@ -46,7 +47,10 @@ export const loginUser = async (credentials: any) => {
 
   if (!response.ok) {
     const message = await response.text();
-    throw new Error(message);
+    throw {
+      message,
+      status: response.status,
+    } as HttpError;
   }
 
   return await response.json();
