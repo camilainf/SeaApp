@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList } from "react-native";
+import React, { useEffect, useState ,useRef } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList ,TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha } from "../utils/randomService";
@@ -16,6 +16,7 @@ import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta,
 import { Icon } from "react-native-elements";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
+
 
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -38,6 +39,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
+  const [menuVisible, setMenuVisible] = useState(false);
+  const modalRef = useRef(null); // Referencia para manejar el cierre del menú al tocar fuera
 
   //Datos importantes
   const [ofertasCargadas, setOfertasCargadas] = useState<Oferta[]>([]);
@@ -154,6 +157,21 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       { cancelable: false }
     );
   };
+  // Botones para boton tres puntos
+  const handleSaludo = () => {
+    console.log("Cómo estás");
+    setMenuVisible(false);
+  };
+
+  const handleDespedida = () => {
+    console.log("Que estés bien");
+    setMenuVisible(false);
+  };
+
+  // Esta función se utiliza para manejar los toques fuera del menú desplegable y cerrarlo
+  const handleCloseMenu = () => {
+    setMenuVisible(false);
+  };
 
   const getPaginatedOffers = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -181,7 +199,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
       <View style={styles.header}></View>
       {/* Barra de Usuario */}
-      {!esDueno && (
+      {!esDueno ? (
         <View style={styles.userBar}>
           {/* Contenedor para la imagen y el nombre */}
           <TouchableOpacity
@@ -206,7 +224,30 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             </TouchableOpacity>
           )}
         </View>
+      ) : (
+        <View style={{ alignItems: "flex-end", padding: 10 }}>
+          <TouchableOpacity onPress={() => setMenuVisible(true)}>
+            <FontAwesome name="ellipsis-h" size={20} />
+          </TouchableOpacity>
+
+          <Modal animationType="fade" transparent={true} visible={menuVisible} onRequestClose={handleCloseMenu} ref={modalRef}>
+            <TouchableWithoutFeedback onPress={handleCloseMenu}>
+              <View style={styles.modalOverlay}>
+                <View style={styles.menuOpciones}>
+                  <Text style={{color:"#2E86C1", fontWeight:"bold",fontSize:20, marginBottom:10}}>Opciones para el servicio</Text>
+                  <TouchableOpacity onPress={handleSaludo} style={styles.opcionMenu}>
+                    <Text style={{color:"#003366"}}>Editar servicio</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleDespedida} style={styles.opcionMenu}>
+                    <Text style={{color:"#003366"}}>Eliminar servicio</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </View>
       )}
+
       {/* Modal de informacion de contacto */}
       <Modal
         animationType="slide"
@@ -546,7 +587,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
               )}
             />
-            
+
             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
               <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
                 <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
@@ -583,7 +624,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.buttonModall, styles.createButtonModal]}
-                onPress={async() => {
+                onPress={async () => {
                   await handleAceptarOferta(selectedOferta);
                   setConfirmModalVisible(false);
                   setVerOfertasModalVisible(false);
@@ -708,6 +749,35 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: "#343a40",
     marginBottom: 15,
+  },
+  // ESTILO DE BOTON TRES PUNTOS
+  menuContenedor: {
+    alignItems: 'flex-end', // Alinea el menú a la derecha
+    // otros estilos que necesites para posicionar tu menú
+  },
+  botonTresPuntos: {
+    padding: 10, // Espaciado para que el botón sea fácilmente presionable
+  },
+  modalOverlay: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)' // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
+  },
+  menuOpciones: {
+    backgroundColor: 'white', // ahora el menú no será transparente
+    padding: 20, // Incrementa el espacio dentro del menú
+    borderRadius: 5, // Opcional: si quieres que el menú tenga esquinas redondeadas
+    // Aplica cualquier otro estilo que desees para tu menú
+  },
+  opcionMenu: {
+    paddingVertical: 10, // Hace que cada opción del menú sea más alta
+    alignItems: 'center', 
+    backgroundColor: "#F3F6FF",
+    marginTop: 10,
+  },
+  textoOpcionMenu: {
+    color: 'black', // O el color que prefieras
   },
   // ESTILO DE MONTO SECTION
   offerUserContainer: {
