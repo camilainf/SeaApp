@@ -13,6 +13,7 @@ import { getUserById, obtenerDieneroGanadoUsuario } from '../services/userServic
 import TarjetaSuperiorHome from '../components/TarjetaSuperiorHome';
 import Buscador from '../components/Buscador';
 import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -26,14 +27,30 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        if (initialLoading) {
+          // Si es la carga inicial, muestra el indicador de carga.
+          await loadData();
+          setInitialLoading(false); // Indica que la carga inicial se ha completado.
+        } else {
+          // Si no es la carga inicial, actualiza los datos en segundo plano.
+          loadData();
+        }
+      };
+
+      fetchData();
+
+      return () => { }; // Retorna una función de limpieza vacía (no hay nada que limpiar en este caso).
+    }, [initialLoading]) // Dependencia en initialLoading para saber si es la carga inicial o no.
+  );
 
   const loadData = async () => {
     try {
-      setIsRefreshing(true);
+      setIsRefreshing(true); // Solo se usa para el control de "pull-to-refresh".
 
       const [categorias, servicios] = await Promise.all([
         getPopularCategories(),
@@ -59,14 +76,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     } catch (error) {
       console.error("Error al cargar los datos:", error);
     } finally {
-      setIsRefreshing(false);
+      setIsRefreshing(false); // Finaliza el "pull-to-refresh" si está activo.
     }
   };
 
   const handleServiceClick = async (service: any) => {
     console.log(`Servicio clickeado con ID: ${service.id}`);
-
-    // Incrementar el contador de clics
     try {
       await incrementServiceClick(service.id);
     } catch (error) {
@@ -99,7 +114,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           onSearch={(term) => {
             navigation.navigate('Buscador', { keyword: term });
           }}
-          immediateSearch={false} // No realizar búsqueda inmediata desde Home
+          immediateSearch={false}
         />
 
         {/* Trabajos destacados */}
@@ -115,8 +130,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
                   style={styles.imagenTrabajo}
                 />
-                <View style={{maxWidth: "91%"}}><Text numberOfLines={1} ellipsizeMode="tail" style={{color:"#50719D",fontWeight: '500',}}>{item.nombreServicio}</Text></View>
-                
+                <View style={{ maxWidth: "91%" }}><Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: '500', }}>{item.nombreServicio}</Text></View>
+
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}
@@ -141,7 +156,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
                   style={styles.imagenCategoria}
                 />
-                
+
                 <Text style={styles.tituloCategoria}>{item.nombre}</Text>
               </TouchableOpacity>
             )}
@@ -156,7 +171,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <TarjetaUltimosTrabajos onPress={() => {
           navigation.navigate('ListaServicios', { categoria: "" });
         }} />
-
 
       </View>
     </ScrollView>
@@ -272,7 +286,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
     tintColor: 'white', // Color del icono
   },
-
 });
 
 export default HomeScreen;

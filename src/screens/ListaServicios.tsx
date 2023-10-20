@@ -80,8 +80,6 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
     const ListHeader = () => {
         return (
             <>
-
-
                 {/* Info List */}
                 {!categoria && (
                     <View style={styles.infoCard}>
@@ -99,7 +97,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            
+
             {/* Titulo */}
             <Text style={styles.title}>{title}</Text>
 

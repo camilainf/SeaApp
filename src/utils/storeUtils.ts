@@ -20,3 +20,20 @@ export const getLastResults = async (userId: string): Promise<(ServicioData | Us
         return [];
     }
 };
+
+export const storeUserProfileImage = async (userId: string, imageUrl: string) => {
+    try {
+        await AsyncStorage.setItem(`@userProfileImage_${userId}`, imageUrl);
+    } catch (e) {
+        console.error("Error al guardar la imagen de perfil:", e);
+    }
+};
+
+export const getUserProfileImage = async (userId: string): Promise<string | null> => {
+    try {
+        return await AsyncStorage.getItem(`@userProfileImage_${userId}`);
+    } catch (e) {
+        console.error("Error al obtener la imagen de perfil:", e);
+        return null;
+    }
+};
