@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, Alert, RefreshControl, ScrollView } from 'react-native';
 import { Avatar, Button, Card, Title } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
 import { getUserIdFromToken, logout } from '../services/authService';
 import { getUserById } from '../services/userService';
 import { UsuarioCasted } from '../resources/user';
@@ -10,31 +11,22 @@ interface Props {
 }
 
 const Mas: React.FC<Props> = ({ navigation }) => {
-
   const [user, setUser] = useState<UsuarioCasted>();
   const [userId, setUserId] = useState<string>();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-
   const obtenerUsuarioActual = async () => {
     try {
       const userId = await getUserIdFromToken();
-
-
       if (userId) {
         const user = await getUserById(userId);
         setUser(user);
         setUserId(userId);
       }
-
     } catch (error) {
       console.error("Error al obtener el userId:", error);
     }
   }
-
-  useEffect(() => {
-    obtenerUsuarioActual();
-  }, []);
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -46,6 +38,15 @@ const Mas: React.FC<Props> = ({ navigation }) => {
       setIsRefreshing(false);
     }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      onRefresh();
+      return () => {
+        // Aquí puedes realizar alguna acción cuando la pantalla pierde el foco, si es necesario.
+      };
+    }, [onRefresh])
+  );
 
   const handleButtonPress = (title: string) => {
     switch (title) {
@@ -103,6 +104,8 @@ const Mas: React.FC<Props> = ({ navigation }) => {
     </ScrollView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
