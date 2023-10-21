@@ -1,19 +1,18 @@
-import React, { useEffect, useState ,useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList ,TouchableWithoutFeedback } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
-import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
+import { RootStackParamList } from "../routes/NavigatorTypes";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UsuarioCasted } from "../resources/user";
 import { getUserById, handleEnviarValoracion } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { deleteService, getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
-import { Oferta, Postoferta } from "../resources/offer";
-import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas, postOffer } from "../services/offerService";
-import { Icon } from "react-native-elements";
+import { Oferta} from "../resources/offer";
+import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas } from "../services/offerService";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
 
@@ -184,7 +183,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
 
       setCurrentPage((prevPage) => prevPage + 1);
 
-    
+
     }
   };
 
@@ -230,17 +229,38 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <FontAwesome name="ellipsis-h" size={20} />
           </TouchableOpacity>
 
+          {/* 3 puntitos */}
           <Modal animationType="fade" transparent={true} visible={menuVisible} onRequestClose={handleCloseMenu} ref={modalRef}>
             <TouchableWithoutFeedback onPress={handleCloseMenu}>
               <View style={styles.modalOverlay}>
                 <View style={styles.menuOpciones}>
-                  <Text style={{color:"#2E86C1", fontWeight:"bold",fontSize:20, marginBottom:10}}>Opciones para el servicio</Text>
-                  <TouchableOpacity onPress={handleSaludo} style={styles.opcionMenu}>
-                    <Text style={{color:"#003366"}}>Editar servicio</Text>
+                  <Text style={{ color: "#2E86C1", fontWeight: "bold", fontSize: 20, marginBottom: 10 }}>Opciones para el servicio</Text>
+
+                  {/* Editar */}
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (idServicio && servicioCargado?.estado === 1) { // Solo permite la edición si el estado es 1
+                        navigation.navigate("EditarServicio", { servicioId: idServicio });
+                      } else {
+                        // Si el servicio no está en el estado correcto, muestra una alerta.
+                        Alert.alert("No se puede editar", "Este servicio ya se encuentra asignado a un ofertante.");
+                      }
+                    }}
+                    style={styles.opcionMenu}
+                  // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
+                  >
+                    <Text style={{ color: "#003366" }}>Editar servicio</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={handleDespedida} style={styles.opcionMenu}>
-                    <Text style={{color:"#003366"}}>Eliminar servicio</Text>
+
+                  {/* Eliminar */}
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (idServicio) handleDeleteService(idServicio);
+                    }}
+                    style={styles.opcionMenu}>
+                    <Text style={{ color: "#003366" }}>Eliminar servicio</Text>
                   </TouchableOpacity>
+
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -562,8 +582,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                         source={
                           usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                             ? {
-                                uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                              }
+                              uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                            }
                             : require("../../assets/iconos/UserProfile.png")
                         }
                         style={styles.ofertaImage}
@@ -679,25 +699,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </Modal>
 
-      {esDueno && (
-        <View>
-          <TouchableOpacity
-            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15 }}
-            onPress={() => {
-              if (idServicio) navigation.navigate("EditarServicio", { servicioId: idServicio });
-            }}>
-            <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Editar servicio</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ backgroundColor: "black", alignItems: "center", marginBottom: 10, borderRadius: 15 }}
-            onPress={() => {
-              if (idServicio) handleDeleteService(idServicio);
-            }}>
-            <Text style={{ color: "white", fontSize: 20, margin: 10 }}>Eliminar servicio</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </ScrollView>
   );
 };
@@ -758,10 +759,10 @@ const styles = StyleSheet.create({
   botonTresPuntos: {
     padding: 10, // Espaciado para que el botón sea fácilmente presionable
   },
-  modalOverlay: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)' // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
   },
   menuOpciones: {
@@ -772,7 +773,7 @@ const styles = StyleSheet.create({
   },
   opcionMenu: {
     paddingVertical: 10, // Hace que cada opción del menú sea más alta
-    alignItems: 'center', 
+    alignItems: 'center',
     backgroundColor: "#F3F6FF",
     marginTop: 10,
   },
@@ -1124,6 +1125,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     backgroundColor: "#FB6865",
     alignItems: "center",
+  },
+  opcionDeshabilitada: {
+    backgroundColor: '#e0e0e0', // o cualquier otro color que signifique "deshabilitado" para ti
+    // otras estilizaciones para la opción deshabilitada, como reducir la opacidad o cambiar el color del borde, etc.
   },
 });
 
