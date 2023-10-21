@@ -208,7 +208,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     onPress={() => {
                       navigation.navigate("Servicio", item);
                     }}>
-                    <Image source={require("../../assets/iconos/ImageReferencia.png")} style={styles.imagenTrabajo} />
+                    <Image
+                      source={
+                        item.imagen && item.imagen !== ''
+                          ? { uri: item.imagen }
+                          : require("../../assets/iconos/ImageReferencia.png")
+                      }
+                      style={styles.imagenTrabajo}
+                    />
                     <View style={{ marginEnd: 90 }}>
                       <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
                         {item.nombreServicio}
@@ -261,7 +268,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     onPress={() => {
                       navigation.navigate("Servicio", item);
                     }}>
-                    <Image source={require("../../assets/iconos/ImageReferencia.png")} style={styles.imagenTrabajo} />
+                    <Image
+                      source={
+                        item.imagen && item.imagen !== ''
+                          ? { uri: item.imagen }
+                          : require("../../assets/iconos/ImageReferencia.png")
+                      }
+                      style={styles.imagenTrabajo}
+                    />
                     <View style={{ marginEnd: 90 }}>
                       <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
                         {item.nombreServicio}
@@ -284,58 +298,58 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       </View>
       {/* Modal de ver mas solicitudes */}
       <Modal
-  transparent={true}
-  animationType="slide"
-  visible={isModalVisible}
-  onRequestClose={() => {
-    setIsModalVisible(!isModalVisible);
-  }}
->
-  <View style={styles.centeredView}>
-    <View style={styles.modalView}>
-      <Text style={styles.modalTitle}>Solicitudes</Text>
-      <FlatList
-        data={modalContent}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.tarjetaTrabajo}
-            onPress={() => {
-              navigation.navigate("Servicio", item);
-              setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
-            }}
-          >
-            {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
-            <Image
-              source={require("../../assets/iconos/ImageReferencia.png")}
-              style={styles.imagenTrabajo}
-            />
-            <View style={{ marginEnd: 90 }}>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={{ color: "#50719D", fontWeight: "bold" }}
-              >
-                {item.nombreServicio}
-              </Text>
-              <Text style={{ color: "#50719D" }}>
-                <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => String(item.id)}
-      />
-      <TouchableOpacity
-        style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-        onPress={() => {
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => {
           setIsModalVisible(!isModalVisible);
         }}
       >
-        <Text style={styles.textStyle}>Cerrar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Solicitudes</Text>
+            <FlatList
+              data={modalContent}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.tarjetaTrabajo}
+                  onPress={() => {
+                    navigation.navigate("Servicio", item);
+                    setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
+                  }}
+                >
+                  {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
+                  <Image
+                    source={require("../../assets/iconos/ImageReferencia.png")}
+                    style={styles.imagenTrabajo}
+                  />
+                  <View style={{ marginEnd: 90 }}>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ color: "#50719D", fontWeight: "bold" }}
+                    >
+                      {item.nombreServicio}
+                    </Text>
+                    <Text style={{ color: "#50719D" }}>
+                      <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => String(item.id)}
+            />
+            <TouchableOpacity
+              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+              onPress={() => {
+                setIsModalVisible(!isModalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </ScrollView>
   );
