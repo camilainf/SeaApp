@@ -133,7 +133,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           idCreador,
           ...values,
           monto: montoFinal,
-          estado: 1, // Puede que quieras manejar esto de manera diferente para la edición.
           imagen: imageUrl || "",
         };
 
