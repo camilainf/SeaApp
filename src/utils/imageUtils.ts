@@ -13,7 +13,7 @@ export const selectImage = async (): Promise<{ uri: string | null, base64: strin
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 4],
-        quality: 0.5,
+        quality: 0.3,
         base64: true,
     });
 
