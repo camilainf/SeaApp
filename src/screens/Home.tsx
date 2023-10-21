@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -28,20 +28,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [usuario, setUsuario] = useState<UsuarioCasted>();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      // Establecer el estado de carga inicial en true cada vez que la pantalla esté en foco
-      setInitialLoading(true);
-      loadData().then(() => {
-        // Una vez que los datos se cargan, establecer la carga inicial en false
-        setInitialLoading(false);
-      });
-
-      // Cuando la pantalla pierde foco (el usuario se va de la pantalla), no necesitas hacer nada especial aquí
+      loadData();
       return () => { };
-    }, []) // Las dependencias están vacías, lo que significa que este efecto se ejecuta una vez cada vez que la pantalla gana el foco.
+    }, [])
   );
 
   const loadData = async () => {
@@ -58,7 +51,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         throw new Error("No se pudo obtener el ID del usuario.");
       }
 
-      setUsuario(await getUserById(userId));
+      const user = await getUserById(userId);
+      setUsuario(user);
+
+      if (user.imagenDePerfil) {
+        // Pre-cargar la imagen de perfil
+        Image.prefetch(user.imagenDePerfil).then(() => {
+          setIsProfileImageLoaded(true);
+        }, error => {
+          console.error("Error al cargar la imagen de perfil:", error);
+          setIsProfileImageLoaded(true);
+        });
+      } else {
+        setIsProfileImageLoaded(true);
+      }
+
       //Dinero ganado:
       const fetchedGanancia = await obtenerDieneroGanadoUsuario(userId);
       setGananaciaDinero(fetchedGanancia);
@@ -83,7 +90,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    initialLoading ? (
+    !isProfileImageLoaded ? (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
