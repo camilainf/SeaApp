@@ -67,9 +67,11 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         const data = await getAllCategories();
         const sortedData = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
         setCategorias(sortedData);
+        
       } catch (error) {
         console.error("Error al obtener las categorías:", error);
       }
+      
     };
 
     fetchCategorias();
@@ -94,6 +96,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       }
     }
   }, [isEditMode, servicioCargado]);
+  const getImageUrlForCategory = (categoryName: string, categories: Categoria[]): string => {
+    // Encuentra la categoría por nombre
+    const category = categories.find(cat => cat.nombre === categoryName);
+  
+    // Si la categoría existe y tiene una imagen, devuelve esa imagen. Si no, devuelve una cadena vacía o una imagen predeterminada.
+    return category?.imagen || "";
+  };
 
 
   const formik = useFormik({
@@ -122,6 +131,9 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         let imageUrl = serviceReferencePic;
         if (serviceReferencePicBase64) {
           imageUrl = await uploadImage(`data:image/jpeg;base64,${serviceReferencePicBase64}`);
+        } else if (!serviceReferencePic && values.categoria) {
+          // Si no hay una imagen de servicio seleccionada, usa la imagen de la categoría
+          imageUrl = getImageUrlForCategory(values.categoria, categorias);
         }
 
         let montoFinal = montoSinFormato;
@@ -273,11 +285,17 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         </View>
       )}
       <View style={styles.separator} />
-
+      {/* <View>
+        <TouchableOpacity onPress={()=> {
+          console.log('Categorias',categorias[0]);
+        }}>
+          <Text style={{ color: "#44B1EE", alignSelf: 'flex-end' }}>¿Cómo funciona?</Text>
+        </TouchableOpacity>
+      </View> */}
       {/* Nombre */}
       <Text style={styles.label}>
         Nombre del servicio{"  "}
-        <FontAwesome name="briefcase" size={16} color="#4E479A" />
+        <FontAwesome name="briefcase" size={16} color="#415C80" />
       </Text>
       <TextInput
         placeholder="Ejemplo: Corte de pasto"
@@ -294,7 +312,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       {/* Categoría */}
       <Text style={styles.label}>
         Categoría{"  "}
-        <FontAwesome name="tag" size={16} color="#4E479A" />
+        <FontAwesome name="tag" size={16} color="#415C80" />
       </Text>
       <View style={[
         styles.pickerContainer,
@@ -317,7 +335,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       {/* Descripcion */}
       <Text style={styles.label}>
         Descripción{"  "}
-        <FontAwesome name="pencil-square-o" size={16} color="#4E479A" />
+        <FontAwesome name="pencil-square-o" size={16} color="#415C80" />
       </Text>
       <TextInput
         placeholder="Descripción del servicio"
@@ -340,7 +358,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         <View style={styles.column}>
           <Text style={styles.label}>
             Fecha{"  "}
-            <FontAwesome name="calendar" size={16} color="#4E479A" />
+            <FontAwesome name="calendar" size={16} color="#415C80" />
           </Text>
           <View style={styles.dateTimePickerContainer}>
             <TouchableOpacity onPress={() => setShowDatePicker(true)}>
@@ -362,7 +380,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         <View style={styles.column}>
           <Text style={styles.label}>
             Hora{"  "}
-            <FontAwesome name="clock-o" size={16} color="#4E479A" />
+            <FontAwesome name="clock-o" size={16} color="#415C80" />
           </Text>
           <View style={styles.dateTimePickerContainer}>
             <TouchableOpacity onPress={() => setShowTimePicker(true)}>
@@ -384,7 +402,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       {/* Dirección */}
       <Text style={styles.label}>
         Dirección del servicio{"  "}
-        <FontAwesome name="map-marker" size={16} color="#4E479A" />
+        <FontAwesome name="map-marker" size={16} color="#415C80" />
       </Text>
       <TextInput
         placeholder="Ejemplo: Calle Falsa 123"
@@ -400,7 +418,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       {/* Monto */}
       <Text style={styles.label}>
         Monto del servicio{"  "}
-        <FontAwesome name="money" size={16} color="#4E479A" />
+        <FontAwesome name="money" size={16} color="#415C80" />
       </Text>
       <TextInputMask
         ref={montoInputRef}
@@ -518,7 +536,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 25,
     fontWeight: "bold",
-    color: "#4E479A",
+    color: "#50719D",
   },
   infoIcon: {
     marginLeft: 10,
@@ -532,7 +550,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
-    color: "#5F5C7D",
+    color: "#415C80",
   },
   separator: {
     height: 1,
@@ -543,7 +561,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
     fontSize: 16,
-    color: "#4E479A",
+    color: "#50719D",
   },
   input: {
     height: 50,

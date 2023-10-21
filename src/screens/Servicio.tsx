@@ -11,11 +11,10 @@ import { getUserById, handleEnviarValoracion } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { deleteService, getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
 import { getUserIdFromToken } from "../services/authService";
-import { Oferta} from "../resources/offer";
+import { Oferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas } from "../services/offerService";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
-
 
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -180,10 +179,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleNextPage = () => {
     if (currentPage * ITEMS_PER_PAGE < ofertasCargadas.length) {
-
       setCurrentPage((prevPage) => prevPage + 1);
-
-
     }
   };
 
@@ -239,7 +235,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   {/* Editar */}
                   <TouchableOpacity
                     onPress={() => {
-                      if (idServicio && servicioCargado?.estado === 1) { // Solo permite la edición si el estado es 1
+                      if (idServicio && servicioCargado?.estado === 1) {
+                        // Solo permite la edición si el estado es 1
                         navigation.navigate("EditarServicio", { servicioId: idServicio });
                       } else {
                         // Si el servicio no está en el estado correcto, muestra una alerta.
@@ -247,7 +244,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       }
                     }}
                     style={styles.opcionMenu}
-                  // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
+                    // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
                   >
                     <Text style={{ color: "#003366" }}>Editar servicio</Text>
                   </TouchableOpacity>
@@ -260,7 +257,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     style={styles.opcionMenu}>
                     <Text style={{ color: "#003366" }}>Eliminar servicio</Text>
                   </TouchableOpacity>
-
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -545,77 +541,94 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.modalTitle2}>
               <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas publicadas
             </Text>
-
-            <FlatList
-              data={getPaginatedOffers()}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item: oferta, index }) => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between", // Alineación horizontal
-                    alignItems: "center", // Alineación vertical
-                    marginBottom: 10,
-                    paddingHorizontal: 10, // Padding horizontal
-                  }}
-                  key={index}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginBottom: 10,
-                    }}
-                    key={index}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        navigation.navigate("PerfilAjeno", {
-                          id: usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
-                        });
-                        setVerOfertasModalVisible(false);
-                      }}
+            
+            {ofertasCargadas.length > 0 ? (
+              <>
+                
+                <FlatList
+                  data={getPaginatedOffers()}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item: oferta, index }) => (
+                    <View
                       style={{
                         flexDirection: "row",
-                        alignItems: "center",
-                        flex: 1,
-                      }}>
-                      <Image
-                        source={
-                          usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
-                            ? {
-                              uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                        justifyContent: "space-between", // Alineación horizontal
+                        alignItems: "center", // Alineación vertical
+                        marginBottom: 10,
+                        paddingHorizontal: 10, // Padding horizontal
+                      }}
+                      key={index}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 10,
+                        }}
+                        key={index}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.navigate("PerfilAjeno", {
+                              id: usuariosOfertantes[oferta.idCreadorOferta]?._id || "",
+                            });
+                            setVerOfertasModalVisible(false);
+                          }}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            flex: 1,
+                          }}>
+                          <Image
+                            source={
+                              usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
+                                ? {
+                                    uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                                  }
+                                : require("../../assets/iconos/UserProfile.png")
                             }
-                            : require("../../assets/iconos/UserProfile.png")
-                        }
-                        style={styles.ofertaImage}
-                      />
-                      <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
-                        {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
-                      </Text>
-                    </TouchableOpacity>
+                            style={styles.ofertaImage}
+                          />
+                          <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
+                            {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
+                          </Text>
+                        </TouchableOpacity>
 
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setSelectedOferta(oferta);
-                          setConfirmModalVisible(true);
-                        }}>
-                        <MaterialIcons name="check" size={24} color="green" />
-                      </TouchableOpacity>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                          <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelectedOferta(oferta);
+                              setConfirmModalVisible(true);
+                            }}>
+                            <MaterialIcons name="check" size={24} color="green" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     </View>
-                  </View>
+                  )}
+                />
+                {}
+                <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
+                  <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
+                    <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleNextPage} disabled={currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length}>
+                    <Text style={{ color: currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length ? "grey" : "#2E86C1" }}>Siguiente</Text>
+                  </TouchableOpacity>
                 </View>
-              )}
-            />
-
-            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
-              <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
-                <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleNextPage} disabled={currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length}>
-                <Text style={{ color: currentPage * ITEMS_PER_PAGE >= ofertasCargadas.length ? "grey" : "#2E86C1" }}>Siguiente</Text>
-              </TouchableOpacity>
-            </View>
+              </>
+            ) : (
+              
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 10,
+                  justifyContent: "center", // Centrar el contenido horizontalmente
+                }}>
+                  
+                <Text style={{ marginRight: 10, color: "grey" , fontSize:16}}>No hay ofertas disponibles por el momento...</Text>
+              </View>
+            )}
             <TouchableOpacity style={styles.closeButton} onPress={() => setVerOfertasModalVisible(false)}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
@@ -698,7 +711,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-
     </ScrollView>
   );
 };
@@ -753,7 +765,7 @@ const styles = StyleSheet.create({
   },
   // ESTILO DE BOTON TRES PUNTOS
   menuContenedor: {
-    alignItems: 'flex-end', // Alinea el menú a la derecha
+    alignItems: "flex-end", // Alinea el menú a la derecha
     // otros estilos que necesites para posicionar tu menú
   },
   botonTresPuntos: {
@@ -761,24 +773,24 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)' // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
   },
   menuOpciones: {
-    backgroundColor: 'white', // ahora el menú no será transparente
+    backgroundColor: "white", // ahora el menú no será transparente
     padding: 20, // Incrementa el espacio dentro del menú
     borderRadius: 5, // Opcional: si quieres que el menú tenga esquinas redondeadas
     // Aplica cualquier otro estilo que desees para tu menú
   },
   opcionMenu: {
     paddingVertical: 10, // Hace que cada opción del menú sea más alta
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: "#F3F6FF",
     marginTop: 10,
   },
   textoOpcionMenu: {
-    color: 'black', // O el color que prefieras
+    color: "black", // O el color que prefieras
   },
   // ESTILO DE MONTO SECTION
   offerUserContainer: {
@@ -1127,7 +1139,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   opcionDeshabilitada: {
-    backgroundColor: '#e0e0e0', // o cualquier otro color que signifique "deshabilitado" para ti
+    backgroundColor: "#e0e0e0", // o cualquier otro color que signifique "deshabilitado" para ti
     // otras estilizaciones para la opción deshabilitada, como reducir la opacidad o cambiar el color del borde, etc.
   },
 });
