@@ -24,6 +24,7 @@ type UsuarioCasted = {
   telefono: string;
   imagenDePerfil?: string;
   calificacion: number[];
+  isAdmin: boolean;
 }
 
 export { Usuario, UsuarioCasted };
