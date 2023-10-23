@@ -29,7 +29,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0);
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false);
-
+  
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -89,97 +89,88 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate("Servicio", service);
   };
 
-  return (
-    !isProfileImageLoaded ? (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    ) : (
-      <ScrollView style={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={loadData}
-          />
-        }>
+  return !isProfileImageLoaded ? (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  ) : (
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={loadData} />}>
+      <LinearGradient colors={usuario?.isAdmin ? ["#FFA500", "#FFA500", "rgba(68, 177, 238, 0)"]:["#0F4FC2", "#44B1EE", "rgba(68, 177, 238, 0)"]} style={styles.gradientBackground} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+      <View style={styles.contentContainer}>
+        <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
 
-        <LinearGradient
-          colors={['#0F4FC2', '#44B1EE', 'rgba(68, 177, 238, 0)']}
-          style={styles.gradientBackground}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
+        <Buscador
+          onSearch={(term) => {
+            navigation.navigate("Buscador", { keyword: term });
+          }}
+          immediateSearch={false} // No realizar búsqueda inmediata desde Home
         />
-        <View style={styles.contentContainer}>
 
-          <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
+        {/* Trabajos destacados */}
+        {!usuario?.isAdmin ? (
+          <>
+            <View style={styles.tarjeta}>
+              <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
+              <FlatList
+                data={serviciosDestacados}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.tarjetaTrabajo}
+                    onPress={() => {
+                      handleServiceClick(item);
+                    }}>
+                    <Image source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : defaultImage} style={styles.imagenTrabajo} />
+                    <View style={{ maxWidth: "91%" }}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "500" }}>
+                        {item.nombreServicio}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+              />
+            </View>
 
-          <Buscador
-            onSearch={(term) => {
-              navigation.navigate('Buscador', { keyword: term });
-            }}
-            immediateSearch={false} // No realizar búsqueda inmediata desde Home
-          />
+            {/* Categorias destacadas*/}
+            <View style={styles.tarjeta}>
+              <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
+              <FlatList
+                data={categoriasPopulares}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.tarjetaCategoria}
+                    onPress={() => {
+                      navigation.navigate("ListaServicios", { categoria: item.nombre });
+                    }}>
+                    <Image source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require("../../assets/iconos/ImageReferencia.png")} style={styles.imagenCategoria} />
 
-          {/* Trabajos destacados */}
-          <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
-            <FlatList
-              data={serviciosDestacados}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.tarjetaTrabajo} onPress={() => {
-                  handleServiceClick(item)
-                }}>
-                  <Image
-                    source={item.imagen && item.imagen !== '' ? { uri: item.imagen } : defaultImage}
-                    style={styles.imagenTrabajo}
-                  />
-                  <View style={{ maxWidth: "91%" }}><Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: '500', }}>{item.nombreServicio}</Text></View>
-
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-
+                    <Text style={styles.tituloCategoria}>{item.nombre}</Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id}
+                numColumns={2}
+                scrollEnabled={false}
+              />
+            </View>
+          </>
+        ) : (
+          
+          <View >
+            
+            <Text style={{ color: "#415C80", fontSize: 20, marginVertical: 25, marginHorizontal: 10 }}>Estas en la vista de <Text style={{fontWeight:"bold"}}>admin</Text> . Aca podras <Text style={{fontWeight:"bold"}}>eliminar y editar </Text> servicios y usuarios si es necesario 🙌.</Text>
           </View>
+          
+        )}
 
-          {/* Categorias destacadas */}
-          <View style={styles.tarjeta}>
-            <Text style={styles.tituloTrabajos}>Categorías destacadas 🤔</Text>
-            <FlatList
-              data={categoriasPopulares}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.tarjetaCategoria}
-                  onPress={() => {
-                    navigation.navigate('ListaServicios', { categoria: item.nombre });
-                  }}
-                >
-                  <Image
-                    source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : require('../../assets/iconos/ImageReferencia.png')}
-                    style={styles.imagenCategoria}
-                  />
-
-                  <Text style={styles.tituloCategoria}>{item.nombre}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id}
-              numColumns={2}
-              scrollEnabled={false}
-            />
-          </View>
-
-
-          {/* Ve los ultimos trabajos */}
-          <TarjetaUltimosTrabajos onPress={() => {
-            navigation.navigate('ListaServicios', { categoria: "" });
-          }} />
-
-
-        </View>
-      </ScrollView>
-
-    )
+        {/* Ve los ultimos trabajos */}
+        <TarjetaUltimosTrabajos
+          onPress={() => {
+            navigation.navigate("ListaServicios", { categoria: "" });
+          }}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -203,7 +194,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: '15%',
+    height: '20%',
     zIndex: 1,
   },
 

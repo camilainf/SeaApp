@@ -24,3 +24,11 @@ export const getUserIdFromToken = async () => {
 export const logout = async () => {
     await removeToken();
 };
+
+export const getUserIsAdminFromToken = async () => {
+    const token = await getToken();
+    if (!token) return null;
+    
+    const decodedToken = decodeToken(token) as DecodedToken;
+    return decodedToken.isAdmin;
+};

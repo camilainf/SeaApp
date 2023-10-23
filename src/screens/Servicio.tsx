@@ -10,7 +10,7 @@ import { UsuarioCasted } from "../resources/user";
 import { getUserById, handleEnviarValoracion } from "../services/userService";
 import { ServicioData } from "../resources/service";
 import { deleteService, getServiceById, obtenerTextoEstado, updateServiceStatus } from "../services/serviceService";
-import { getUserIdFromToken } from "../services/authService";
+import { getUserIdFromToken, getUserIsAdminFromToken } from "../services/authService";
 import { Oferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas } from "../services/offerService";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
@@ -65,12 +65,17 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
           setUserCreador(fetchedUser);
           const userData = await getUserIdFromToken();
+          const isAdmin = await  getUserIsAdminFromToken();
           setUserToken(userData);
           if (fetchedServicio.idCreador === userData) {
             setEsDueno(true);
-          } else {
+          } else if  (isAdmin){
+            setEsDueno(true);
+          }
+           else {
             setEsDueno(false);
           }
+          
         }
         //Carga de todas las ofertas del servicio
         const fetchedOffer = await getOffersByServiceId(idServicio);
