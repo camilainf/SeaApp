@@ -24,6 +24,8 @@ export type RootStackParamList = {
     EditarPerfil: {
         userId: string;
     };
+
+    Categorias: undefined;
 };
 
 export type MainTabParamList = {

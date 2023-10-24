@@ -12,6 +12,7 @@ import Profile from '../screens/Profile';
 import ListaServicios from '../screens/ListaServicios';
 import EditarPerfil from '../screens/EditarPerfil';
 import Crear from '../screens/Crear';
+import Categorias from '../screens/Categorias';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -101,6 +102,17 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen
                     name="Main"
                     component={TabGroup}
+                />
+
+                <Stack.Screen
+                    name="Categorias"
+                    component={Categorias}
+                    options={{
+                        headerShown: true,
+                        headerBackTitleVisible: false,
+                        headerTitle: 'Categorías',
+
+                    }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

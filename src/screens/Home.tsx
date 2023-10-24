@@ -29,7 +29,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0);
   const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false);
-  
+
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -89,13 +89,17 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate("Servicio", service);
   };
 
+  const handleVerMasCategorias = async () => {
+    navigation.navigate("Categorias");
+  };
+
   return !isProfileImageLoaded ? (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#0000ff" />
     </View>
   ) : (
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={loadData} />}>
-      <LinearGradient colors={usuario?.isAdmin ? ["#FFA500", "#FFA500", "rgba(68, 177, 238, 0)"]:["#0F4FC2", "#44B1EE", "rgba(68, 177, 238, 0)"]} style={styles.gradientBackground} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+      <LinearGradient colors={usuario?.isAdmin ? ["#FFA500", "#FFA500", "rgba(68, 177, 238, 0)"] : ["#0F4FC2", "#44B1EE", "rgba(68, 177, 238, 0)"]} style={styles.gradientBackground} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
       <View style={styles.contentContainer}>
         <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
 
@@ -152,15 +156,20 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 numColumns={2}
                 scrollEnabled={false}
               />
+
+              {/* VER MÁS */}
+              <TouchableOpacity onPress={() => handleVerMasCategorias()}>
+                  <Text style={styles.categoriaText}>Ver más...</Text>
+              </TouchableOpacity>
             </View>
           </>
         ) : (
-          
+
           <View >
-            
-            <Text style={{ color: "#415C80", fontSize: 20, marginVertical: 25, marginHorizontal: 10 }}>Estas en la vista de <Text style={{fontWeight:"bold"}}>admin</Text> . Aca podras <Text style={{fontWeight:"bold"}}>eliminar y editar </Text> servicios y usuarios si es necesario 🙌.</Text>
+
+            <Text style={{ color: "#415C80", fontSize: 20, marginVertical: 25, marginHorizontal: 10 }}>Estas en la vista de <Text style={{ fontWeight: "bold" }}>admin</Text> . Aca podras <Text style={{ fontWeight: "bold" }}>eliminar y editar </Text> servicios y usuarios si es necesario 🙌.</Text>
           </View>
-          
+
         )}
 
         {/* Ve los ultimos trabajos */}
@@ -175,6 +184,20 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+
+  categoriaText: {
+    alignContent: "center",
+    color: "white",
+    backgroundColor: "#0787E2",
+    marginVertical: 20,
+    paddingVertical: 10,
+    marginHorizontal: "25%",
+
+    borderRadius: 8,
+    fontSize: 15,
+    fontWeight: "600",
+    textAlign: 'center',
+  },
 
   // ESTILOS GENERALES
 

@@ -35,6 +35,6 @@ export const getPopularCategories = async (): Promise<CategoriaPopular[]> => {
     imagen: cat.imagen,
     contador: cat.count
   }));
-  
+
   return categoriasPopulares;
 };
