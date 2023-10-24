@@ -39,7 +39,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ServicioData[]>([]);
-  const [isAdmin,setIsAdmin] = useState(false); 
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -52,7 +52,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             userId = route.params.id;
           } else {
             userId = await getUserIdFromToken();
-            
+
             if (!userId) {
               throw new Error("No se pudo obtener el ID del usuario.");
             }
@@ -60,7 +60,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           }
           //Es admin?
           const dataAdmin = await getUserIsAdminFromToken();
-          if (dataAdmin) { setIsAdmin(true); setPerfilPersonal(true)}
+          if (dataAdmin) { setIsAdmin(true); setPerfilPersonal(true) }
           //Carga informacion user
           const data = await getUserById(userId);
           setUsuarioData(data);
@@ -111,15 +111,15 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   };
 
 
-  const handleEdit =(userId:string|undefined) => {
-    if (userId){
+  const handleEdit = (userId: string | undefined) => {
+    if (userId) {
       navigation.navigate('EditarPerfil', { userId: userId });
-    }else{
+    } else {
       Alert.alert(`No se puede editar este perfil`);
     }
-    
+
   };
-  const handleDelete =(userId:string|undefined) => {
+  const handleDelete = (userId: string | undefined) => {
     Alert.alert('Eliminacion');
   };
   return (
@@ -148,8 +148,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
               <FontAwesome name="ellipsis-h" size={20} />
             </TouchableOpacity>
 
-          </View>:<></>}
-          
+          </View> : <></>}
+
           <View style={styles.imageContainer}>
             {usuarioData?.imagenDePerfil ? <Image source={{ uri: usuarioData?.imagenDePerfil }} style={styles.profileImage} /> : <Image source={require("../../assets/iconos/usericon.png")} style={styles.profileImage} />}
             <Rating imageSize={20} readonly startingValue={calcularPromedioCalificaciones(usuarioData?.calificacion)} style={styles.rating} />
@@ -157,7 +157,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
             {usuarioData?.nombre} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
           </Text>
-          <TouchableOpacity style={isAdmin ?styles.contactButtonAdmin: styles.contactButton} onPress={() => Alert.alert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`, [{ text: "OK" }])}>
+          <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => Alert.alert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`, [{ text: "OK" }])}>
             <FontAwesome name="info-circle" size={15} color="white" />
             <Text style={styles.contactButtonText}>Informacion</Text>
           </TouchableOpacity>
@@ -331,89 +331,89 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       </View>
       {/* Modal de ver mas solicitudes */}
       <Modal
-  transparent={true}
-  animationType="slide"
-  visible={isModalVisible}
-  onRequestClose={() => {
-    setIsModalVisible(!isModalVisible);
-  }}
->
-  <View style={styles.centeredView}>
-    <View style={styles.modalView}>
-      <Text style={styles.modalTitle}>Solicitudes</Text>
-      <FlatList
-        data={modalContent}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.tarjetaTrabajo}
-            onPress={() => {
-              navigation.navigate("Servicio", item);
-              setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
-            }}
-          >
-            {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
-            <Image
-              source={require("../../assets/iconos/ImageReferencia.png")}
-              style={styles.imagenTrabajo}
-            />
-            <View style={{ marginEnd: 90 }}>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={{ color: "#50719D", fontWeight: "bold" }}
-              >
-                {item.nombreServicio}
-              </Text>
-              <Text style={{ color: "#50719D" }}>
-                <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={{ paddingBottom: 50 }}  // Añade un padding al final para asegurar que todos los elementos son visibles
-      />
-      <TouchableOpacity
-        style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-        onPress={() => {
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => {
           setIsModalVisible(!isModalVisible);
         }}
       >
-        <Text style={styles.textStyle}>Cerrar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Solicitudes</Text>
+            <FlatList
+              data={modalContent}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.tarjetaTrabajo}
+                  onPress={() => {
+                    navigation.navigate("Servicio", item);
+                    setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
+                  }}
+                >
+                  {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
+                  <Image
+                    source={item.imagen && item.imagen != '' ? {uri: item.imagen} : require("../../assets/iconos/ImageReferencia.png")}
+                    style={styles.imagenTrabajo}
+                  />
+                  <View style={{ marginEnd: 90 }}>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ color: "#50719D", fontWeight: "bold" }}
+                    >
+                      {item.nombreServicio}
+                    </Text>
+                    <Text style={{ color: "#50719D" }}>
+                      <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => String(item.id)}
+              contentContainerStyle={{ paddingBottom: 50 }}  // Añade un padding al final para asegurar que todos los elementos son visibles
+            />
+            <TouchableOpacity
+              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+              onPress={() => {
+                setIsModalVisible(!isModalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal de opciones de servicio */}
       <Modal animationType="fade" transparent={true} visible={menuVisible} onRequestClose={handleCloseMenu} ref={modalRef}>
-            <TouchableWithoutFeedback onPress={handleCloseMenu}>
-              <View style={styles.modalOverlay}>
-                <View style={styles.menuOpciones}>
-                  <Text style={{ color: "#2E86C1", fontWeight: "bold", fontSize: 20, marginBottom: 10 }}>Opciones para el usuario</Text>
+        <TouchableWithoutFeedback onPress={handleCloseMenu}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.menuOpciones}>
+              <Text style={{ color: "#2E86C1", fontWeight: "bold", fontSize: 20, marginBottom: 10 }}>Opciones para el usuario</Text>
 
-                  {/* Editar usuario*/}
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleEdit(usuarioData?._id);
-                    }}
-                    style={styles.opcionMenu}
-                  >
-                    <Text style={{ color: "#003366" }}>Editar usuario</Text>
-                  </TouchableOpacity>
+              {/* Editar usuario*/}
+              <TouchableOpacity
+                onPress={() => {
+                  handleEdit(usuarioData?._id);
+                }}
+                style={styles.opcionMenu}
+              >
+                <Text style={{ color: "#003366" }}>Editar usuario</Text>
+              </TouchableOpacity>
 
-                  {/* Eliminar cuenta  */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleDelete(usuarioData?._id);
-                    }}
-                    style={styles.opcionMenu}>
-                    <Text style={{ color: "#003366" }}>Eliminar usuario</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
+              {/* Eliminar cuenta  */}
+              <TouchableOpacity
+                onPress={() => {
+                  handleDelete(usuarioData?._id);
+                }}
+                style={styles.opcionMenu}>
+                <Text style={{ color: "#003366" }}>Eliminar usuario</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 };
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 10,
   },
-  contactButtonAdmin:{
+  contactButtonAdmin: {
     marginTop: 10,
     backgroundColor: "#FFA500",
     padding: 5,
