@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert, RefreshControl, ScrollView } from 'react-nativ
 import { Avatar, Button, Card, Title } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUserIdFromToken, logout } from '../services/authService';
-import { getUserById } from '../services/userService';
+import { deactivateUser, getUserById } from '../services/userService';
 import { UsuarioCasted } from '../resources/user';
 
 interface Props {
@@ -57,6 +57,35 @@ const Mas: React.FC<Props> = ({ navigation }) => {
       case "Editar datos personales":
         navigation.navigate('EditarPerfil', { userId: userId });
         break;
+      case "Desactivar cuenta":
+        // Mostrar un diálogo de confirmación antes de desactivar la cuenta.
+        Alert.alert(
+          "Desactivar cuenta",
+          "¿Estás seguro de que quieres desactivar tu cuenta? Esta acción no se puede deshacer.",
+          [
+            {
+              text: "Cancelar",
+              style: "cancel"
+            },
+            { 
+              text: "Confirmar", 
+              onPress: async () => {
+                try {
+                  if (userId) {
+                    await deactivateUser(userId); 
+                    logout();
+                    navigation.navigate("Auth");
+                  }
+                } catch (error) {
+                  console.error('Error al desactivar la cuenta del usuario:', error);
+                  Alert.alert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+                }
+              }
+            }
+          ],
+          { cancelable: false }
+        );
+        break;
       default:
         Alert.alert(title);
     }
@@ -104,8 +133,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
     </ScrollView>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {

@@ -179,3 +179,25 @@ export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined)
   }
 };
 
+export const deactivateUser = async (userId: string) => {
+  try {
+    const url = `${URL}/deactivateUser/${userId}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Hubo un problema al desactivar el usuario:", error);
+    throw error;
+  }
+};
+
