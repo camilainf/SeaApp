@@ -34,6 +34,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
         telefono: '',
         imagenDePerfil: "",
         calificacion: [],
+        isAdmin: false
     });
 
     const formik = useFormik({
@@ -71,6 +72,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     email: userData.email,
                     imagenDePerfil: userData.imagenDePerfil,
                     calificacion: userData.calificacion,
+                    isAdmin: userData.isAdmin
                 });
                 if (userData.imagenDePerfil) {
                     setProfilePic(userData.imagenDePerfil);
@@ -147,7 +149,6 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     value={formik.values.nombre}
                     onChangeText={formik.handleChange('nombre')}
                     onBlur={formik.handleBlur('nombre')}
-                    maxLength={40}
                 />
                 {formik.touched.nombre && formik.errors.nombre ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.nombre}</Text>) : null}
 
@@ -158,7 +159,6 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     value={formik.values.apellidoPaterno}
                     onChangeText={formik.handleChange('apellidoPaterno')}
                     onBlur={formik.handleBlur('apellidoPaterno')}
-                    maxLength={30}
                 />
                 {formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.apellidoPaterno}</Text>) : null}
 
@@ -169,7 +169,6 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     value={formik.values.apellidoMaterno}
                     onChangeText={formik.handleChange('apellidoMaterno')}
                     onBlur={formik.handleBlur('apellidoMaterno')}
-                    maxLength={30}
                 />
                 {formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.apellidoMaterno}</Text>) : null}
 

@@ -129,7 +129,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
             <TextInput
               value={formik.values.nombre}
               onChangeText={formik.handleChange("nombre")}
-              maxLength={40}
+              maxLength={30}
               style={[
                 styles.input,
                 formik.touched.nombre && formik.errors.nombre

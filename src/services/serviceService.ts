@@ -197,7 +197,7 @@ export const getServiceById = async (id: string): Promise<ServicioData> => {
     fechaCreacion: servicioData.fechaCreacion
   };
 
-  
+
   return servicio;
 };
 
@@ -328,6 +328,8 @@ export const obtenerTextoEstado = (estado: number | undefined) => {
       return "En valoración";
     case 5:
       return "Terminado";
+    case 6:
+      return "Terminado"; // Termino forzado
     default:
       return "Estado desconocido";
   }

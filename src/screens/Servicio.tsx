@@ -65,17 +65,17 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
           setUserCreador(fetchedUser);
           const userData = await getUserIdFromToken();
-          const isAdmin = await  getUserIsAdminFromToken();
+          const isAdmin = await getUserIsAdminFromToken();
           setUserToken(userData);
           if (fetchedServicio.idCreador === userData) {
             setEsDueno(true);
-          } else if  (isAdmin){
+          } else if (isAdmin) {
             setEsDueno(true);
           }
-           else {
+          else {
             setEsDueno(false);
           }
-          
+
         }
         //Carga de todas las ofertas del servicio
         const fetchedOffer = await getOffersByServiceId(idServicio);
@@ -249,7 +249,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                       }
                     }}
                     style={styles.opcionMenu}
-                    // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
+                  // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
                   >
                     <Text style={{ color: "#003366" }}>Editar servicio</Text>
                   </TouchableOpacity>
@@ -453,11 +453,18 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               //
             )}
 
-            {servicioCargado && servicioCargado?.estado > 4 && (
+            {servicioCargado && servicioCargado?.estado === 5 && (
               <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 15 }}>
                 El servicio actual ya se encuentra <Text style={{ fontWeight: "bold" }}>finalizado</Text> y <Text style={{ fontWeight: "bold" }}>valorado </Text> por ambos usuarios! ✅
               </Text>
             )}
+
+            {servicioCargado && servicioCargado?.estado === 6 && (
+              <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 40 }}>
+                El servicio finalizó con éxito. ✅
+              </Text>
+            )}
+
           </>
         ) : (
           <>{servicioCargado && servicioCargado?.estado !== 1 && <Text style={{ color: "#00162D", fontSize: 20, marginBottom: 20 }}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>}</>
@@ -546,10 +553,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.modalTitle2}>
               <FontAwesome name="bullhorn" size={24} color="#2E86C1" /> Ofertas publicadas
             </Text>
-            
+
             {ofertasCargadas.length > 0 ? (
               <>
-                
+
                 <FlatList
                   data={getPaginatedOffers()}
                   keyExtractor={(item, index) => index.toString()}
@@ -586,8 +593,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                             source={
                               usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                                 ? {
-                                    uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                                  }
+                                  uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                                }
                                 : require("../../assets/iconos/UserProfile.png")
                             }
                             style={styles.ofertaImage}
@@ -611,7 +618,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                   )}
                 />
-                {}
+                { }
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
                   <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
                     <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
@@ -622,7 +629,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
               </>
             ) : (
-              
+
               <View
                 style={{
                   flexDirection: "row",
@@ -630,8 +637,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   marginBottom: 10,
                   justifyContent: "center", // Centrar el contenido horizontalmente
                 }}>
-                  
-                <Text style={{ marginRight: 10, color: "grey" , fontSize:16}}>No hay ofertas disponibles por el momento...</Text>
+
+                <Text style={{ marginRight: 10, color: "grey", fontSize: 16 }}>No hay ofertas disponibles por el momento...</Text>
               </View>
             )}
             <TouchableOpacity style={styles.closeButton} onPress={() => setVerOfertasModalVisible(false)}>
@@ -892,7 +899,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 22,
     color: "#003366",
-    marginBottom: 35,
+    marginBottom: 30,
   },
   button: {
     backgroundColor: "#3D86CE",

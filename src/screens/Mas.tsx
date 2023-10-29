@@ -104,7 +104,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
       <View style={styles.container}>
         <Card style={styles.userCard}>
           <Card.Content style={styles.userContent}>
-            <Avatar.Image size={50} source={{ uri: user?.imagenDePerfil }} style={{ backgroundColor: '#44B1EE' }} />
+            <Avatar.Image size={50} source={{ uri: user?.imagenDePerfil }} style={styles.userFoto} />
             <Title style={styles.userName}>{user?.nombre}</Title>
           </Card.Content>
         </Card>
@@ -150,10 +150,15 @@ const styles = StyleSheet.create({
   },
   userContent: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    height: 100,
   },
   userName: {
-    marginLeft: 10
+    marginLeft: 10,
+    width: '80%',
+  },
+  userFoto: {
+    backgroundColor: '#44B1EE',
   },
   button: {
     marginBottom: 15,
