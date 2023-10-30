@@ -1,7 +1,7 @@
 import { Categoria, CategoriaPopular } from "../resources/category";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/categories';
+const URL = process.env.BASE_URL + '/categories';
 
 export const getAllCategories = async (): Promise<Categoria[]> => {
   const response = await fetch(URL);

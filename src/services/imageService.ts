@@ -1,6 +1,6 @@
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/image';
+const URL = process.env.BASE_URL + '/image';
 
 export const uploadImage = async (base64Image: string) => {
   try {

@@ -3,7 +3,7 @@ import { Oferta, Postoferta } from "../resources/offer";
 import { updateServiceStatus } from "./serviceService";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/offers';
+const URL = process.env.BASE_URL + '/offers';
 
 export const getOffersByServiceId = async (serviceId: string): Promise<Oferta[]> => {
   const response = await fetch(URL + "/getOfferOfService/" + serviceId);
