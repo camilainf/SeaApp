@@ -1,7 +1,6 @@
 import { Categoria, CategoriaPopular } from "../resources/category";
-import { BASE_URL } from "@env";
 
-const URL = process.env.BASE_URL + '/categories';
+const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/categories';
 
 export const getAllCategories = async (): Promise<Categoria[]> => {
   const response = await fetch(URL);

@@ -1,6 +1,5 @@
-import { BASE_URL } from "@env";
 
-const URL = process.env.BASE_URL + '/image';
+const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/image';
 
 export const uploadImage = async (base64Image: string) => {
   try {

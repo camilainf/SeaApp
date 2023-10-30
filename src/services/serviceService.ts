@@ -1,7 +1,6 @@
-import { ServicioData, ServicioDataNew } from "../resources/service";
-import { BASE_URL } from "@env";
+import { ServicioData } from "../resources/service";
 
-const URL = process.env.BASE_URL + '/services';
+const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
   const response = await fetch(URL);
@@ -49,6 +48,7 @@ export const createService = async (service: any) => {
 };
 
 export const getServicesByCategory = async (categoria: string): Promise<ServicioData[]> => {
+  console.log("SERVICIOS URL:", URL);
   const response = await fetch(`${URL}/byCategory?categoria=${encodeURIComponent(categoria)}`);
 
   if (!response.ok) {
@@ -104,7 +104,6 @@ export const getLastServices = async (skip: number = 0, categoria?: string): Pro
 
   return servicios;
 };
-
 
 export const getServicesByUser = async (idUsuario: string): Promise<ServicioData[]> => {
   const response = await fetch(`${URL}/byUser?idCreador=${encodeURIComponent(idUsuario)}`);

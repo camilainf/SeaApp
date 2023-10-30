@@ -1,10 +1,8 @@
 import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
-import { BASE_URL } from "@env";
 import { HttpError } from "../resources/httpError";
 
-// const URL = "http://10.0.2.2:9000/api" + '/users';
-const URL = process.env.BASE_URL + '/users';
+const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/users';
 
 export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
   const response = await fetch(URL);
@@ -38,6 +36,7 @@ export const createUser = async (user: any) => {
 };
 
 export const loginUser = async (credentials: any) => {
+  console.log("URL1:", URL);
   const response = await fetch(URL + '/login', {
     method: 'POST',
     headers: {
@@ -122,25 +121,25 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
   }
 };
 
-export const handleEnviarValoracion = async (idUsuario: string |undefined, valoracion: number) => {
+export const handleEnviarValoracion = async (idUsuario: string | undefined, valoracion: number) => {
   try {
 
-      const response = await fetch(`${URL}/uptateCalification/${idUsuario}`, {
-          method: 'PATCH',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ calificacion: valoracion }),
-      });
-      if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'No se pudo enviar la valoración.');
-      }
+    const response = await fetch(`${URL}/uptateCalification/${idUsuario}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ calificacion: valoracion }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'No se pudo enviar la valoración.');
+    }
 
   } catch (error) {
-      console.error('Error al enviar valoración:', error);
-      Alert.alert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
-  } 
+    console.error('Error al enviar valoración:', error);
+    Alert.alert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
+  }
 };
 
 
@@ -151,11 +150,11 @@ export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined)
     console.error('No se proporcionó un idUsuario válido');
     return 0;
   }
-  
+
   try {
     // Definiendo la URL del endpoint
-    
-    
+
+
     // Haciendo la solicitud al back-end
     const response = await fetch(URL + '/getMoneyEarnUser/' + idUsuario, {
       method: 'GET',
