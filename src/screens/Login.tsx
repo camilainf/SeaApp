@@ -45,7 +45,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
       if (httpError.status === 400) {
         errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
       } else if (httpError.status >= 500) {
-        errorMessage = 'Problemas del servidor. Por favor, intenta más tarde.';
+        errorMessage = 'Hubo un problema al iniciar sesión. Por favor, intenta de nuevo';
       }
 
       Alert.alert("Error", errorMessage);

@@ -19,8 +19,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/iconos/iconSeajob/IconSeajob.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/iconos/iconSeajob/IconSeajob.png"
+
       },
       "package": "com.camilainf.ServisApp"
     },
