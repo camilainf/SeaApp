@@ -104,7 +104,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
             <FlatList
                 ref={flatListRef}
                 data={services}
-                ListHeaderComponent={ListHeader}  // Aquí se añade el componente de encabezado
+                ListHeaderComponent={ListHeader}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleServiceClick(item)}>
                         <TarjetaServicioYPerfil item={item} type="servicio" />
@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
     },
     title: {
-        fontSize: 24, // Puedes ajustar el tamaño de fuente según prefieras
+        fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginVertical: 10, // Espaciado vertical para separar el título del FlatList
+        marginVertical: 10, 
         color: '#0797FF',
     },
     scrollToTopButton: {
@@ -148,15 +148,15 @@ const styles = StyleSheet.create({
     },
     infoCard: {
         backgroundColor: '#02B3FF',
-        borderRadius: 40, // Redondea las esquinas de la tarjeta
-        marginHorizontal: 15, // Margen horizontal para separar la tarjeta de los bordes laterales
-        padding: 15, // Espaciado interno de la tarjeta
-        marginBottom: 10, // Espaciado inferior para separar la tarjeta del FlatList
+        borderRadius: 40,
+        marginHorizontal: 15,
+        padding: 15,
+        marginBottom: 10,
     },
     infoText: {
-        color: '#FFFFFF', // Color de texto blanco para contrastar con el fondo azul
-        fontSize: 16, // Tamaño de fuente
-        textAlign: 'center', // Centra el texto horizontalmente
+        color: '#FFFFFF',
+        fontSize: 16,
+        textAlign: 'center',
     },
     boldText: {
         fontWeight: 'bold',

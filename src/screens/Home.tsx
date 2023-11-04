@@ -115,25 +115,31 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <>
             <View style={styles.tarjeta}>
               <Text style={styles.tituloTrabajos}>Trabajos destacados ⭐️</Text>
-              <FlatList
-                data={serviciosDestacados}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.tarjetaTrabajo}
-                    onPress={() => {
-                      handleServiceClick(item);
-                    }}>
-                    <Image source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : defaultImage} style={styles.imagenTrabajo} />
-                    <View style={{ maxWidth: "91%" }}>
-                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "500" }}>
-                        {item.nombreServicio}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-                scrollEnabled={false}
-              />
+              {serviciosDestacados.length === 0 ? (
+                <Text style={{ textAlign: 'center', margin: 10, color: '#50719D' }}>
+                  Aún no hay servicios publicados, ¡Comienza publicando el tuyo! :)
+                </Text>
+              ) : (
+                <FlatList
+                  data={serviciosDestacados}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.tarjetaTrabajo}
+                      onPress={() => {
+                        handleServiceClick(item);
+                      }}>
+                      <Image source={item.imagen && item.imagen !== "" ? { uri: item.imagen } : defaultImage} style={styles.imagenTrabajo} />
+                      <View style={{ maxWidth: "91%" }}>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "500" }}>
+                          {item.nombreServicio}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                />
+              )}
             </View>
 
             {/* Categorias destacadas*/}
@@ -159,7 +165,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
               {/* VER MÁS */}
               <TouchableOpacity onPress={() => handleVerMasCategorias()}>
-                  <Text style={styles.categoriaText}>Ver más...</Text>
+                <Text style={styles.categoriaText}>Ver más...</Text>
               </TouchableOpacity>
             </View>
           </>

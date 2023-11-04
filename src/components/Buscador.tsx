@@ -26,7 +26,7 @@ const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue, immediateSe
                 style={styles.buscadorTexto}
                 placeholderTextColor="#AEBFFB"
                 value={searchTerm}
-                onChangeText={handleTextChange} // Usar la función handleTextChange
+                onChangeText={handleTextChange}
             />
             <TouchableOpacity onPress={() => {
                 if (searchTerm.trim() !== '') {

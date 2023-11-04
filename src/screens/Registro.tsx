@@ -10,6 +10,8 @@ import CountryPicker from "react-native-country-picker-modal";
 import { uploadImage } from "../services/imageService";
 import { selectImage } from "../utils/imageUtils";
 import { registroSchema } from "../utils/validations/registroValidations";
+import { ActivityIndicator } from 'react-native';
+import { HttpError } from "../resources/httpError";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -18,6 +20,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
   const [countryCode, setCountryCode] = useState<CountryCode>("CL");
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [profilePicBase64, setProfilePicBase64] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -34,26 +37,31 @@ const Registro: React.FC<Props> = ({ navigation }) => {
     },
     validationSchema: registroSchema,
     onSubmit: async (values) => {
-    
+
       if (!profilePic) {
-        Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");
+        Alert.alert("Foto de perfil obligatoria", "Selecciona una foto de perfil para poder continuar.");
         return;
+      } else {
+        setLoading(true);
       }
-    
+
       try {
         let imageUrl = profilePic;
         if (profilePicBase64) {
           imageUrl = await uploadImage(`data:image/jpeg;base64,${profilePicBase64}`);
         }
-    
+
         const user = {
           ...values,
           telefono: `+56${values.telefono}`,
           calificacion: [],
           imagenDePerfil: imageUrl || "",
         };
-    
+
         const newUser = await createUser(user);
+
+        setLoading(false);
+
         console.log("Usuario creado:", newUser);
         Alert.alert("Usuario creado con éxito.", "", [
           {
@@ -65,8 +73,17 @@ const Registro: React.FC<Props> = ({ navigation }) => {
           },
         ]);
       } catch (error) {
-        console.error("Error al crear el usuario:", error);
-        Alert.alert("Error al crear el usuario :(");
+        const httpError = error as HttpError;
+        let errorTitle = 'Ocurrió un problema :(';
+        let errorMessage = 'Vuelve a intentarlo en unos minutos.';
+
+        if (httpError.status === 400) {
+          errorTitle = 'Ups';
+          errorMessage = 'Correo ya se encuentra en uso.';
+        }
+
+        Alert.alert(errorTitle, errorMessage);
+        setLoading(false);
       }
     },
 
@@ -88,6 +105,14 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
   const handleNavigationToLogin = () => {
     navigation.goBack();
+  };
+
+  const handleFormSubmit = () => {
+    if (!profilePic) {
+      Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");
+      return;
+    }
+    formik.handleSubmit();
   };
 
   return (
@@ -113,7 +138,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
             <View style={styles.profilePicContainer}>
               <Image
-                
+
                 source={profilePic ? { uri: profilePic } : require("../../assets/iconos/UserProfileRegistro.png")}
                 style={styles.profilePic}
               />
@@ -289,25 +314,33 @@ const Registro: React.FC<Props> = ({ navigation }) => {
               ) : null}
             </View>
 
-            <View style={styles.buttonsContainer}>
-              <View style={[styles.button, styles.roundedButton]}>
-                <Button
-                  title="Volver"
-                  color="#FF5C5C"
-                  onPress={handleNavigationToLogin}
-                />
-              </View>
-              <View style={[styles.button, styles.roundedButton]}>
-                <Button
-                  title="Crear cuenta"
-                  color="#5CB1FF"
-                  onPress={() => {
-                    // console.log("Errores de Formik:", formik.errors);
-                    formik.handleSubmit();
-                  }}
-                />
-              </View>
-            </View>
+            {
+              loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <View style={styles.buttonsContainer}>
+                  <View style={[styles.button, styles.roundedButton]}>
+                    <Button
+                      title="Volver"
+                      color="#FF5C5C"
+                      onPress={handleNavigationToLogin}
+                      disabled={loading}
+                    />
+                  </View>
+                  <View style={[styles.button, styles.roundedButton]}>
+                    <Button
+                      title="Crear cuenta"
+                      color="#5CB1FF"
+                      onPress={() => {
+                        formik.handleSubmit();
+                      }}
+                      disabled={loading}
+                    />
+                  </View>
+                </View>
+              )
+            }
+
           </View>
         </View>
       </View>

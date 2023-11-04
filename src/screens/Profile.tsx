@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, TextInput, FlatList, StyleSheet, ScrollView, TouchableOpacity, TouchableNativeFeedback, Alert, ActivityIndicator, Modal, TouchableWithoutFeedback } from "react-native";
-import { Rating, Card } from "react-native-elements";
+import React, { useState, useRef } from "react";
+import { View, Text, Image, FlatList, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Modal, TouchableWithoutFeedback } from "react-native";
+import { Rating } from "react-native-elements";
 import { calcularPromedioCalificaciones, convertirFecha } from "../utils/randomService";
 import { UsuarioCasted } from "../resources/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MainTabParamList, RootStackParamList } from "../routes/NavigatorTypes";
-import { ServicioData, ServicioDataNew } from "../resources/service";
+import { ServicioData } from "../resources/service";
 import { getUserById, obtenerDieneroGanadoUsuario } from "../services/userService";
 import { LinearGradient } from "expo-linear-gradient";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -85,8 +85,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       fetchData();
 
       return () => {
-        // Aquí puedes añadir lógica de limpieza si es necesario.
       };
+
     }, [])
   );
 
@@ -213,8 +213,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
         <View
           style={{
             height: 2,
-            backgroundColor: "#EEF2FF", // Color gris claro
-            marginVertical: 8, // Margen vertical para espacio arriba y abajo
+            backgroundColor: "#EEF2FF",
+            marginVertical: 8,
             marginHorizontal: 30,
           }}></View>
         <View style={{ marginHorizontal: 20 }}>
@@ -272,9 +272,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
         <View
           style={{
             height: 2,
-            backgroundColor: "#EEF2FF", // Color gris claro
-            marginVertical: 8, // Margen vertical para espacio arriba y abajo
-            //width: "100%",
+            backgroundColor: "#EEF2FF",
+            marginVertical: 8,
             marginHorizontal: 30,
           }}></View>
         <View style={{ marginBottom: 20, marginHorizontal: 20 }}>
@@ -351,7 +350,6 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     setIsModalVisible(false);  // Cierra el modal al seleccionar una solicitud
                   }}
                 >
-                  {/* Asegúrate de que el estilo de estas tarjetas sea el mismo que usas en la vista principal */}
                   <Image
                     source={item.imagen && item.imagen != '' ? {uri: item.imagen} : require("../../assets/iconos/ImageReferencia.png")}
                     style={styles.imagenTrabajo}
@@ -371,7 +369,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 </TouchableOpacity>
               )}
               keyExtractor={(item) => String(item.id)}
-              contentContainerStyle={{ paddingBottom: 50 }}  // Añade un padding al final para asegurar que todos los elementos son visibles
+              contentContainerStyle={{ paddingBottom: 50 }}
             />
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
@@ -496,7 +494,7 @@ const styles = StyleSheet.create({
     paddingRight: 110,
   },
   icon: {
-    marginRight: 8, // Espacio entre el ícono y el texto
+    marginRight: 8,
   },
   userInfo: {
     marginLeft: 20,
@@ -542,11 +540,11 @@ const styles = StyleSheet.create({
   },
   columnaIzquierda: {
     flex: 0.3,
-    paddingRight: 8, // Espacio entre las dos columnas
+    paddingRight: 8,
   },
   columnaDerecha: {
     flex: 0.5,
-    paddingLeft: 8, // Espacio entre las dos columnas
+    paddingLeft: 8,
   },
   textoSolicitudes: {
     color: "#0676C6",
@@ -567,40 +565,39 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     textAlign: "center",
-    color: "green", // Puedes ajustar el tono de verde según prefieras
+    color: "green",
   },
   numberContainer: {
-    width: 75, // Puedes ajustar este valor según la cantidad máxima de dígitos que esperas
-    alignItems: "flex-end", // Alinea el texto a la derecha
+    width: 75, 
+    alignItems: "flex-end",
   },
   // Modal 3 puntos
   menuContenedor: {
-    alignItems: "flex-end", // Alinea el menú a la derecha
-    // otros estilos que necesites para posicionar tu menú
+    alignItems: "flex-end",
   },
   botonTresPuntos: {
-    padding: 10, // Espaciado para que el botón sea fácilmente presionable
+    padding: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   menuOpciones: {
-    backgroundColor: "white", // ahora el menú no será transparente
-    padding: 20, // Incrementa el espacio dentro del menú
-    borderRadius: 5, // Opcional: si quieres que el menú tenga esquinas redondeadas
-    // Aplica cualquier otro estilo que desees para tu menú
+    backgroundColor: "white",
+    padding: 20, 
+    borderRadius: 5,
+
   },
   opcionMenu: {
-    paddingVertical: 10, // Hace que cada opción del menú sea más alta
+    paddingVertical: 10,
     alignItems: "center",
     backgroundColor: "#F3F6FF",
     marginTop: 10,
   },
   textoOpcionMenu: {
-    color: "black", // O el color que prefieras
+    color: "black",
   },
   // Tarjeta de solicitudes
 

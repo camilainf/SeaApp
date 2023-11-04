@@ -46,7 +46,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [usuariosOfertantes, setUsuariosOfertantes] = useState<Record<string, UsuarioCasted>>({});
   const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
   const [userCreador, setUserCreador] = useState<UsuarioCasted | null>(null);
-  const [esDueno, setEsDueno] = useState<boolean>(false); // Aquí deberías determinar si esDueño es verdadero o falso
+  const [esDueno, setEsDueno] = useState<boolean>(false);
   const [userToken, setUserToken] = useState<string | null>("");
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
@@ -56,11 +56,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     setIsLoading(true); // Comienza la carga
 
     try {
-      // 1. Obtener datos del servicio
+      // Obtener datos del servicio
       if (idServicio) {
         const fetchedServicio = await getServiceById(idServicio);
         setServicioCargado(fetchedServicio);
-        // 2. Usando el servicio obtenido, cargar datos del usuario creador
+        // Usando el servicio obtenido, cargar datos del usuario creador
         if (fetchedServicio && fetchedServicio.idCreador) {
           const fetchedUser = await getUserById(fetchedServicio.idCreador);
           setUserCreador(fetchedUser);
@@ -111,7 +111,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       setIsLoading(false); // Termina la carga
     }
     setIsLoading(false);
-    setIsRefreshing(false); // Agregar esta línea
+    setIsRefreshing(false);
   };
 
   useEffect(() => {
@@ -203,7 +203,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.userBar}>
           {/* Contenedor para la imagen y el nombre */}
           <TouchableOpacity
-            style={{ flexDirection: "row", alignItems: "center", flex: 1 }} // Añade flex para que ocupe el espacio disponible
+            style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
             onPress={() => {
               navigation.navigate("PerfilAjeno", {
                 id: servicioCargado?.idCreador || "",
@@ -244,12 +244,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                         // Solo permite la edición si el estado es 1
                         navigation.navigate("EditarServicio", { servicioId: idServicio });
                       } else {
-                        // Si el servicio no está en el estado correcto, muestra una alerta.
+                        // Si el servicio no está en el estado correcto, mostrar una alerta.
                         Alert.alert("No se puede editar", "Este servicio ya se encuentra asignado a un ofertante.");
                       }
                     }}
                     style={styles.opcionMenu}
-                  // disabled={servicioCargado?.estado !== 1} // Deshabilita el botón si el estado es diferente de 1
                   >
                     <Text style={{ color: "#003366" }}>Editar servicio</Text>
                   </TouchableOpacity>
@@ -525,14 +524,14 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.createButton, ofertaValue ? {} : { opacity: 0.5 }]} // Opcional: Agrega un estilo cuando esté deshabilitado.
+                style={[styles.createButton, ofertaValue ? {} : { opacity: 0.5 }]}
                 onPress={() => {
                   handlePublicarOfertas(idServicio, ofertaValue, userToken);
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
                   onRefresh();
                 }}
-                disabled={!ofertaValue} // Desactiva el botón si ofertaValue está vacío o nulo.
+                disabled={!ofertaValue}
               >
                 <Text style={styles.createButtonText}>Crear</Text>
               </TouchableOpacity>
@@ -564,10 +563,10 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     <View
                       style={{
                         flexDirection: "row",
-                        justifyContent: "space-between", // Alineación horizontal
-                        alignItems: "center", // Alineación vertical
+                        justifyContent: "space-between",
+                        alignItems: "center",
                         marginBottom: 10,
-                        paddingHorizontal: 10, // Padding horizontal
+                        paddingHorizontal: 10,
                       }}
                       key={index}>
                       <View
@@ -732,7 +731,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
-    paddingBottom: 40, // Para añadir espacio después del botón.
+    paddingBottom: 40,
   },
   header: {
     flexDirection: "row",
@@ -777,32 +776,30 @@ const styles = StyleSheet.create({
   },
   // ESTILO DE BOTON TRES PUNTOS
   menuContenedor: {
-    alignItems: "flex-end", // Alinea el menú a la derecha
-    // otros estilos que necesites para posicionar tu menú
+    alignItems: "flex-end",
   },
   botonTresPuntos: {
-    padding: 10, // Espaciado para que el botón sea fácilmente presionable
+    padding: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Esto hace que el resto de la pantalla esté semi-oscura mientras el menú está abierto
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   menuOpciones: {
-    backgroundColor: "white", // ahora el menú no será transparente
-    padding: 20, // Incrementa el espacio dentro del menú
-    borderRadius: 5, // Opcional: si quieres que el menú tenga esquinas redondeadas
-    // Aplica cualquier otro estilo que desees para tu menú
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
   },
   opcionMenu: {
-    paddingVertical: 10, // Hace que cada opción del menú sea más alta
+    paddingVertical: 10,
     alignItems: "center",
     backgroundColor: "#F3F6FF",
     marginTop: 10,
   },
   textoOpcionMenu: {
-    color: "black", // O el color que prefieras
+    color: "black",
   },
   // ESTILO DE MONTO SECTION
   offerUserContainer: {
@@ -817,7 +814,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   offerUserName: {
-    flex: 1, // Para que ocupe el espacio restante y los puntos suspensivos funcionen.
+    flex: 1,
     fontWeight: "400",
     fontSize: 18,
     color: "#003366",
@@ -854,7 +851,7 @@ const styles = StyleSheet.create({
   },
 
   createButtonModal: {
-    backgroundColor: "#4CAF50", // Un verde representativo para el botón de "Sí"
+    backgroundColor: "#4CAF50",
   },
 
   buttonTextModal: {
@@ -972,7 +969,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
     paddingHorizontal: 5,
-    borderBottomWidth: 1, // Puedes eliminarlo si no te gusta
+    borderBottomWidth: 1,
     borderBottomColor: "#003366",
   },
 
@@ -985,17 +982,16 @@ const styles = StyleSheet.create({
   },
 
   userNameContainer: {
-    // Esta es la nueva View que envolverá el nombre del usuario
-    flex: 2, // Ajusta este valor si es necesario
-    marginRight: 10, // Un pequeño margen para asegurar el espacio entre el nombre y el botón
+    flex: 2,
+    marginRight: 10,
     marginLeft: 5,
   },
 
   userName: {
     fontSize: 18,
-    color: "#003366", // Un tono azul-grisáceo para el nombre
-    flexShrink: 1, // Asegura que el texto pueda reducirse si es necesario
-    overflow: "hidden", // Esconde el exceso de texto
+    color: "#003366",
+    flexShrink: 1,
+    overflow: "hidden",
   },
 
   contactButton: {
@@ -1014,7 +1010,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)", // Fondo semi transparente
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
   modalView: {
     width: "80%",
@@ -1099,7 +1095,7 @@ const styles = StyleSheet.create({
   ofertaImage: {
     width: 50,
     height: 50,
-    borderRadius: 25, // Esto hace que la imagen sea redonda, puedes ajustar según necesites
+    borderRadius: 25,
     marginRight: 10,
   },
   buttonYellow: {
@@ -1151,8 +1147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   opcionDeshabilitada: {
-    backgroundColor: "#e0e0e0", // o cualquier otro color que signifique "deshabilitado" para ti
-    // otras estilizaciones para la opción deshabilitada, como reducir la opacidad o cambiar el color del borde, etc.
+    backgroundColor: "#e0e0e0",
   },
 });
 

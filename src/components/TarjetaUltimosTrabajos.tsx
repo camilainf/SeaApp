@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: '#02B3FF', // Color de fondo de la tarjeta
+        backgroundColor: '#02B3FF', 
         borderRadius: 8,
         marginBottom: 20,
         elevation: 6,
@@ -40,16 +40,16 @@ const styles = StyleSheet.create({
     saludoUltimosTrabajos: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: 'white', // Color de la letra
-        flex: 1, // Asegura que el texto ocupe todo el espacio disponible
-        flexWrap: 'wrap', // Permite que el texto se envuelva
+        color: 'white', 
+        flex: 1,
+        flexWrap: 'wrap', 
     },
 
     iconoUltimosTrabajos: {
         width: 82,
         height: 82,
         marginRight: 16,
-        tintColor: 'white', // Color del icono
+        tintColor: 'white',
     },
 });
 

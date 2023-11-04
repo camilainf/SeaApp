@@ -1,6 +1,8 @@
 import { Valoracion, ValoracionCreacion } from "../resources/valoration";
+import { BASE_URL } from "@env";
 
-const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/valoration';
+const URL = BASE_URL + '/valoration';
+// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/valoration';
 
 export const obtenerValoracionesServicio = async (idSolicitud: string | null) => {
   const response = await fetch(URL + "/" + idSolicitud, {

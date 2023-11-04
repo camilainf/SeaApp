@@ -1,6 +1,6 @@
 export function convertirFecha(fecha: string | undefined): string {
     if (fecha === undefined) {
-        return "Fecha no disponible"; // Puedes cambiar este mensaje según tus necesidades
+        return "Fecha no disponible";
     }
 
     const meses: string[] = [

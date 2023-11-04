@@ -11,7 +11,6 @@ const SinSolicitudes = () => (
       padding: 20,
     }}
   >
-    {/* Un simple círculo con un ícono/texto dentro */}
     <View
       style={{
         width: 60,

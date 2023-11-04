@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../routes/NavigatorTypes';
 import Home from '../screens/Home';
@@ -6,10 +6,6 @@ import Profile from '../screens/Profile';
 import { Image } from 'react-native';
 import Mas from '../screens/Mas';
 import Crear from '../screens/Crear';
-import { getToken } from '../services/storageService';
-import { decodeToken } from '../services/tokenService';
-import { DecodedToken } from '../types/auth';
-
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 

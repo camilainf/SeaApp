@@ -1,6 +1,8 @@
 import { ServicioData } from "../resources/service";
+import { BASE_URL } from "@env";
 
-const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/services';
+const URL = BASE_URL + '/services';
+// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
   const response = await fetch(URL);
@@ -162,7 +164,7 @@ export const getServicesAcceptedByUser = async (idUsuario: string): Promise<Serv
     return servicios;
   } catch (error) {
     console.error("Hubo un problema al obtener los servicios aceptados:", error);
-    return []; // Retorna un arreglo vacío en caso de error
+    return [];
   }
 };
 

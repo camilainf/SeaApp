@@ -1,8 +1,10 @@
 import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
 import { HttpError } from "../resources/httpError";
+import { BASE_URL } from "@env";
 
-const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/users';
+const URL = BASE_URL + '/users';
+// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/users';
 
 export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
   const response = await fetch(URL);
@@ -29,36 +31,56 @@ export const createUser = async (user: any) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Error al crear el usuario.');
+    throw {
+      message: data.message,
+      status: response.status,
+    } as HttpError;
   }
 
   return data;
 };
 
+const TIMEOUT = 10000; // 10 segundos
+
+const fetchWithTimeout = (url: RequestInfo, options?: RequestInit, timeout: number = TIMEOUT): Promise<Response> =>
+  Promise.race([
+    fetch(url, options),
+    new Promise<Response>((_, reject) =>
+      setTimeout(() => reject(new Error('Tiempo de espera agotado')), timeout)
+    )
+  ]);
+
 export const loginUser = async (credentials: any) => {
   console.log("URL1:", URL);
-  const response = await fetch(URL + '/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
 
-  if (!response.ok) {
-    const message = await response.text();
-    throw {
-      message,
-      status: response.status,
-    } as HttpError;
+  try {
+    const response = await fetchWithTimeout(URL + '/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    if (!response.ok) {
+      const message = await response.text();
+      throw {
+        message,
+        status: response.status,
+      } as HttpError;
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    if (error.message === 'Tiempo de espera agotado') {
+      throw {
+        message: "La solicitud tardó demasiado. Por favor, verifica tu conexión a Internet y vuelve a intentarlo.",
+        status: 408,
+      } as HttpError;
+    }
+    throw error;
   }
-
-  return await response.json();
 };
-
-export const logout = () => {
-  // código para cerrar sesión, borrando tokens, restableciendo estados, etc.
-}
 
 export const getUserById = async (id: string): Promise<UsuarioCasted> => {
   const response = await fetch(URL + '/' + id, {
@@ -145,17 +167,13 @@ export const handleEnviarValoracion = async (idUsuario: string | undefined, valo
 
 
 export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined): Promise<number> => {
-  // Verificando si el idUsuario es válido
+  // Verificar si el idUsuario es válido
   if (!idUsuario) {
     console.error('No se proporcionó un idUsuario válido');
     return 0;
   }
 
   try {
-    // Definiendo la URL del endpoint
-
-
-    // Haciendo la solicitud al back-end
     const response = await fetch(URL + '/getMoneyEarnUser/' + idUsuario, {
       method: 'GET',
       headers: {
@@ -163,13 +181,11 @@ export const obtenerDieneroGanadoUsuario = async (idUsuario: string | undefined)
       },
     });;
 
-    // Verificando si la respuesta es exitosa
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'No se pudo obtener el monto ganado');
     }
 
-    // Parseando la respuesta a JSON
     const data: any = await response.json();
     const montoGanado: number = data.totalEarnings;
     return montoGanado;

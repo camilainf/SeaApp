@@ -1,7 +1,9 @@
 import { Alert } from "react-native";
 import { Oferta } from "../resources/offer";
+import { BASE_URL } from "@env";
 
-const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/offers';
+const URL = BASE_URL + '/offers';
+// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/offers';
 
 export const getOffersByServiceId = async (serviceId: string): Promise<Oferta[]> => {
   const response = await fetch(URL + "/getOfferOfService/" + serviceId);
@@ -90,7 +92,6 @@ export const handlePublicarOfertas = async (idServicio: string | null, ofertaVal
 
       const response = await postOffer(postOferta);
 
-      // Si llegas aquí, la oferta se ha creado correctamente
       Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
         {
           text: "Ok",

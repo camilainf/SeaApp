@@ -4,7 +4,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { Categoria } from '../resources/category';
 import { getAllCategories } from '../services/categoryService';
-import { ActivityIndicator } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 
 type Props = {

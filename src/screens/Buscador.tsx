@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/NavigatorTypes';
 import { ServicioData } from '../resources/service';
@@ -69,7 +69,7 @@ const BuscadorScreen: React.FC<Props> = ({ navigation }) => {
             .catch(error => {
                 console.error("Error al obtener los usuarios:", error);
             });
-    }, [userId]); // El array vacío indica que este useEffect se ejecutará solo una vez, cuando el componente se monte
+    }, [userId]);
 
     const usuariosModificados = usuarios.map(u => ({ ...u, id: `${u._id}` }));
     const serviciosModificados = servicios.map(s => ({ ...s, id: `${s.id}` }));

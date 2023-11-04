@@ -1,5 +1,5 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { useFormik, FormikProps, FormikProvider } from 'formik';
+import React, { useState, useEffect } from "react";
+import { useFormik, FormikProvider } from 'formik';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Button, Alert } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";

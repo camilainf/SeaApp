@@ -43,7 +43,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
     useCallback(() => {
       onRefresh();
       return () => {
-        // Aquí puedes realizar alguna acción cuando la pantalla pierde el foco, si es necesario.
       };
     }, [onRefresh])
   );
@@ -58,7 +57,6 @@ const Mas: React.FC<Props> = ({ navigation }) => {
         navigation.navigate('EditarPerfil', { userId: userId });
         break;
       case "Desactivar cuenta":
-        // Mostrar un diálogo de confirmación antes de desactivar la cuenta.
         Alert.alert(
           "Desactivar cuenta",
           "¿Estás seguro de que quieres desactivar tu cuenta? Esta acción no se puede deshacer.",

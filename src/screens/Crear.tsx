@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
 import { View, Text, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -19,6 +19,7 @@ import { crearServicioSchema } from "../utils/validations/crearServicioValidatio
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { ServicioData } from "../resources/service";
+import { ActivityIndicator } from 'react-native';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -44,8 +45,12 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isEditMode, setIsEditMode] = useState(false);
   const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
-
+  const [loading, setLoading] = useState(false);
+  
+  
   const currentDate = new Date();
+  const currentDateFormatted = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear().toString().substr(-2)}`;
+  const currentTimeFormatted = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
 
   useEffect(() => {
 
@@ -67,11 +72,11 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         const data = await getAllCategories();
         const sortedData = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
         setCategorias(sortedData);
-        
+
       } catch (error) {
         console.error("Error al obtener las categorías:", error);
       }
-      
+
     };
 
     fetchCategorias();
@@ -97,10 +102,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     }
   }, [isEditMode, servicioCargado]);
   const getImageUrlForCategory = (categoryName: string, categories: Categoria[]): string => {
-    // Encuentra la categoría por nombre
     const category = categories.find(cat => cat.nombre === categoryName);
-  
-    // Si la categoría existe y tiene una imagen, devuelve esa imagen. Si no, devuelve una cadena vacía o una imagen predeterminada.
     return category?.imagen || "";
   };
 
@@ -110,14 +112,15 @@ const Crear: React.FC<Props> = ({ navigation }) => {
       nombreServicio: "",
       categoria: "",
       descripcion: "",
-      fechaSolicitud: "",
-      horaSolicitud: "",
+      fechaSolicitud: currentDateFormatted,
+      horaSolicitud: currentTimeFormatted,
       direccion: "",
       monto: "",
     },
     validationSchema: crearServicioSchema,
     onSubmit: async (values) => {
       try {
+        setLoading(true);
         const token = await getToken();
 
         if (!token) {
@@ -132,7 +135,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         if (serviceReferencePicBase64) {
           imageUrl = await uploadImage(`data:image/jpeg;base64,${serviceReferencePicBase64}`);
         } else if (!serviceReferencePic && values.categoria) {
-          // Si no hay una imagen de servicio seleccionada, usa la imagen de la categoría
           imageUrl = getImageUrlForCategory(values.categoria, categorias);
         }
 
@@ -151,6 +153,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         if (isEditMode && servicioCargado) {
 
           await updateService(servicioCargado.id, servicio);
+          setLoading(false);
           Alert.alert(
             "Servicio actualizado con éxito.",
             "",
@@ -170,7 +173,8 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           );
         } else {
           const newService = await createService(servicio);
-
+          console.log("Servicio creado:", newService);
+          setLoading(false);
           Alert.alert(
             "Servicio creado con éxito.",
             "",
@@ -234,7 +238,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
     setShowDatePicker(false);
     if (date) {
       setSelectedDate(date);
-      // const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear().toString().substr(-2)}`;
       formik.setFieldValue("fechaSolicitud", formattedDate);
     }
@@ -285,13 +288,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         </View>
       )}
       <View style={styles.separator} />
-      {/* <View>
-        <TouchableOpacity onPress={()=> {
-          console.log('Categorias',categorias[0]);
-        }}>
-          <Text style={{ color: "#44B1EE", alignSelf: 'flex-end' }}>¿Cómo funciona?</Text>
-        </TouchableOpacity>
-      </View> */}
+
       {/* Nombre */}
       <Text style={styles.label}>
         Nombre del servicio{"  "}
@@ -425,7 +422,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         type={"money"}
         options={{
           precision: 0,
-          separator: '.', 
+          separator: '.',
           unit: '$',
           suffixUnit: ''
         }}
@@ -434,7 +431,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         value={formik.values.monto}
         onChangeText={(text) => {
           formik.setFieldValue("monto", text);
-          const rawValue = text.replace(/[^0-9]/g, ''); 
+          const rawValue = text.replace(/[^0-9]/g, '');
           const numericValue = parseFloat(rawValue);
           if (!isNaN(numericValue)) {
             setMontoSinFormato(numericValue);
@@ -493,30 +490,37 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         <Text style={{ color: "white", alignSelf: 'center' }}>Selecciona una imagen de referencia</Text>
       </TouchableOpacity>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handleCancelar}
-          style={{
-            backgroundColor: "#FF6B6B",
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-            borderRadius: 20,
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: "bold" }}>CANCELAR</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => formik.handleSubmit()}
-          style={{
-            backgroundColor: "#44B1EE",
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-            borderRadius: 20,
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: "bold" }}>GUARDAR</Text>
-        </TouchableOpacity>
-      </View>
+      {
+        loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={handleCancelar}
+              style={{
+                backgroundColor: "#FF6B6B",
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 20,
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>CANCELAR</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => formik.handleSubmit()}
+              style={{
+                backgroundColor: "#44B1EE",
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 20,
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>GUARDAR</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      }
+
     </ScrollView>
   );
 };

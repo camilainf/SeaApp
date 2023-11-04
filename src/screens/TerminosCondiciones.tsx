@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image, Button, ScrollView } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 50,
         marginVertical: 10,
-        marginHorizontal: 5, // Espaciado entre los botones
+        marginHorizontal: 5,
     },
     roundedButton: {
         borderRadius: 50,
