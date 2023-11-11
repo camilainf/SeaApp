@@ -507,7 +507,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 style={[styles.createButton, ofertaValue ? {} : { opacity: 0.5 }]}
                 onPress={() => {
-                  handlePublicarOfertas(idServicio, ofertaValue, userToken);
+                  handlePublicarOfertas(idServicio, ofertaValue, userToken, showAlert);
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
                   onRefresh();

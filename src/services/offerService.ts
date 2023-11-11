@@ -2,6 +2,7 @@ import { Alert } from "react-native";
 import { Oferta } from "../resources/offer";
 import { BASE_URL } from "@env";
 import { useAlert } from "../context/AlertContext";
+// import { useAlert } from "../context/AlertContext";
 
 const URL = BASE_URL + '/offers';
 // const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/offers';
@@ -82,8 +83,12 @@ export const handleAceptarOferta = async (Offerta: Oferta | null) => {
 };
 
 
-export const handlePublicarOfertas = async (idServicio: string | null, ofertaValue: string, userToken: string | null) => {
-  const { showAlert } = useAlert();
+export const handlePublicarOfertas = async (
+  idServicio: string | null, 
+  ofertaValue: string, 
+  userToken: string | null,
+  showAlert: (title: string, message: string) => void // Añade showAlert como parámetro
+) => {
 
   if (idServicio && ofertaValue && userToken) {
     try {
