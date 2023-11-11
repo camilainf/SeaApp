@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { convertirFecha } from "../utils/randomService";
+import { convertirFecha, formatoDinero } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -328,7 +328,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={{ fontSize: 18, fontWeight: "bold", color: "#003366" }}>${servicioCargado?.monto} CLP</Text>
         </TouchableOpacity>
       ) : (
-        <Text style={styles.amount}>Monto: ${servicioCargado?.monto} CLP </Text>
+        <Text style={styles.amount}>Monto: ${formatoDinero(servicioCargado?.monto)} CLP </Text>
       )}
 
       {/*Boton oferta/veroferta/valorar*/}
@@ -638,7 +638,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.centeredViewModal}>
           <View style={styles.modalViewModal}>
             <Text style={styles.descripcionModal}>Quieres aceptar la oferta por el monto de:</Text>
-            <Text style={styles.amountText}>CLP {selectedOferta?.montoOfertado.toLocaleString()}</Text>
+            <Text style={styles.amountText}>CLP {formatoDinero(selectedOferta?.montoOfertado)}</Text>
             <View style={styles.modalButtonsModal}>
               <TouchableOpacity
                 style={[styles.buttonModall, styles.cancelButtonModal]}

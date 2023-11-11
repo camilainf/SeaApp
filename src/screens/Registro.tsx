@@ -201,7 +201,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
               </Text>
             ) : null}
 
-            <Text>Descripción:</Text>
+            <Text>Descripción de usuario:</Text>
             <TextInput
               value={formik.values.descripcion}
               onChangeText={formik.handleChange("descripcion")}

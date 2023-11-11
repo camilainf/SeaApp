@@ -197,14 +197,16 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleCancelar = () => {
-    showAlert("Creación del servicio cancelada", "", undefined, () => {
+    const texto = !isEditMode ? "Continuar proceso" : "Seguir editando";
+    showAlert("¿Descartar cambios? ",
+    "Si sales ahora, perderás los cambios.", () => {
       formik.resetForm();
       setSelectedDate(new Date());
       setShowInfo(false);
       setServiceReferencePic(null);
       setServiceReferencePicBase64(null);
       navigation.goBack();
-    });
+    } ,undefined,texto,"Descartar");
   };
 
   const handleAddServiceReferencePic = async () => {
@@ -415,8 +417,9 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         onChangeText={(text) => {
           formik.setFieldValue("monto", text);
           const rawValue = text.replace(/[^0-9]/g, '');
-          const numericValue = parseFloat(rawValue);
+          const numericValue = parseInt(rawValue, 10);
           if (!isNaN(numericValue)) {
+            formik.setFieldValue("monto", `$${rawValue}`);
             setMontoSinFormato(numericValue);
           } else {
             console.log("Error al convertir el monto a un número:", rawValue);

@@ -31,3 +31,9 @@ export function calcularPromedioCalificaciones(calificaciones :number[] | undefi
         return suma / calificaciones.length;
     }
 }
+export function formatoDinero(monto: number | undefined): string {
+    if(monto){
+        return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(monto);
+    }
+    return "Cargando..."
+}

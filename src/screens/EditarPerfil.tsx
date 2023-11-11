@@ -132,6 +132,19 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    const handleCancel = async () => {
+        showAlert(
+            "¿Descartar cambios? ",
+            "Si sales ahora, perderás los cambios.",
+            
+            async () => {
+                navigation.goBack()
+            }
+            ,undefined,"Seguir editando","Descartar"
+        );
+        
+    };
+
     if (!isUserDataLoaded) {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
@@ -227,13 +240,13 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                         <Button
                             title="Cancelar"
                             color="#FF5C5C"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => handleCancel()}
                         />
                     </View>
                     <View style={[styles.button, styles.roundedButton]}>
                         <Button
                             title="Guardar cambios"
-                            color="#5CB1FF"
+                            color="#369DFB"
                             onPress={formik.submitForm}
                         />
                     </View>

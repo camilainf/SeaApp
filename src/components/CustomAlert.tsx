@@ -4,7 +4,7 @@ import { useAlert } from '../context/AlertContext';
 
 const CustomAlert: React.FC = () => {
     const { alertInfo, hideAlert } = useAlert();
-    const { visible, title, message, onConfirm, onCloseCallback } = alertInfo;
+    const { visible, title, message, onConfirm, onCloseCallback , titleAux, titleAuxil} = alertInfo;
 
     const handleClose = () => {
         if (onCloseCallback) {
@@ -21,29 +21,25 @@ const CustomAlert: React.FC = () => {
     };
 
     return (
-        <Modal
-            transparent
-            visible={visible}
-            animationType="fade"
-            onRequestClose={handleClose}
-        >
-            <View style={styles.modalBackground}>
-                <View style={styles.alertBox}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.message}>{message}</Text>
-                    <View style={styles.buttonContainer}>
-                        {onConfirm && (
-                            <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={handleConfirm}>
-                                <Text style={styles.buttonText}>Confirmar</Text>
-                            </TouchableOpacity>
-                        )}
-                        <TouchableOpacity style={styles.button} onPress={handleClose}>
-                            <Text style={styles.buttonText}>Cerrar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+      <Modal transparent visible={visible} animationType="fade" onRequestClose={handleClose}>
+        <View style={styles.modalBackground}>
+          <View style={styles.alertBox}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.message}>{message}</Text>
+            <View style={styles.buttonContainer}>
+              
+              <TouchableOpacity style={styles.button} onPress={handleClose}>
+                <Text style={{ color: "black", fontWeight: "bold" }}>{!titleAux ? "Cerrar":titleAux}</Text>
+              </TouchableOpacity>
+              {onConfirm && (
+                <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={handleConfirm}>
+                  <Text style={styles.buttonText}>{!titleAuxil ? "Confirmar":titleAuxil}</Text>
+                </TouchableOpacity>
+              )}
             </View>
-        </Modal>
+          </View>
+        </View>
+      </Modal>
     );
 };
 
@@ -67,15 +63,17 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
     message: {
         fontSize: 16,
         marginVertical: 10,
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#DFE2E7',
         padding: 10,
         borderRadius: 5,
+        paddingHorizontal:25,
     },
     buttonText: {
         color: 'white',
@@ -85,9 +83,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
+        marginTop: 5,
     },
     confirmButton: {
-        backgroundColor: '#28a745',
+
+        backgroundColor: '#2390F3',
+        shadowColor: "#000",
+        paddingHorizontal:20,
+        elevation: 10, // Esto es para Android
     },
 });
 
