@@ -128,7 +128,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
             );
         } catch (error) {
             console.error("Hubo un error al actualizar el perfil del usuario:", error);
-            showAlert("Error al actualizar", "No se pudieron guardar los cambios.");
+            showAlert("Error al actualizar ⛔", "No se pudieron guardar los cambios.");
         }
     };
 

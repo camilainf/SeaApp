@@ -41,7 +41,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
     onSubmit: async (values) => {
 
       if (!profilePic) {
-        showAlert("Foto de perfil obligatoria", "Selecciona una foto de perfil para poder continuar.");
+        showAlert("Foto de perfil obligatoria ⛔", "Selecciona una foto de perfil para poder continuar.");
         return;
       } else {
         setLoading(true);

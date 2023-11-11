@@ -181,13 +181,13 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               navigation.navigate("Main", { screen: "Home" });
             } catch (error) {
               console.error('Error al desactivar la cuenta del usuario:', error);
-              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+              showAlert('Error ⛔', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
             }
           });
         }
       } catch (error) {
         console.error("Error al enviar la solicitud:", error);
-        showAlert("Ups", "Error al procesar solicitud.");
+        showAlert("Ups ⛔", "Error al procesar solicitud.");
       }
     },
   });

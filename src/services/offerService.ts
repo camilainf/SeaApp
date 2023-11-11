@@ -99,7 +99,7 @@ export const handlePublicarOfertas = async (
       };
 
       const response = await postOffer(postOferta);
-      showAlert("Oferta creada", "Tu oferta ha sido creada con éxito!");
+      showAlert("Oferta creada ✅", "Tu oferta ha sido creada con éxito!");
 
     } catch (error) {
       if (error instanceof Error) {

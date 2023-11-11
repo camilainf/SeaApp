@@ -62,7 +62,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
 
             } catch (error) {
               console.error('Error al desactivar la cuenta del usuario:', error);
-              showAlert('Ups', 'Hubo un error al intentar cerrar la sesión, intenta en unos minutos.');
+              showAlert('Ups 😥', 'Hubo un error al intentar cerrar la sesión, intenta en unos minutos.');
             }
           }
         );
@@ -83,7 +83,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
               }
             } catch (error) {
               console.error('Error al desactivar la cuenta del usuario:', error);
-              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+              showAlert('Error ⛔', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
             }
           }
         );

@@ -110,7 +110,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Hubo un error:", error);
-      showAlert("Error", "No se pudo obtener la información. Por favor, intenta de nuevo.");
+      showAlert("Error ⛔", "No se pudo obtener la información. Por favor, intenta de nuevo.");
     } finally {
       setIsLoading(false); // Termina la carga
     }
@@ -226,7 +226,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                         navigation.navigate("EditarServicio", { servicioId: idServicio });
                       } else {
                         // Si el servicio no está en el estado correcto, mostrar una alerta.
-                        showAlert("No se puede editar", "Este servicio ya se encuentra asignado a un ofertante.");
+                        showAlert("No se puede editar ⛔", "Este servicio ya se encuentra asignado a un ofertante.");
                       }
                     }}
                     style={styles.opcionMenu}

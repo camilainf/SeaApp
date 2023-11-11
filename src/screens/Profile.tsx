@@ -119,7 +119,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     if (userId) {
       navigation.navigate('EditarPerfil', { userId: userId });
     } else {
-      showAlert('No se puede editar este perfil', '');
+      showAlert('No se puede editar este perfil ⛔', '');
     }
 
   };

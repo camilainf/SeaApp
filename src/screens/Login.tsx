@@ -56,7 +56,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
       } else if (httpError.status >= 500) {
         errorMessage = 'Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.';
       }
-      showAlert("Ups", errorMessage);
+      showAlert("Ups 😥", errorMessage);
     }
   };
 
