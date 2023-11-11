@@ -20,6 +20,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { ServicioData } from "../resources/service";
 import { ActivityIndicator } from 'react-native';
+import { useAlert } from "../context/AlertContext";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -46,11 +47,12 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [servicioCargado, setServicioCargado] = useState<ServicioData | null>(null);
   const [loading, setLoading] = useState(false);
-  
-  
+
   const currentDate = new Date();
   const currentDateFormatted = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear().toString().substr(-2)}`;
   const currentTimeFormatted = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+
+  const { showAlert } = useAlert();
 
   useEffect(() => {
 
@@ -151,51 +153,42 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         };
 
         if (isEditMode && servicioCargado) {
-
           await updateService(servicioCargado.id, servicio);
           setLoading(false);
-          Alert.alert(
-            "Servicio actualizado con éxito.",
-            "",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  formik.resetForm();
-                  setSelectedDate(new Date());
-                  setShowInfo(false);
-                  setServiceReferencePic(null);
-                  setServiceReferencePicBase64(null);
-                  navigation.goBack();
-                },
-              },
-            ]
-          );
+          showAlert("Operación exitosa", "El servicio fué actualizado.", undefined, () => {
+            try {
+              formik.resetForm();
+              setSelectedDate(new Date());
+              setShowInfo(false);
+              setServiceReferencePic(null);
+              setServiceReferencePicBase64(null);
+              navigation.goBack();
+            } catch (error) {
+              console.error('Error al desactivar la cuenta del usuario:', error);
+              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+            }
+          });
         } else {
           const newService = await createService(servicio);
           console.log("Servicio creado:", newService);
           setLoading(false);
-          Alert.alert(
-            "Servicio creado con éxito.",
-            "",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  formik.resetForm();
-                  setSelectedDate(new Date());
-                  setShowInfo(false);
-                  setServiceReferencePic(null);
-                  setServiceReferencePicBase64(null);
-                  navigation.navigate("Main", { screen: "Home" });
-                },
-              },
-            ]
-          );
+          showAlert("Operación exitosa", "El servicio fué creado.", undefined, () => {
+            try {
+              formik.resetForm();
+              setSelectedDate(new Date());
+              setShowInfo(false);
+              setServiceReferencePic(null);
+              setServiceReferencePicBase64(null);
+              navigation.navigate("Main", { screen: "Home" });
+            } catch (error) {
+              console.error('Error al desactivar la cuenta del usuario:', error);
+              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+            }
+          });
         }
       } catch (error) {
         console.error("Error al enviar la solicitud:", error);
-        Alert.alert("Error al procesar el servicio.");
+        showAlert("Ups", "Error al procesar solicitud.");
       }
     },
   });
@@ -205,23 +198,14 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleCancelar = () => {
-    Alert.alert(
-      "Creación del servicio cancelada",
-      "",
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            formik.resetForm();
-            setSelectedDate(new Date());
-            setShowInfo(false);
-            setServiceReferencePic(null);
-            setServiceReferencePicBase64(null);
-            navigation.goBack();
-          },
-        },
-      ]
-    );
+    showAlert("Creación del servicio cancelada", "", undefined, () => {
+      formik.resetForm();
+      setSelectedDate(new Date());
+      setShowInfo(false);
+      setServiceReferencePic(null);
+      setServiceReferencePicBase64(null);
+      navigation.goBack();
+    });
   };
 
   const handleAddServiceReferencePic = async () => {

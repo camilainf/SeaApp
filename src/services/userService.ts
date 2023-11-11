@@ -2,6 +2,7 @@ import { Alert } from "react-native";
 import { UsuarioCasted } from "../resources/user";
 import { HttpError } from "../resources/httpError";
 import { BASE_URL } from "@env";
+import { useAlert } from "../context/AlertContext";
 
 const URL = BASE_URL + '/users';
 // const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/users';
@@ -144,6 +145,7 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
 };
 
 export const handleEnviarValoracion = async (idUsuario: string | undefined, valoracion: number) => {
+  const { showAlert } = useAlert();
   try {
 
     const response = await fetch(`${URL}/uptateCalification/${idUsuario}`, {
@@ -160,7 +162,7 @@ export const handleEnviarValoracion = async (idUsuario: string | undefined, valo
 
   } catch (error) {
     console.error('Error al enviar valoración:', error);
-    Alert.alert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
+    showAlert('Error', 'No se pudo enviar la valoración. Por favor, intenta de nuevo.');
   }
 };
 

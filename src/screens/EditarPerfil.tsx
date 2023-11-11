@@ -11,6 +11,7 @@ import { getUserById, updateUserProfile } from "../services/userService";
 import { UsuarioCasted } from "../resources/user";
 import { ActivityIndicator } from "react-native-paper";
 import { uploadImage } from "../services/imageService";
+import { useAlert } from "../context/AlertContext";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -19,6 +20,8 @@ type EditarPerfilProp = RouteProp<RootStackParamList, "EditarPerfil">;
 const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     const route = useRoute<EditarPerfilProp>();
     const userId = route.params?.userId;
+
+    const { showAlert } = useAlert();
 
     const [profilePic, setProfilePic] = useState<string | null>(null);
     const [profilePicBase64, setProfilePicBase64] = useState<string | null>(null);
@@ -42,7 +45,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
         validationSchema: editarPerfilSchema,
         onSubmit: async (values) => {
             await handleGuardarCambios(values);
-            navigation.navigate("Main", { screen: "Mas" });
+            // navigation.navigate("Main", { screen: "Mas" });
         },
         enableReinitialize: true,
     });
@@ -97,7 +100,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     const handleGuardarCambios = async (values: UsuarioCasted) => {
         try {
             let finalProfilePic = profilePic; // Si no se selecciona una nueva imagen, se mantiene la actual.
-    
+
             if (profilePicBase64) {
                 const uploadedImageUrl = await uploadImage(`data:image/jpeg;base64,${profilePicBase64}`);
                 if (uploadedImageUrl) {
@@ -106,18 +109,26 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                     throw new Error('Error al subir la imagen a Cloudinary.');
                 }
             }
-    
+
             const profileData = {
                 ...values,
                 telefono: `+56${values.telefono}`,
-                imagenDePerfil: finalProfilePic, 
+                imagenDePerfil: finalProfilePic,
             };
-    
+
             await updateUserProfile(userId, profileData);
-            Alert.alert("Perfil actualizado", "Tus cambios han sido guardados exitosamente.");
+
+            showAlert(
+                "Estás seguro que deseas guardar los cambios realizados? ",
+                "",
+                async () => {
+                    await updateUserProfile(userId, profileData);
+                    navigation.navigate("Main", { screen: "Mas" });
+                }
+            );
         } catch (error) {
             console.error("Hubo un error al actualizar el perfil del usuario:", error);
-            Alert.alert("Error al actualizar", "No se pudieron guardar los cambios.");
+            showAlert("Error al actualizar", "No se pudieron guardar los cambios.");
         }
     };
 

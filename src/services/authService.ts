@@ -10,6 +10,7 @@ export const login = async (credentials: any) => {
         await storeToken(data.token);
         return data;
     } catch (error) {
+        console.log("ERROR",error);
         throw error as HttpError;
     }
 };

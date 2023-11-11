@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha } from "../utils/randomService";
@@ -15,6 +15,7 @@ import { Oferta } from "../resources/offer";
 import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta, handlePublicarOfertas } from "../services/offerService";
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
+import { useAlert } from "../context/AlertContext";
 
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -52,6 +53,9 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
   const [usuarioOferta, setUsuarioOferta] = useState<UsuarioCasted | null>(null);
   const [valoracionController, setValoracionController] = useState<Valoracion | null>(null);
+
+  const { showAlert } = useAlert();
+
   const fetchData = async () => {
     setIsLoading(true); // Comienza la carga
 
@@ -106,7 +110,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Hubo un error:", error);
-      Alert.alert("Error", "No se pudo obtener la información. Por favor, intenta de nuevo.");
+      showAlert("Error", "No se pudo obtener la información. Por favor, intenta de nuevo.");
     } finally {
       setIsLoading(false); // Termina la carga
     }
@@ -130,45 +134,22 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleDeleteService = async (serviceId: string) => {
-    Alert.alert(
-      "Eliminar servicio",
+    showAlert(
+      "Eliminar servicio ❗",
       "¿Estás seguro de que quieres eliminar este servicio?",
-      [
-        {
-          text: "Cancelar",
-          onPress: () => {
-            console.log("Cancelado");
-          },
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          onPress: async () => {
-            try {
-              const response = await deleteService(serviceId);
-              navigation.navigate("Main", {
-                screen: "Perfil",
-                params: { id: userCreador?._id },
-              } as any);
-              console.log(response);
-            } catch (error) {
-              console.error("No se pudo eliminar el servicio:", error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
+      async () => {
+        try {
+          const response = await deleteService(serviceId);
+          navigation.navigate("Main", {
+            screen: "Perfil",
+            params: { id: userCreador?._id },
+          } as any);
+          console.log(response);
+        } catch (error) {
+          console.error("No se pudo eliminar el servicio:", error);
+        }
+      }
     );
-  };
-  // Botones para boton tres puntos
-  const handleSaludo = () => {
-    console.log("Cómo estás");
-    setMenuVisible(false);
-  };
-
-  const handleDespedida = () => {
-    console.log("Que estés bien");
-    setMenuVisible(false);
   };
 
   // Esta función se utiliza para manejar los toques fuera del menú desplegable y cerrarlo
@@ -245,7 +226,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                         navigation.navigate("EditarServicio", { servicioId: idServicio });
                       } else {
                         // Si el servicio no está en el estado correcto, mostrar una alerta.
-                        Alert.alert("No se puede editar", "Este servicio ya se encuentra asignado a un ofertante.");
+                        showAlert("No se puede editar", "Este servicio ya se encuentra asignado a un ofertante.");
                       }
                     }}
                     style={styles.opcionMenu}
@@ -387,7 +368,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     await updateServiceStatus(idServicio, 3);
                     onRefresh();
                   }
-                  Alert.alert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio, si ves necesario, puedes comunicarte con el trabajador 😉" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
+                  showAlert(message, esDueno ? "Debes esperar que el trabajador inicie el servicio, si ves necesario, puedes comunicarte con el trabajador 😉" : "Se ha dado comienzo al servicio, si ves necesario, comunicate con el contratador para avisarle 😉");
                 }}>
                 <Text style={styles.buttonText}>
                   {esDueno ? (
@@ -413,7 +394,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     await crearValoracion(idServicio, servicioCargado.idCreador, userCreador?._id);
                     onRefresh();
                   }
-                  Alert.alert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
+                  showAlert(message, esDueno ? "El trabajador sigue en proceso con este servicio, espera a que este termine" : "Se ha terminado el servicio, comunicate con el contratador para avisarle");
                 }}>
                 <Text style={styles.buttonText}>
                   {esDueno ? (
@@ -714,7 +695,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   setValorarModalVisible(false);
                   onRefresh();
-                  Alert.alert("Valoracion enviada", "Gracias por valorar al usuario ⭐");
+                  showAlert("Valoracion enviada", "Gracias por valorar al usuario ⭐");
                 }}>
                 <Text style={{ color: "#FFFFFF", textAlign: "center", fontSize: 19, fontWeight: "bold" }}>Enviar Valoración</Text>
               </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { LinearGradient } from "expo-linear-gradient";
@@ -8,6 +8,8 @@ import { getToken } from "../services/storageService";
 import { decodeToken } from "../services/tokenService";
 import { DecodedToken } from "../types/auth";
 import { HttpError } from "../resources/httpError";
+import { useAlert } from "../context/AlertContext";
+import CustomAlert from "../components/CustomAlert";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,10 +23,11 @@ type Props = {
 const Login: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { showAlert } = useAlert();
 
   const handleLogin = async () => {
     try {
-      const data = await authService.login({ email, password });
+      await authService.login({ email, password });
       const user_token = await getToken();
 
       if (user_token) {
@@ -33,22 +36,27 @@ const Login: React.FC<Props> = ({ navigation }) => {
           console.log("ID del usuario:", decodedInfo.id);
         }
       }
-      console.log("handleLogin, Login.tsx, Data:", data);
 
-      Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
-      navigation.navigate("Main", { screen: "Home" });
+      showAlert(
+        "Inicio de sesión exitoso ✅",
+        "Bienvenido!",
+        undefined,
+        () => navigation.navigate("Main", { screen: "Home" })
+      );
+
     } catch (error) {
       const httpError = error as HttpError;
 
       let errorMessage = 'Hubo un problema al iniciar sesión.';
 
       if (httpError.status === 400) {
+        errorMessage = 'Esta cuenta ha sido desactivada.';
+      } else if (httpError.status > 400 && httpError.status < 500) {
         errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
       } else if (httpError.status >= 500) {
-        errorMessage = 'Hubo un problema al iniciar sesión. Por favor, intenta de nuevo';
+        errorMessage = 'Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.';
       }
-
-      Alert.alert("Error", errorMessage);
+      showAlert("Ups", errorMessage);
     }
   };
 
@@ -63,6 +71,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
+      <CustomAlert />
       <View style={styles.card}>
         <View style={styles.logoImagen}>
           <Image

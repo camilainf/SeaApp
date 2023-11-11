@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getUserIdFromToken, logout } from '../services/authService';
 import { deactivateUser, getUserById } from '../services/userService';
 import { UsuarioCasted } from '../resources/user';
+import { useAlert } from '../context/AlertContext';
 
 interface Props {
   navigation: any;
@@ -14,6 +15,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
   const [user, setUser] = useState<UsuarioCasted>();
   const [userId, setUserId] = useState<string>();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { showAlert } = useAlert();
 
   const obtenerUsuarioActual = async () => {
     try {
@@ -50,42 +52,44 @@ const Mas: React.FC<Props> = ({ navigation }) => {
   const handleButtonPress = (title: string) => {
     switch (title) {
       case "Desconectarse":
-        logout();
-        navigation.navigate("Auth");
+        showAlert(
+          "Cerrar sesión",
+          "¿Estas seguro que deseas desconectarte?",
+          async () => {
+            try {
+              logout();
+              navigation.navigate("Auth");
+
+            } catch (error) {
+              console.error('Error al desactivar la cuenta del usuario:', error);
+              showAlert('Ups', 'Hubo un error al intentar cerrar la sesión, intenta en unos minutos.');
+            }
+          }
+        );
         break;
       case "Editar datos personales":
         navigation.navigate('EditarPerfil', { userId: userId });
         break;
       case "Desactivar cuenta":
-        Alert.alert(
-          "Desactivar cuenta",
-          "¿Estás seguro de que quieres desactivar tu cuenta? Esta acción no se puede deshacer.",
-          [
-            {
-              text: "Cancelar",
-              style: "cancel"
-            },
-            { 
-              text: "Confirmar", 
-              onPress: async () => {
-                try {
-                  if (userId) {
-                    await deactivateUser(userId); 
-                    logout();
-                    navigation.navigate("Auth");
-                  }
-                } catch (error) {
-                  console.error('Error al desactivar la cuenta del usuario:', error);
-                  Alert.alert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
-                }
+        showAlert(
+          "Eliminar cuenta ❗",
+          "¿Estás seguro de que quieres eliminar tu cuenta? Tu cuenta pasará a un estado inactivo y esta acción no se puede deshacer.",
+          async () => {
+            try {
+              if (userId) {
+                await deactivateUser(userId);
+                logout();
+                navigation.navigate("Auth");
               }
+            } catch (error) {
+              console.error('Error al desactivar la cuenta del usuario:', error);
+              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
             }
-          ],
-          { cancelable: false }
+          }
         );
         break;
       default:
-        Alert.alert(title);
+        showAlert(title, "");
     }
   };
 

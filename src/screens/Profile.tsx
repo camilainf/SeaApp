@@ -15,6 +15,7 @@ import SinSolicitudes from "../components/SinSolicitudes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { getServicesAcceptedByUser, getServicesByUser } from "../services/serviceService";
+import { useAlert } from "../context/AlertContext";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -40,6 +41,9 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ServicioData[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // Alerta Customizada
+  const { showAlert } = useAlert();
 
   useFocusEffect(
     useCallback(() => {
@@ -115,12 +119,12 @@ const Profile: React.FC<Props> = ({ navigation }) => {
     if (userId) {
       navigation.navigate('EditarPerfil', { userId: userId });
     } else {
-      Alert.alert(`No se puede editar este perfil`);
+      showAlert('No se puede editar este perfil', '');
     }
 
   };
   const handleDelete = (userId: string | undefined) => {
-    Alert.alert('Eliminacion');
+    showAlert('Eliminacion', '');
   };
   return (
     <ScrollView style={styles.container}>
@@ -157,7 +161,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
             {usuarioData?.nombre} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
           </Text>
-          <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => Alert.alert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`, [{ text: "OK" }])}>
+          <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => showAlert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`)}>
             <FontAwesome name="info-circle" size={15} color="white" />
             <Text style={styles.contactButtonText}>Informacion</Text>
           </TouchableOpacity>

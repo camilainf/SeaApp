@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import { Oferta } from "../resources/offer";
 import { BASE_URL } from "@env";
+import { useAlert } from "../context/AlertContext";
 
 const URL = BASE_URL + '/offers';
 // const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/offers';
@@ -82,6 +83,8 @@ export const handleAceptarOferta = async (Offerta: Oferta | null) => {
 
 
 export const handlePublicarOfertas = async (idServicio: string | null, ofertaValue: string, userToken: string | null) => {
+  const { showAlert } = useAlert();
+
   if (idServicio && ofertaValue && userToken) {
     try {
       const postOferta = {
@@ -91,51 +94,19 @@ export const handlePublicarOfertas = async (idServicio: string | null, ofertaVal
       };
 
       const response = await postOffer(postOferta);
+      showAlert("Oferta creada", "Tu oferta ha sido creada con éxito!");
 
-      Alert.alert("Oferta creada", "Tu oferta ha sido creada con éxito!", [
-        {
-          text: "Ok",
-          onPress: () => console.log("Oferta creada con éxito"),
-        },
-      ]);
     } catch (error) {
       if (error instanceof Error) {
         console.error("Hubo un error al crear la oferta:", error.message);
-        Alert.alert(
-          "Error",
-          error.message ||
-          "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-          [
-            {
-              text: "Ok",
-              onPress: () => console.log("Error al crear oferta"),
-            },
-          ]
-        );
+        showAlert("Error", error.message || "Hubo un problema al crear la oferta. Por favor intenta nuevamente.");
+
       } else {
         console.error("Hubo un error al crear la oferta:", error);
-        Alert.alert(
-          "Error",
-          "Hubo un problema al crear la oferta. Por favor intenta nuevamente.",
-          [
-            {
-              text: "Ok",
-              onPress: () => console.log("Error al crear oferta"),
-            },
-          ]
-        );
+        showAlert("Error", "Hubo un problema al crear la oferta. Por favor intenta nuevamente.");
       }
     }
   } else {
-    Alert.alert(
-      "Error",
-      "Asegúrate de haber ingresado todos los datos necesarios.",
-      [
-        {
-          text: "Ok",
-          onPress: () => console.log("Datos incompletos"),
-        },
-      ]
-    );
+    showAlert("Error", "Asegúrate de haber ingresado todos los datos necesarios.");
   }
 };

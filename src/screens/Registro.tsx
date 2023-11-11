@@ -12,6 +12,7 @@ import { selectImage } from "../utils/imageUtils";
 import { registroSchema } from "../utils/validations/registroValidations";
 import { ActivityIndicator } from 'react-native';
 import { HttpError } from "../resources/httpError";
+import { useAlert } from "../context/AlertContext";
 
 type Props = { navigation: StackNavigationProp<RootStackParamList>; };
 type CountryCode = "CL";
@@ -21,6 +22,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [profilePicBase64, setProfilePicBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useAlert();
 
   const formik = useFormik({
     initialValues: {
@@ -39,7 +41,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
     onSubmit: async (values) => {
 
       if (!profilePic) {
-        Alert.alert("Foto de perfil obligatoria", "Selecciona una foto de perfil para poder continuar.");
+        showAlert("Foto de perfil obligatoria", "Selecciona una foto de perfil para poder continuar.");
         return;
       } else {
         setLoading(true);
@@ -63,15 +65,17 @@ const Registro: React.FC<Props> = ({ navigation }) => {
         setLoading(false);
 
         console.log("Usuario creado:", newUser);
-        Alert.alert("Usuario creado con éxito.", "", [
-          {
-            text: "OK",
-            onPress: () => {
-              formik.resetForm();
-              navigation.navigate("Auth");
-            },
-          },
-        ]);
+
+        showAlert(
+          "Usuario creado con éxito ✅",
+          "",
+          undefined,
+          () => {
+            formik.resetForm();
+            navigation.navigate("Auth");
+          }
+        );
+
       } catch (error) {
         const httpError = error as HttpError;
         let errorTitle = 'Ocurrió un problema :(';
@@ -82,7 +86,8 @@ const Registro: React.FC<Props> = ({ navigation }) => {
           errorMessage = 'Correo ya se encuentra en uso.';
         }
 
-        Alert.alert(errorTitle, errorMessage);
+        showAlert(errorTitle, errorMessage);
+
         setLoading(false);
       }
     },
@@ -105,14 +110,6 @@ const Registro: React.FC<Props> = ({ navigation }) => {
 
   const handleNavigationToLogin = () => {
     navigation.goBack();
-  };
-
-  const handleFormSubmit = () => {
-    if (!profilePic) {
-      Alert.alert("Error", "Selecciona una foto de perfil antes de continuar.");
-      return;
-    }
-    formik.handleSubmit();
   };
 
   return (
@@ -162,6 +159,11 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                   : null,
               ]}
             />
+            {formik.touched.nombre && formik.errors.nombre ? (
+              <Text style={{ color: "red", marginBottom: 10 }}>
+                {formik.errors.nombre}
+              </Text>
+            ) : null}
 
             <Text>Apellido paterno:</Text>
             <TextInput
@@ -175,6 +177,11 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                   : null,
               ]}
             />
+            {formik.touched.apellidoPaterno && formik.errors.apellidoPaterno ? (
+              <Text style={{ color: "red", marginBottom: 10 }}>
+                {formik.errors.apellidoPaterno}
+              </Text>
+            ) : null}
 
             <Text>Apellido materno:</Text>
             <TextInput
@@ -188,6 +195,12 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                   : null,
               ]}
             />
+            {formik.touched.apellidoMaterno && formik.errors.apellidoMaterno ? (
+              <Text style={{ color: "red", marginBottom: 10 }}>
+                {formik.errors.apellidoMaterno}
+              </Text>
+            ) : null}
+
             <Text>Descripción:</Text>
             <TextInput
               value={formik.values.descripcion}
@@ -237,6 +250,11 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                 ]}
               />
             </View>
+            {formik.touched.telefono && formik.errors.telefono ? (
+              <Text style={{ color: "red", marginBottom: 10 }}>
+                {formik.errors.telefono}
+              </Text>
+            ) : null}
 
             <Text>Email:</Text>
             <TextInput
@@ -269,6 +287,11 @@ const Registro: React.FC<Props> = ({ navigation }) => {
                   : null,
               ]}
             />
+            {formik.touched.password && formik.errors.password ? (
+              <Text style={{ color: "red", marginBottom: 10 }}>
+                {formik.errors.password}
+              </Text>
+            ) : null}
 
             <Text>Repetir Contraseña:</Text>
             <TextInput
