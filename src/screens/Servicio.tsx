@@ -493,7 +493,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 borderRadius: 8,
               }}>
               <Text style={{ padding: 10 }}>CLP</Text>
-              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={10} value={ofertaValue} onChangeText={handleTextChange} />
+              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={7} value={ofertaValue} onChangeText={handleTextChange} />
             </View>
             <View style={{ ...styles.modalButtons, marginTop: 20 }}>
               <TouchableOpacity
@@ -577,19 +577,23 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                             }
                             style={styles.ofertaImage}
                           />
-                          <Text style={{ marginRight: 3, maxWidth: 120 }} numberOfLines={1} ellipsizeMode="tail">
+                          <Text style={{ marginRight: 3, maxWidth: 75, fontSize:12}} numberOfLines={1} ellipsizeMode="tail">
                             {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
                           </Text>
                         </TouchableOpacity>
 
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                          <Text style={{ marginRight: 10, fontWeight: "bold" }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
+                          <Text style={{ marginRight: 10, fontWeight: "bold" ,fontSize:11}}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
                           <TouchableOpacity
                             onPress={() => {
                               setSelectedOferta(oferta);
                               setConfirmModalVisible(true);
                             }}>
-                            <MaterialIcons name="check" size={24} color="green" />
+                            <View style={{borderRadius:20 , backgroundColor:"#07A15C",paddingHorizontal:8, paddingVertical:5}}>
+                              <Text style={{fontSize:11,color:"white"}}>Aceptar</Text>
+                            </View>
+                            
+                            {/*<MaterialIcons name="check" size={24} color="green" />*/}
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -1070,8 +1074,8 @@ const styles = StyleSheet.create({
 
   // Estilos para el modal de ver ofertas
   ofertaImage: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
     marginRight: 10,
   },
