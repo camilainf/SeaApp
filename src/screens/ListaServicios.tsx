@@ -61,6 +61,14 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    const renderEmptyListMessage = () => {
+        return (
+            <Text style={{ textAlign: 'center', margin: 10, color: '#50719D' }}>
+                Aún no hay servicios publicados en esta categoría 😥
+            </Text>
+        );
+    };
+
     const scrollToTop = () => {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
@@ -114,6 +122,7 @@ const ListaServicios: React.FC<Props> = ({ navigation }) => {
                 onEndReached={fetchServices}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={() => loading ? <ActivityIndicator size="large" color="#0000ff" /> : null}
+                ListEmptyComponent={renderEmptyListMessage}
             />
             <TouchableOpacity style={styles.scrollToTopButton} onPress={scrollToTop}>
                 <Text style={styles.arrowUp}>↑</Text>
