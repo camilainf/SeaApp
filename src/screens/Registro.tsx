@@ -99,7 +99,7 @@ const Registro: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleAddProfilePic = async () => {
-    const { uri, base64 } = await selectImage();
+    const { uri, base64 } = await selectImage(showAlert);
     if (uri) {
       setProfilePic(uri);
     }

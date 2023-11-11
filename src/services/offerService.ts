@@ -87,7 +87,7 @@ export const handlePublicarOfertas = async (
   idServicio: string | null, 
   ofertaValue: string, 
   userToken: string | null,
-  showAlert: (title: string, message: string) => void // Añade showAlert como parámetro
+  showAlert: (title: string, message: string) => void
 ) => {
 
   if (idServicio && ofertaValue && userToken) {

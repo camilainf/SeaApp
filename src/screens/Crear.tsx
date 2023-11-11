@@ -209,7 +209,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleAddServiceReferencePic = async () => {
-    const { uri, base64 } = await selectImage();
+    const { uri, base64 } = await selectImage(showAlert);
     if (uri) {
       setServiceReferencePic(uri);
     }

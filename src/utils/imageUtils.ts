@@ -1,9 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useAlert } from '../context/AlertContext';
 
-export const selectImage = async (): Promise<{ uri: string | null, base64: string | null }> => {
+export const selectImage = async (showAlert: (title: string, message: string) => void): Promise<{ uri: string | null, base64: string | null }> => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    const { showAlert } = useAlert();
 
     if (status !== 'granted') {
         

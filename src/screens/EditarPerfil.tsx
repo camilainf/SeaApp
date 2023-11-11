@@ -90,7 +90,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     }, [userId]);
 
     const handleAddProfilePic = async () => {
-        const { uri, base64 } = await selectImage();
+        const { uri, base64 } = await selectImage(showAlert);
         if (uri && base64) {
             setProfilePic(uri); // Previsualización.
             setProfilePicBase64(base64); // Carga cuando se guarde.
