@@ -589,8 +589,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                               setSelectedOferta(oferta);
                               setConfirmModalVisible(true);
                             }}>
-                            <View style={{borderRadius:20 , backgroundColor:"#07A15C",paddingHorizontal:8, paddingVertical:5}}>
-                              <Text style={{fontSize:11,color:"white"}}>Aceptar</Text>
+                            <View style={{borderRadius:10 , backgroundColor:"#078C93",paddingHorizontal:8, paddingVertical:5}}>
+                              <Text style={{fontSize:11,color:"white", fontWeight:"bold"}}>Aceptar</Text>
                             </View>
                             
                             {/*<MaterialIcons name="check" size={24} color="green" />*/}
