@@ -119,7 +119,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
             await updateUserProfile(userId, profileData);
 
             showAlert(
-                "Estás seguro que deseas guardar los cambios realizados? ",
+                "¿Estás seguro que deseas guardar los cambios realizados? ",
                 "",
                 async () => {
                     await updateUserProfile(userId, profileData);

@@ -155,7 +155,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         if (isEditMode && servicioCargado) {
           await updateService(servicioCargado.id, servicio);
           setLoading(false);
-          showAlert("Operación exitosa", "El servicio fué actualizado.", undefined, () => {
+          showAlert("Operación exitosa ✅", "Tu servicio fué actualizado.", undefined, () => {
             try {
               formik.resetForm();
               setSelectedDate(new Date());
@@ -164,15 +164,14 @@ const Crear: React.FC<Props> = ({ navigation }) => {
               setServiceReferencePicBase64(null);
               navigation.goBack();
             } catch (error) {
-              console.error('Error al desactivar la cuenta del usuario:', error);
-              showAlert('Error', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
+              showAlert('Error ⛔', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
             }
           });
         } else {
           const newService = await createService(servicio);
           console.log("Servicio creado:", newService);
           setLoading(false);
-          showAlert("Operación exitosa", "El servicio fué creado.", undefined, () => {
+          showAlert("Operación exitosa ✅", "El servicio fué creado.", undefined, () => {
             try {
               formik.resetForm();
               setSelectedDate(new Date());

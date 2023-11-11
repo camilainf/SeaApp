@@ -695,7 +695,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   setValorarModalVisible(false);
                   onRefresh();
-                  showAlert("Valoracion enviada", "Gracias por valorar al usuario ⭐");
+                  showAlert("Valoración enviada ✅", "Gracias por valorar al usuario ⭐");
                 }}>
                 <Text style={{ color: "#FFFFFF", textAlign: "center", fontSize: 19, fontWeight: "bold" }}>Enviar Valoración</Text>
               </TouchableOpacity>

@@ -54,7 +54,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
       case "Desconectarse":
         showAlert(
           "Cerrar sesión",
-          "¿Estas seguro que deseas desconectarte?",
+          "¿Estás seguro que deseas cerrar sesión?",
           async () => {
             try {
               logout();
