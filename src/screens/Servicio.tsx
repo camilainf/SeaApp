@@ -151,6 +151,11 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       }
     );
   };
+  const handleTextChange = (text: string) => {
+    // Filtra el texto para permitir solo números
+    const filteredText = text.replace(/[^0-9]/g, '');
+    setOfertaValue(filteredText);
+};
 
   // Esta función se utiliza para manejar los toques fuera del menú desplegable y cerrarlo
   const handleCloseMenu = () => {
@@ -174,6 +179,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
+  
   const paginatedOffers = ofertasCargadas.slice(0, currentPage * ITEMS_PER_PAGE);
 
   return (
@@ -229,8 +235,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                         showAlert("No se puede editar ⛔", "Este servicio ya se encuentra asignado a un ofertante.");
                       }
                     }}
-                    style={styles.opcionMenu}
-                  >
+                    style={styles.opcionMenu}>
                     <Text style={{ color: "#003366" }}>Editar servicio</Text>
                   </TouchableOpacity>
 
@@ -439,12 +444,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
               </Text>
             )}
 
-            {servicioCargado && servicioCargado?.estado === 6 && (
-              <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 40 }}>
-                El servicio finalizó con éxito. ✅
-              </Text>
-            )}
-
+            {servicioCargado && servicioCargado?.estado === 6 && <Text style={{ fontSize: 20, color: "#00162D", marginBottom: 40 }}>El servicio finalizó con éxito. ✅</Text>}
           </>
         ) : (
           <>{servicioCargado && servicioCargado?.estado !== 1 && <Text style={{ color: "#00162D", fontSize: 20, marginBottom: 20 }}>Esta solicitud ya ha sido tomada. Sigue buscando para encontrar la tuya 🙌🏻</Text>}</>
@@ -493,7 +493,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 borderRadius: 8,
               }}>
               <Text style={{ padding: 10 }}>CLP</Text>
-              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={10} onChangeText={(text) => setOfertaValue(text)} />
+              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={10} value={ofertaValue} onChangeText={handleTextChange} />
             </View>
             <View style={{ ...styles.modalButtons, marginTop: 20 }}>
               <TouchableOpacity
@@ -512,8 +512,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   setOfertaValue("");
                   onRefresh();
                 }}
-                disabled={!ofertaValue}
-              >
+                disabled={!ofertaValue}>
                 <Text style={styles.createButtonText}>Crear</Text>
               </TouchableOpacity>
             </View>
@@ -536,7 +535,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
 
             {ofertasCargadas.length > 0 ? (
               <>
-
                 <FlatList
                   data={getPaginatedOffers()}
                   keyExtractor={(item, index) => index.toString()}
@@ -573,8 +571,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                             source={
                               usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                                 ? {
-                                  uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                                }
+                                    uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                                  }
                                 : require("../../assets/iconos/UserProfile.png")
                             }
                             style={styles.ofertaImage}
@@ -598,7 +596,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                   )}
                 />
-                { }
+                {}
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
                   <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
                     <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
@@ -609,7 +607,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
               </>
             ) : (
-
               <View
                 style={{
                   flexDirection: "row",
@@ -617,7 +614,6 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                   marginBottom: 10,
                   justifyContent: "center", // Centrar el contenido horizontalmente
                 }}>
-
                 <Text style={{ marginRight: 10, color: "grey", fontSize: 16 }}>No hay ofertas disponibles por el momento...</Text>
               </View>
             )}
