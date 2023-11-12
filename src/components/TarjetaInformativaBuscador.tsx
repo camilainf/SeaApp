@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, UIManager, Platform } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
+if (
+    Platform.OS === "android" &&
+    UIManager.setLayoutAnimationEnabledExperimental
+) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const TarjetaInformativaBuscador: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handlePress = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setIsExpanded(!isExpanded);
     };
 
@@ -19,7 +27,6 @@ const TarjetaInformativaBuscador: React.FC = () => {
                     name={isExpanded ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
                     size={24}
                     color="#FFFFFF"
-                    style={styles.iconStyle}
                 />
             </View>
             {isExpanded && (
@@ -38,7 +45,7 @@ const styles = StyleSheet.create({
     infoCard: {
         backgroundColor: '#90caf9',
         borderRadius: 40,
-        padding: 15,
+        padding: 10,
         marginBottom: 10,
         elevation: 1,
     },
@@ -48,7 +55,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     content: {
-        marginTop: 10,
+        marginTop: 5,
     },
     infoText: {
         color: '#FFFFFF',
