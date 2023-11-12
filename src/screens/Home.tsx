@@ -15,6 +15,7 @@ import Buscador from '../components/Buscador';
 import TarjetaUltimosTrabajos from '../components/TarjetaUltimosTrabajos';
 import { ActivityIndicator } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import TarjetaInformativaBuscador from '../components/TarjetaInformativaBuscador';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -102,6 +103,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <LinearGradient colors={usuario?.isAdmin ? ["#FFA500", "#FFA500", "rgba(68, 177, 238, 0)"] : ["#0F4FC2", "#44B1EE", "rgba(68, 177, 238, 0)"]} style={styles.gradientBackground} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
       <View style={styles.contentContainer}>
         <TarjetaSuperiorHome usuario={usuario} ganancia={gananciaDinero} />
+
+        <TarjetaInformativaBuscador/>
 
         <Buscador
           onSearch={(term) => {

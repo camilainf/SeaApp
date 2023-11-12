@@ -199,14 +199,14 @@ const Crear: React.FC<Props> = ({ navigation }) => {
   const handleCancelar = () => {
     const texto = !isEditMode ? "Continuar proceso" : "Seguir editando";
     showAlert("¿Descartar cambios? ",
-    "Si sales ahora, perderás los cambios.", () => {
-      formik.resetForm();
-      setSelectedDate(new Date());
-      setShowInfo(false);
-      setServiceReferencePic(null);
-      setServiceReferencePicBase64(null);
-      navigation.goBack();
-    } ,undefined,texto,"Descartar");
+      "Si sales ahora, perderás los cambios.", () => {
+        formik.resetForm();
+        setSelectedDate(new Date());
+        setShowInfo(false);
+        setServiceReferencePic(null);
+        setServiceReferencePicBase64(null);
+        navigation.goBack();
+      }, undefined, texto, "Descartar");
   };
 
   const handleAddServiceReferencePic = async () => {
@@ -290,6 +290,11 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           formik.touched.nombreServicio && formik.errors.nombreServicio ? styles.inputError : null
         ]}
       />
+      {formik.touched.nombreServicio && formik.errors.nombreServicio ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>
+          {formik.errors.nombreServicio}
+        </Text>
+      ) : null}
 
       {/* Categoría */}
       <Text style={styles.label}>
@@ -310,9 +315,12 @@ const Crear: React.FC<Props> = ({ navigation }) => {
             <Picker.Item key={categoria.id} label={categoria.nombre} value={categoria.nombre} />
           ))}
         </Picker>
-
-
       </View>
+      {formik.touched.categoria && formik.errors.categoria ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>
+          {formik.errors.categoria}
+        </Text>
+      ) : null}
 
       {/* Descripcion */}
       <Text style={styles.label}>
@@ -332,10 +340,14 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           formik.touched.descripcion && formik.errors.descripcion ? styles.inputError : null
         ]}
       />
+      {formik.touched.descripcion && formik.errors.descripcion ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>
+          {formik.errors.descripcion}
+        </Text>
+      ) : null}
 
       {/* Horario */}
       <View style={styles.row}>
-
         {/* Fecha */}
         <View style={styles.column}>
           <Text style={styles.label}>
@@ -378,7 +390,6 @@ const Crear: React.FC<Props> = ({ navigation }) => {
             )}
           </View>
         </View>
-
       </View>
 
       {/* Dirección */}
@@ -396,6 +407,11 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           formik.touched.direccion && formik.errors.direccion ? styles.inputError : null
         ]}
       />
+      {formik.touched.direccion && formik.errors.direccion ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>
+          {formik.errors.direccion}
+        </Text>
+      ) : null}
 
       {/* Monto */}
       <Text style={styles.label}>
@@ -430,6 +446,11 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           formik.touched.monto && formik.errors.monto ? styles.inputError : null
         ]}
       />
+      {formik.touched.monto && formik.errors.monto ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>
+          {formik.errors.monto}
+        </Text>
+      ) : null}
 
       {/* Seleccionar imagen de referencia */}
       <Text style={styles.label}>
@@ -559,7 +580,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 12,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: "#F3F6FF",
     color: "#6B6B7D",
   },

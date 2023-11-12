@@ -124,7 +124,10 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                 async () => {
                     await updateUserProfile(userId, profileData);
                     navigation.navigate("Main", { screen: "Mas" });
-                }
+                },
+                undefined,
+                "Cancelar",
+                "Guardar"
             );
         } catch (error) {
             console.error("Hubo un error al actualizar el perfil del usuario:", error);

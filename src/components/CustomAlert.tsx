@@ -74,10 +74,12 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         paddingHorizontal:25,
+        elevation: 3,
     },
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
+        
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -86,11 +88,10 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     confirmButton: {
-
         backgroundColor: '#2390F3',
         shadowColor: "#000",
         paddingHorizontal:20,
-        elevation: 10, // Esto es para Android
+        elevation: 3,
     },
 });
 

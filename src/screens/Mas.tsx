@@ -64,7 +64,10 @@ const Mas: React.FC<Props> = ({ navigation }) => {
               console.error('Error al desactivar la cuenta del usuario:', error);
               showAlert('Ups 😥', 'Hubo un error al intentar cerrar la sesión, intenta en unos minutos.');
             }
-          }
+          },
+          undefined,
+          "Cerrar",
+          "Desconectarse"
         );
         break;
       case "Editar datos personales":
@@ -85,7 +88,10 @@ const Mas: React.FC<Props> = ({ navigation }) => {
               console.error('Error al desactivar la cuenta del usuario:', error);
               showAlert('Error ⛔', 'No se pudo desactivar la cuenta. Por favor, inténtalo de nuevo.');
             }
-          }
+          },
+          undefined,
+          "Cancelar",
+          "Eliminar cuenta"
         );
         break;
       default:
