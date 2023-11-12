@@ -1,26 +1,49 @@
 import React, { useState } from 'react';
-import { View, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Animated } from 'react-native';
 
 type BuscadorProps = {
     onSearch: (term: string) => void;
     initialValue?: string;
-    immediateSearch?: boolean; // Nueva prop
+    immediateSearch?: boolean;
 };
 
 const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue, immediateSearch = false }) => {
     const [searchTerm, setSearchTerm] = useState(initialValue || '');
-    const searchIcon = require('../../assets/iconos/Search.png');
+    const opacity = useState(new Animated.Value(0))[0];
 
-    // Actualizar el término de búsqueda en tiempo real
+    React.useEffect(() => {
+        Animated.timing(opacity, {
+            toValue: searchTerm ? 1 : 0,
+            duration: 240,
+            useNativeDriver: true,
+        }).start();
+    }, [searchTerm, opacity]);
+
     const handleTextChange = (text: string) => {
         setSearchTerm(text);
-        if (immediateSearch) { // Si immediateSearch es true, realiza la búsqueda inmediata
+        if (immediateSearch) {
             onSearch(text);
+        }
+    };
+
+    const handleClearInput = () => {
+        setSearchTerm('');
+        if (immediateSearch) {
+            onSearch('');
         }
     };
 
     return (
         <View style={styles.buscadorContainer}>
+            {searchTerm ? (
+                <Animated.View style={[styles.clearButton, { opacity }]}>
+                    <TouchableOpacity onPress={handleClearInput}>
+                        <MaterialIcons name="close" size={20} color="#AEBFFB" />
+                    </TouchableOpacity>
+                </Animated.View>
+            ) : null}
             <TextInput
                 placeholder="¿Qué buscas?"
                 style={styles.buscadorTexto}
@@ -28,12 +51,8 @@ const Buscador: React.FC<BuscadorProps> = ({ onSearch, initialValue, immediateSe
                 value={searchTerm}
                 onChangeText={handleTextChange}
             />
-            <TouchableOpacity onPress={() => {
-                if (searchTerm.trim() !== '') {
-                    onSearch(searchTerm);
-                }
-            }}>
-                <Image source={searchIcon} style={styles.iconoLupa} />
+            <TouchableOpacity onPress={() => onSearch(searchTerm)}>
+                <MaterialIcons name="search" size={28} color="#AEBFFB" />
             </TouchableOpacity>
         </View>
     );
@@ -46,16 +65,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#F3F6FF',
         borderRadius: 50,
         marginBottom: 16,
-        paddingHorizontal: 30,
-        paddingVertical: 10
-    },
-    iconoLupa: {
-        width: 28,
-        height: 28,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
     },
     buscadorTexto: {
         fontSize: 16,
         flex: 1,
+        marginLeft: 10,
+    },
+    clearButton: {
+        paddingHorizontal: 5,
     },
 });
 
