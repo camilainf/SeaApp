@@ -28,7 +28,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
   const [alertInfo, setAlertInfo] = useState<AlertInfo>(defaultAlertInfo);
 
   const showAlert = (title: string, message: string, onConfirm?: () => void, onCloseCallback?: () => void, titleAux?:string,titleAuxil?:string) => {
-    console.log("Mostrando alerta con título:", title, "y onConfirm:", !!onConfirm);
+
     setAlertInfo({ title, message, visible: true, onConfirm, onCloseCallback , titleAux,titleAuxil});
   };
 

@@ -289,7 +289,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
         <View style={{ marginTop: 25, marginBottom: 10 }}>
           <Text style={styles.estadoText}>Estado: {obtenerTextoEstado(servicioCargado?.estado)}</Text>
 
-          <Text style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
+          <Text numberOfLines={1}
+    ellipsizeMode="tail" style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
         </View>
       </View>
       {/* Descripcion de servicio */}
@@ -942,6 +943,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     fontSize: 15,
+    maxWidth: '50%',
     fontWeight: "600",
   },
   userBar: {

@@ -113,7 +113,8 @@ const Mas: React.FC<Props> = ({ navigation }) => {
         <Card style={styles.userCard}>
           <Card.Content style={styles.userContent}>
             <Avatar.Image size={50} source={{ uri: user?.imagenDePerfil }} style={styles.userFoto} />
-            <Title style={styles.userName}>{user?.nombre}</Title>
+            <Title numberOfLines={1}
+    ellipsizeMode="tail" style={styles.userName}>{user?.nombre} {user?.apellidoPaterno}</Title>
           </Card.Content>
         </Card>
         <Button
@@ -164,6 +165,7 @@ const styles = StyleSheet.create({
   userName: {
     marginLeft: 10,
     width: '80%',
+    
   },
   userFoto: {
     backgroundColor: '#44B1EE',
