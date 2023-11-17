@@ -20,6 +20,7 @@ type EditarPerfilProp = RouteProp<RootStackParamList, "EditarPerfil">;
 const EditarPerfil: React.FC<Props> = ({ navigation }) => {
     const route = useRoute<EditarPerfilProp>();
     const userId = route.params?.userId;
+    const [loading, setLoading] = useState(false);
 
     const { showAlert } = useAlert();
 
@@ -116,13 +117,15 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                 imagenDePerfil: finalProfilePic,
             };
 
-            await updateUserProfile(userId, profileData);
+            // await updateUserProfile(userId, profileData);
 
             showAlert(
                 "¿Estás seguro que deseas guardar los cambios realizados? ",
                 "",
                 async () => {
+                    setLoading(true);
                     await updateUserProfile(userId, profileData);
+                    setLoading(false);
                     navigation.navigate("Main", { screen: "Mas" });
                 },
                 undefined,
@@ -130,6 +133,7 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                 "Guardar"
             );
         } catch (error) {
+            setLoading(false);
             console.error("Hubo un error al actualizar el perfil del usuario:", error);
             showAlert("Error al actualizar ⛔", "No se pudieron guardar los cambios.");
         }
@@ -139,13 +143,13 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
         showAlert(
             "¿Descartar cambios? ",
             "Si sales ahora, perderás los cambios.",
-            
+
             async () => {
                 navigation.goBack()
             }
-            ,undefined,"Seguir editando","Descartar"
+            , undefined, "Seguir editando", "Descartar"
         );
-        
+
     };
 
     if (!isUserDataLoaded) {
@@ -238,22 +242,28 @@ const EditarPerfil: React.FC<Props> = ({ navigation }) => {
                 </View>
                 {formik.touched.telefono && formik.errors.telefono ? (<Text style={{ color: "red", marginBottom: 10 }}>{formik.errors.telefono}</Text>) : null}
 
-                <View style={styles.buttonsContainer}>
-                    <View style={[styles.button, styles.roundedButton]}>
-                        <Button
-                            title="Cancelar"
-                            color="#FF5C5C"
-                            onPress={() => handleCancel()}
-                        />
-                    </View>
-                    <View style={[styles.button, styles.roundedButton]}>
-                        <Button
-                            title="Guardar cambios"
-                            color="#369DFB"
-                            onPress={formik.submitForm}
-                        />
-                    </View>
-                </View>
+                {
+                    loading ? (
+                        <ActivityIndicator size="large" color="#0000ff" />
+                    ) : (
+                        <View style={styles.buttonsContainer}>
+                            <View style={[styles.button, styles.roundedButton]}>
+                                <Button
+                                    title="Cancelar"
+                                    color="#FF5C5C"
+                                    onPress={() => handleCancel()}
+                                />
+                            </View>
+                            <View style={[styles.button, styles.roundedButton]}>
+                                <Button
+                                    title="Guardar cambios"
+                                    color="#369DFB"
+                                    onPress={formik.submitForm}
+                                />
+                            </View>
+                        </View>
+                    )
+                }
             </ScrollView>
         </FormikProvider>
 

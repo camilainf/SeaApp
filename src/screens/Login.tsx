@@ -10,6 +10,7 @@ import { DecodedToken } from "../types/auth";
 import { HttpError } from "../resources/httpError";
 import { useAlert } from "../context/AlertContext";
 import CustomAlert from "../components/CustomAlert";
+import { ActivityIndicator } from "react-native-paper";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -23,10 +24,12 @@ type Props = {
 const Login: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { showAlert } = useAlert();
 
   const handleLogin = async () => {
     try {
+      setLoading(true);
       await authService.login({ email, password });
       const user_token = await getToken();
 
@@ -43,8 +46,10 @@ const Login: React.FC<Props> = ({ navigation }) => {
         undefined,
         () => navigation.navigate("Main", { screen: "Home" })
       );
+      setLoading(false);
 
     } catch (error) {
+      setLoading(true);
       const httpError = error as HttpError;
 
       let errorMessage = 'Hubo un problema al iniciar sesión.';
@@ -93,9 +98,15 @@ const Login: React.FC<Props> = ({ navigation }) => {
           secureTextEntry={true}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
+        {
+          loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Iniciar Sesión</Text>
+            </TouchableOpacity>
+          )
+        }
         <Text style={styles.footerText}>
           No posees una cuenta?, únete a SeaJob pulsando{" "}
           <Text style={styles.linkText} onPress={handleNavigationToRegister}>
