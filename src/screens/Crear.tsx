@@ -402,6 +402,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
         value={formik.values.direccion}
         onChangeText={formik.handleChange("direccion")}
         onBlur={formik.handleBlur("direccion")}
+        maxLength={300}
         style={[
           styles.input,
           formik.touched.direccion && formik.errors.direccion ? styles.inputError : null
@@ -427,7 +428,7 @@ const Crear: React.FC<Props> = ({ navigation }) => {
           unit: '$',
           suffixUnit: ''
         }}
-        maxLength={19}
+        maxLength={16}
         placeholder="$0"
         value={formik.values.monto}
         onChangeText={(text) => {

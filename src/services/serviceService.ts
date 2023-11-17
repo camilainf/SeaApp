@@ -1,8 +1,7 @@
 import { ServicioData } from "../resources/service";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/services';
-// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/services';
+const URL = process.env.BASE_URL + '/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
   const response = await fetch(URL);

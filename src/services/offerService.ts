@@ -1,11 +1,8 @@
 import { Alert } from "react-native";
 import { Oferta } from "../resources/offer";
 import { BASE_URL } from "@env";
-import { useAlert } from "../context/AlertContext";
-// import { useAlert } from "../context/AlertContext";
 
-const URL = BASE_URL + '/offers';
-// const URL = "https://seajob-2a7634f714d7.herokuapp.com/api" + '/offers';
+const URL = process.env.BASE_URL + '/offers';
 
 export const getOffersByServiceId = async (serviceId: string): Promise<Oferta[]> => {
   const response = await fetch(URL + "/getOfferOfService/" + serviceId);

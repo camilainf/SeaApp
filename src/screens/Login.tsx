@@ -49,7 +49,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
       setLoading(false);
 
     } catch (error) {
-      setLoading(true);
+      setLoading(false);
       const httpError = error as HttpError;
 
       let errorMessage = 'Hubo un problema al iniciar sesión.';

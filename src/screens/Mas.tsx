@@ -129,7 +129,7 @@ const Mas: React.FC<Props> = ({ navigation }) => {
           mode="contained"
           icon="account-remove"
           onPress={() => handleButtonPress('Desactivar cuenta')}>
-          Eliminar cuenta
+          Desactivar cuenta
         </Button>
         <Button
           style={styles.button}
