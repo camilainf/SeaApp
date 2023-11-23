@@ -37,3 +37,11 @@ export function formatoDinero(monto: number | undefined): string {
     }
     return "Cargando..."
 }
+
+
+export const formatStringtoCLP = (numberString: string): string => {
+    // Eliminar los puntos existentes para evitar conflictos en el formateo
+    let cleanedNumberString = numberString.replace(/\./g, '');
+    // Formatear el número con puntos como separadores de miles
+    return cleanedNumberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };

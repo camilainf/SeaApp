@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ToastAndroid, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { convertirFecha, formatoDinero } from "../utils/randomService";
+import { convertirFecha, formatStringtoCLP, formatoDinero } from "../utils/randomService";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/NavigatorTypes";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -52,6 +52,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
   const [userToken, setUserToken] = useState<string | null>("");
   const [valoracion, setValoracion] = useState(1.0); // Estado para la valoración
   const [ofertaValue, setOfertaValue] = useState<string>(""); // Estado para el valor de la oferta
+  const [ofertaSinFormato, setofertaSinFormato] = useState(''); // monto sin formato
   const [usuarioOferta, setUsuarioOferta] = useState<UsuarioCasted | null>(null);
   const [valoracionController, setValoracionController] = useState<Valoracion | null>(null);
 
@@ -152,10 +153,13 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       }
     );
   };
+
   const handleTextChange = (text: string) => {
-    // Filtra el texto para permitir solo números
     const filteredText = text.replace(/[^0-9]/g, '');
-    setOfertaValue(filteredText);
+    setofertaSinFormato(filteredText);
+
+    const formattedNumber = formatStringtoCLP(text);
+    setOfertaValue(formattedNumber);
   };
 
   // Esta función se utiliza para manejar los toques fuera del menú desplegable y cerrarlo
@@ -284,7 +288,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <View style={styles.contactInfo}>
               <MaterialIcons name="phone" size={24} color="#003366" />
               <Text style={styles.contactText}> {userCreador?.telefono}</Text>
-              <TouchableOpacity onPress={() => userCreador?.telefono && copyToClipboard("telefono",userCreador.telefono)}>
+              <TouchableOpacity onPress={() => userCreador?.telefono && copyToClipboard("telefono", userCreador.telefono)}>
                 <MaterialIcons name="content-copy" size={24} color="#003366" />
               </TouchableOpacity>
             </View>
@@ -509,7 +513,14 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 borderRadius: 8,
               }}>
               <Text style={{ padding: 10 }}>CLP</Text>
-              <TextInput style={{ flex: 1, height: 40, paddingHorizontal: 10 }} placeholder="Ingrese el valor de la oferta" keyboardType="number-pad" maxLength={7} value={ofertaValue} onChangeText={handleTextChange} />
+              <TextInput
+                style={{ flex: 1, height: 40, paddingHorizontal: 10 }}
+                placeholder="Ingrese el valor de la oferta"
+                keyboardType="number-pad"
+                maxLength={9}
+                value={ofertaValue}
+                onChangeText={handleTextChange}
+              />
             </View>
             <View style={{ ...styles.modalButtons, marginTop: 20 }}>
               <TouchableOpacity
@@ -521,14 +532,14 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.createButton, ofertaValue ? {} : { opacity: 0.5 }]}
+                style={[styles.createButton, ofertaSinFormato ? {} : { opacity: 0.5 }]}
                 onPress={() => {
-                  handlePublicarOfertas(idServicio, ofertaValue, userToken, showAlert);
+                  handlePublicarOfertas(idServicio, ofertaSinFormato, userToken, showAlert);
                   setCrearOfertaModalVisible(false);
                   setOfertaValue("");
                   onRefresh();
                 }}
-                disabled={!ofertaValue}>
+                disabled={!ofertaSinFormato}>
                 <Text style={styles.createButtonText}>Crear</Text>
               </TouchableOpacity>
             </View>
