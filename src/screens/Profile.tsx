@@ -14,7 +14,7 @@ import { getUserIdFromToken, getUserIsAdminFromToken } from "../services/authSer
 import SinSolicitudes from "../components/SinSolicitudes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { getServicesAcceptedByUser, getServicesByUser } from "../services/serviceService";
+import { getServicesAcceptedByUser, getServicesByUser, getServicesOfferedByUser } from "../services/serviceService";
 import { useAlert } from "../context/AlertContext";
 import * as Clipboard from 'expo-clipboard';
 import { MaterialIcons } from "@expo/vector-icons";
@@ -35,6 +35,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [usuarioData, setUsuarioData] = useState<UsuarioCasted | null>(null);
   const [serviciosPropios, setServiciosPropios] = useState<ServicioData[]>([]);
   const [solicitudesAceptadas, setSolicitudesAceptadas] = useState<ServicioData[]>([]);
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState<ServicioData[]>([]);
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
@@ -88,6 +89,10 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           //Servicios Aceptados para trabajar por este usuario
           const fetchedServicesAceptados = await getServicesAcceptedByUser(userId);
           setSolicitudesAceptadas(fetchedServicesAceptados);
+
+          //Servicios a los que este usuario ha ofertado y aún no es aceptado para trabajar
+          const fetchedServicesPendientes = await getServicesOfferedByUser(userId);
+          setSolicitudesPendientes(fetchedServicesPendientes);
           //Dinero ganado por el usuario
           const fetchedGanancia = await obtenerDieneroGanadoUsuario(userId);
           setGananaciaDinero(fetchedGanancia);
@@ -379,6 +384,67 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 scrollEnabled={false}
               />
               <TouchableOpacity onPress={() => handleVerMas(solicitudesAceptadas, "Solicitudes Aceptadas")}>
+                <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* LISTADO DE SOLICITUDES EN LAS QUE EL USUARIO OFERTÓ */}
+
+        <View
+          style={{
+            height: 2,
+            backgroundColor: "#EEF2FF",
+            marginVertical: 8,
+            marginHorizontal: 30,
+          }}></View>
+        <View style={{ marginBottom: 20, marginHorizontal: 20 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              marginBottom: 10,
+              paddingLeft: 15,
+              color: "#3B5373",
+            }}>
+            Solicitudes Pendientes
+          </Text>
+          {solicitudesPendientes.length === 0 ? (
+            <SinSolicitudes />
+          ) : (
+            <View>
+              {/* Arreglo solicitudes Aceptadas */}
+              <FlatList
+                data={solicitudesPendientes.slice(0, 5)}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.tarjetaTrabajo}
+                    onPress={() => {
+                      navigation.navigate("Servicio", item);
+                    }}>
+                    <Image
+                      source={
+                        item.imagen && item.imagen !== ''
+                          ? { uri: item.imagen }
+                          : require("../../assets/iconos/ImageReferencia.png")
+                      }
+                      style={styles.imagenTrabajo}
+                    />
+                    <View style={{ marginEnd: 90 }}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
+                        {item.nombreServicio}
+                      </Text>
+                      <Text style={{ color: "#50719D" }}>
+                        <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => String(item.id)}
+                scrollEnabled={false}
+              />
+              <TouchableOpacity onPress={() => handleVerMas(solicitudesPendientes, "Solicitudes pendientes")}>
                 <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
               </TouchableOpacity>
             </View>

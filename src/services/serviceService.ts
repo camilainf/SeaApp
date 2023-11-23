@@ -167,6 +167,43 @@ export const getServicesAcceptedByUser = async (idUsuario: string): Promise<Serv
   }
 };
 
+export const getServicesOfferedByUser = async (idUsuario: string): Promise<ServicioData[]> => {
+  try {
+    const response = await fetch(`${URL}/offeredByUser/${idUsuario}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const serviciosData: any[] = await response.json();
+
+    const servicios: ServicioData[] = serviciosData.map((serv: any) => ({
+      id: serv._id,
+      idCreador: serv.idCreador,
+      nombreServicio: serv.nombreServicio,
+      categoria: serv.categoria,
+      descripcion: serv.descripcion,
+      fechaSolicitud: serv.fechaSolicitud,
+      horaSolicitud: serv.horaSolicitud,
+      direccion: serv.direccion,
+      monto: serv.monto,
+      imagen: serv.imagen,
+      estado: serv.estado,
+      fechaCreacion: serv.fechaCreacion,
+    }));
+
+    return servicios;
+  } catch (error) {
+    console.error("Hubo un problema al obtener los servicios aceptados:", error);
+    return [];
+  }
+};
+
 
 export const getServiceById = async (id: string): Promise<ServicioData> => {
   const response = await fetch(URL + '/' + id, {
