@@ -3,7 +3,7 @@ import { UsuarioCasted } from "../resources/user";
 import { HttpError } from "../resources/httpError";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/users';
+const URL = "http://10.0.2.2:9000/api" + '/users';
 
 export const getAllUsers = async (): Promise<UsuarioCasted[]> => {
   const response = await fetch(URL);

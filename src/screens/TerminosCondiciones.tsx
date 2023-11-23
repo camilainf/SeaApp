@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
         color: '#322E61',
         marginRight: 5,
     },
-
     termText: {
         flex: 1,
         fontSize: 15,

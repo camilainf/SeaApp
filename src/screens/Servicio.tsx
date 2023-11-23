@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
+import { ToastAndroid, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator, RefreshControl, FlatList, TouchableWithoutFeedback } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { convertirFecha, formatoDinero } from "../utils/randomService";
@@ -16,6 +16,7 @@ import { getOfferAcceptedByServiceId, getOffersByServiceId, handleAceptarOferta,
 import { actualizarValoracion, crearValoracion, obtenerValoracionesServicio } from "../services/valoracionService";
 import { Valoracion } from "../resources/valoration";
 import { useAlert } from "../context/AlertContext";
+import * as Clipboard from 'expo-clipboard';
 
 const defaultImage = require("../../assets/iconos/Default_imagen.jpg");
 type ServicioRouteProp = RouteProp<RootStackParamList, "Servicio">;
@@ -155,7 +156,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
     // Filtra el texto para permitir solo números
     const filteredText = text.replace(/[^0-9]/g, '');
     setOfertaValue(filteredText);
-};
+  };
 
   // Esta función se utiliza para manejar los toques fuera del menú desplegable y cerrarlo
   const handleCloseMenu = () => {
@@ -179,8 +180,16 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
-  
+
   const paginatedOffers = ofertasCargadas.slice(0, currentPage * ITEMS_PER_PAGE);
+
+  const copyToClipboard = async (info: string, text: string) => {
+    await Clipboard.setStringAsync(text);
+
+    let message = info === "email" ? 'Email copiado al portapapeles' : 'Número copiado al portapapeles';
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+
+  };
 
   return (
     <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
@@ -207,7 +216,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           {/* Botón de contactar */}
           {userCreador && (
             <TouchableOpacity style={styles.contactButton} onPress={() => setModalVisible(true)}>
-              <Text style={styles.contactButtonText}>Contactar</Text>
+              <Text style={styles.contactButtonText}>Más información</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -268,10 +277,16 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
             <View style={styles.contactInfo}>
               <MaterialIcons name="email" size={24} color="#003366" />
               <Text style={styles.contactText}> {userCreador?.email}</Text>
+              <TouchableOpacity onPress={() => userCreador?.email && copyToClipboard("email", userCreador.email)}>
+                <MaterialIcons name="content-copy" size={24} color="#003366" />
+              </TouchableOpacity>
             </View>
             <View style={styles.contactInfo}>
-              <FontAwesome name="phone" size={24} color="#003366" />
+              <MaterialIcons name="phone" size={24} color="#003366" />
               <Text style={styles.contactText}> {userCreador?.telefono}</Text>
+              <TouchableOpacity onPress={() => userCreador?.telefono && copyToClipboard("telefono",userCreador.telefono)}>
+                <MaterialIcons name="content-copy" size={24} color="#003366" />
+              </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
@@ -290,7 +305,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.estadoText}>Estado: {obtenerTextoEstado(servicioCargado?.estado)}</Text>
 
           <Text numberOfLines={1}
-    ellipsizeMode="tail" style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
+            ellipsizeMode="tail" style={styles.categoriaText}>{servicioCargado?.categoria}</Text>
         </View>
       </View>
       {/* Descripcion de servicio */}
@@ -572,28 +587,28 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                             source={
                               usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil
                                 ? {
-                                    uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
-                                  }
+                                  uri: usuariosOfertantes[oferta.idCreadorOferta]?.imagenDePerfil,
+                                }
                                 : require("../../assets/iconos/UserProfile.png")
                             }
                             style={styles.ofertaImage}
                           />
-                          <Text style={{ marginRight: 3, maxWidth: 75, fontSize:12}} numberOfLines={1} ellipsizeMode="tail">
+                          <Text style={{ marginRight: 3, maxWidth: 75, fontSize: 12 }} numberOfLines={1} ellipsizeMode="tail">
                             {usuariosOfertantes[oferta.idCreadorOferta]?.nombre || "Cargando..."}
                           </Text>
                         </TouchableOpacity>
 
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                          <Text style={{ marginRight: 10, fontWeight: "bold" ,fontSize:11}}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
+                          <Text style={{ marginRight: 10, fontWeight: "bold", fontSize: 11 }}>CLP ${oferta.montoOfertado.toLocaleString()}</Text>
                           <TouchableOpacity
                             onPress={() => {
                               setSelectedOferta(oferta);
                               setConfirmModalVisible(true);
                             }}>
-                            <View style={{borderRadius:10 , backgroundColor:"#078C93",paddingHorizontal:8, paddingVertical:5}}>
-                              <Text style={{fontSize:11,color:"white", fontWeight:"bold"}}>Aceptar</Text>
+                            <View style={{ borderRadius: 10, backgroundColor: "#078C93", paddingHorizontal: 8, paddingVertical: 5 }}>
+                              <Text style={{ fontSize: 11, color: "white", fontWeight: "bold" }}>Aceptar</Text>
                             </View>
-                            
+
                             {/*<MaterialIcons name="check" size={24} color="green" />*/}
                           </TouchableOpacity>
                         </View>
@@ -601,7 +616,7 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                   )}
                 />
-                {}
+                { }
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 20, marginTop: 10 }}>
                   <TouchableOpacity onPress={handlePrevPage} disabled={currentPage === 1}>
                     <Text style={{ color: currentPage === 1 ? "grey" : "#2E86C1" }}>Anterior</Text>
@@ -1022,6 +1037,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     marginLeft: 10,
+    marginRight: 10,
     fontSize: 18,
   },
   closeButton: {

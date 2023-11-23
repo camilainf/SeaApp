@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Text, Image, FlatList, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Modal, TouchableWithoutFeedback } from "react-native";
+import { ToastAndroid, View, Text, Image, FlatList, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Modal, TouchableWithoutFeedback } from "react-native";
 import { Rating } from "react-native-elements";
 import { calcularPromedioCalificaciones, convertirFecha } from "../utils/randomService";
 import { UsuarioCasted } from "../resources/user";
@@ -16,6 +16,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { getServicesAcceptedByUser, getServicesByUser } from "../services/serviceService";
 import { useAlert } from "../context/AlertContext";
+import * as Clipboard from 'expo-clipboard';
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -44,6 +46,18 @@ const Profile: React.FC<Props> = ({ navigation }) => {
 
   // Alerta Customizada
   const { showAlert } = useAlert();
+
+  // Modal información de usuario
+  const [modalVisible, setModalVisible] = useState(false);
+
+
+  const copyToClipboard = async (info: string, text: string) => {
+    await Clipboard.setStringAsync(text);
+
+    let message = info === "email" ? 'Email copiado al portapapeles' : 'Número copiado al portapapeles';
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -161,11 +175,50 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
             {usuarioData?.nombre} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
           </Text>
-          <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => showAlert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`)}>
+          {/* <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => showAlert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`)}>
+            <FontAwesome name="info-circle" size={15} color="white" />
+            <Text style={styles.contactButtonText}>Informacion</Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => setModalVisible(true)}>
             <FontAwesome name="info-circle" size={15} color="white" />
             <Text style={styles.contactButtonText}>Informacion</Text>
           </TouchableOpacity>
         </View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Información de contacto</Text>
+              <View style={styles.contactInfo}>
+                {/* <MaterialIcons name="short-text" size={24} color="#003366" /> */}
+                <Text style={styles.contactText}> {usuarioData?.descripcion}</Text>
+              </View>
+              <View style={styles.contactInfo}>
+                <MaterialIcons name="email" size={24} color="#003366" />
+                <Text style={styles.contactText}> {usuarioData?.email}</Text>
+                <TouchableOpacity onPress={() => usuarioData?.email && copyToClipboard("email", usuarioData.email)}>
+                  <MaterialIcons name="content-copy" size={24} color="#003366" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.contactInfo}>
+                <MaterialIcons name="phone" size={24} color="#003366" />
+                <Text style={styles.contactText}> {usuarioData?.telefono}</Text>
+                <TouchableOpacity onPress={() => usuarioData?.telefono && copyToClipboard("telefono", usuarioData.telefono)}>
+                  <MaterialIcons name="content-copy" size={24} color="#003366" />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* TARJETA RESUMEN  */}
         {perfilPersonal && (
@@ -355,7 +408,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                   }}
                 >
                   <Image
-                    source={item.imagen && item.imagen != '' ? {uri: item.imagen} : require("../../assets/iconos/ImageReferencia.png")}
+                    source={item.imagen && item.imagen != '' ? { uri: item.imagen } : require("../../assets/iconos/ImageReferencia.png")}
                     style={styles.imagenTrabajo}
                   />
                   <View style={{ marginEnd: 90 }}>
@@ -572,7 +625,7 @@ const styles = StyleSheet.create({
     color: "green",
   },
   numberContainer: {
-    width: 75, 
+    width: 75,
     alignItems: "flex-end",
   },
   // Modal 3 puntos
@@ -590,7 +643,7 @@ const styles = StyleSheet.create({
   },
   menuOpciones: {
     backgroundColor: "white",
-    padding: 20, 
+    padding: 20,
     borderRadius: 5,
 
   },
@@ -658,6 +711,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  // Modal información de usuario
+  contactInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  contactText: {
+    marginLeft: 10,
+    marginRight: 10,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#21618C",
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: "white",
   },
 });
 export default Profile;

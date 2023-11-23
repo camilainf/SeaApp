@@ -1,7 +1,7 @@
 import { Valoracion, ValoracionCreacion } from "../resources/valoration";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/valoration';
+const URL = "http://10.0.2.2:9000/api" + '/valoration';
 
 export const obtenerValoracionesServicio = async (idSolicitud: string | null) => {
   const response = await fetch(URL + "/" + idSolicitud, {

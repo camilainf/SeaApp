@@ -2,7 +2,7 @@ import { Alert } from "react-native";
 import { Oferta } from "../resources/offer";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/offers';
+const URL = "http://10.0.2.2:9000/api" + '/offers';
 
 export const getOffersByServiceId = async (serviceId: string): Promise<Oferta[]> => {
   const response = await fetch(URL + "/getOfferOfService/" + serviceId);

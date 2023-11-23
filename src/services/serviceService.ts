@@ -1,7 +1,7 @@
 import { ServicioData } from "../resources/service";
 import { BASE_URL } from "@env";
 
-const URL = BASE_URL + '/services';
+const URL = "http://10.0.2.2:9000/api" + '/services';
 
 export const getAllServices = async (): Promise<ServicioData[]> => {
   const response = await fetch(URL);
