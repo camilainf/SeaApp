@@ -14,7 +14,7 @@ import { getUserIdFromToken, getUserIsAdminFromToken } from "../services/authSer
 import SinSolicitudes from "../components/SinSolicitudes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { getServicesAcceptedByUser, getServicesByUser, getServicesOfferedByUser } from "../services/serviceService";
+import { getCompletedServicesCountByUser, getServicesAcceptedByUser, getServicesByUser, getServicesOfferedByUser } from "../services/serviceService";
 import { useAlert } from "../context/AlertContext";
 import * as Clipboard from 'expo-clipboard';
 import { MaterialIcons } from "@expo/vector-icons";
@@ -39,11 +39,15 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   const [perfilPersonal, setPerfilPersonal] = useState<boolean>(false);
   const numeroSolicitudesCreadas = serviciosPropios.length; //Valor de solicitudes creadas
   const numeroSolicitudesAceptadas = solicitudesAceptadas.length; //Valor de solicitudes recibidas
+  const numeroSolicitudesPendientes = solicitudesPendientes.length;
+  const [numeroSolicitudesCompletadas, setNumeroSolicitudesCompletadas] = useState<number>(0);
   //Por ver
   const [gananciaDinero, setGananaciaDinero] = useState<number>(0); //Valor de ganancia de dinero
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ServicioData[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [iconTime, setIconTime] = useState(false);
+  // const [iconConstruction, setIconConstruction] = useState(false);
 
   // Alerta Customizada
   const { showAlert } = useAlert();
@@ -93,6 +97,18 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           //Servicios a los que este usuario ha ofertado y aún no es aceptado para trabajar
           const fetchedServicesPendientes = await getServicesOfferedByUser(userId);
           setSolicitudesPendientes(fetchedServicesPendientes);
+
+          const fetchCompletedServicesCount = async () => {
+            console.log("count", usuarioData)
+            if (usuarioData) {
+              console.log("count2", usuarioData)
+              const count = await getCompletedServicesCountByUser(usuarioData._id);
+              setNumeroSolicitudesCompletadas(count);
+              console.log("count", count)
+            }
+          };
+
+          fetchCompletedServicesCount();
           //Dinero ganado por el usuario
           const fetchedGanancia = await obtenerDieneroGanadoUsuario(userId);
           setGananaciaDinero(fetchedGanancia);
@@ -180,10 +196,6 @@ const Profile: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.userName} numberOfLines={2} ellipsizeMode="tail">
             {usuarioData?.nombre} {usuarioData?.apellidoPaterno} {usuarioData?.apellidoMaterno}
           </Text>
-          {/* <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => showAlert("Información de contacto", `ℹ️  ${usuarioData?.descripcion}\n\n📧  ${usuarioData?.email}\n\n📞  ${usuarioData?.telefono}`)}>
-            <FontAwesome name="info-circle" size={15} color="white" />
-            <Text style={styles.contactButtonText}>Informacion</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity style={isAdmin ? styles.contactButtonAdmin : styles.contactButton} onPress={() => setModalVisible(true)}>
             <FontAwesome name="info-circle" size={15} color="white" />
             <Text style={styles.contactButtonText}>Informacion</Text>
@@ -201,7 +213,6 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             <View style={styles.modalView}>
               <Text style={styles.modalTitle}>Información de contacto</Text>
               <View style={styles.contactInfo}>
-                {/* <MaterialIcons name="short-text" size={24} color="#003366" /> */}
                 <Text style={styles.contactText}> {usuarioData?.descripcion}</Text>
               </View>
               <View style={styles.contactInfo}>
@@ -242,26 +253,39 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             <View style={styles.fila}>
               {/*Izquierda*/}
               <View style={styles.columnaIzquierda}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 8,
-                  }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 8, }}>
                   <View style={styles.numberContainer}>
                     <Text style={styles.numberText}>{numeroSolicitudesCreadas > 99 ? "+99" : numeroSolicitudesCreadas}</Text>
                   </View>
-                  <Text style={styles.textoSolicitudes}>Solicitudes creadas</Text>
+                  <Text style={styles.textoSolicitudes}>{numeroSolicitudesCreadas > 1 ? "Solicitudes creadas" : "Solicitud creada"}</Text>
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8, }}>
                   <View style={styles.numberContainer}>
                     <Text style={styles.numberText}>{numeroSolicitudesAceptadas > 99 ? "+99" : numeroSolicitudesAceptadas}</Text>
                   </View>
-                  <Text style={styles.textoSolicitudes}>Solicitudes aceptadas</Text>
+                  <Text style={styles.textoSolicitudes}>{numeroSolicitudesAceptadas > 1 ? "Solicitudes aceptadas" : "Solicitud aceptada"}</Text>
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={styles.numberContainer}>
+                    <Text style={styles.numberText}>{numeroSolicitudesPendientes > 99 ? "+99" : numeroSolicitudesPendientes}</Text>
+                  </View>
+                  <Text style={styles.textoSolicitudes}>{numeroSolicitudesPendientes > 1 ? "Solicitudes pendientes" : "Solicitud pendiente"}</Text>
                 </View>
               </View>
               {/*Derecha*/}
               <View style={styles.columnaDerecha}>
+                {numeroSolicitudesCompletadas > 0 && (
+                  <>
+                    <Text style={styles.textoSolicitudes}>
+                      {numeroSolicitudesCompletadas > 1 ? "Solicitudes completadas" : "Solicitud completada"}
+                    </Text>
+                    <View style={styles.numberContainerCompleted}>
+                      <Text style={styles.numberText}>
+                        {numeroSolicitudesCompletadas > 99 ? "+99" : numeroSolicitudesCompletadas}
+                      </Text>
+                    </View>
+                  </>
+                )}
                 <Text style={styles.gananciaDineroTexto}>Ganancias de dinero 💰</Text>
                 <Text numberOfLines={1} ellipsizeMode="tail" style={styles.gananciaNumero}>
                   {gananciaDinero} CLP
@@ -311,13 +335,26 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                       }
                       style={styles.imagenTrabajo}
                     />
-                    <View style={{ marginEnd: 90 }}>
+                    <View style={{ marginEnd: 50 }}>
                       <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
                         {item.nombreServicio}
                       </Text>
                       <Text style={{ color: "#50719D" }}>
                         <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
                       </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      {item.estado === 5 || item.estado === 6 ? (
+                        <MaterialIcons name="done-all" size={20} color="green" />
+                      ) : item.estado === 4 ? (
+                        <FontAwesome name="star" size={20} color="orange" />
+                      ) : item.estado === 1 ? (
+                        <MaterialIcons name="gavel" size={20} color="#50719D" />
+                      ) : item.estado === 2 ? (
+                        <MaterialIcons name="play-circle-outline" size={20} color="#E3CF1B" />
+                      ) : item.estado === 3 ? (
+                        <MaterialIcons name="construction" size={20} color="#E3CF1B" />
+                      ) : null}
                     </View>
                   </TouchableOpacity>
                 )}
@@ -330,7 +367,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             </View>
           )}
         </View>
-        {/* LISTADO DE SOLICITUDES Aceptadas */}
+        {/* LISTADO DE SOLICITUDES ACEPTADAS */}
         <View
           style={{
             height: 2,
@@ -370,7 +407,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                       }
                       style={styles.imagenTrabajo}
                     />
-                    <View style={{ marginEnd: 90 }}>
+                    <View style={{ marginEnd: 50 }}>
                       <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
                         {item.nombreServicio}
                       </Text>
@@ -378,12 +415,23 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                         <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
                       </Text>
                     </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      {item.estado === 5 || item.estado === 6 ? (
+                        <MaterialIcons name="done-all" size={20} color="green" />
+                      ) : item.estado === 4 ? (
+                        <FontAwesome name="star" size={20} color="orange" />
+                      ) : item.estado === 2 ? (
+                        <MaterialIcons name="play-circle-outline" size={20} color="#E3CF1B" />
+                      ) : item.estado === 3 ? (
+                        <MaterialIcons name="construction" size={20} color="#E3CF1B" />
+                      ) : null}
+                    </View>
                   </TouchableOpacity>
                 )}
                 keyExtractor={(item) => String(item.id)}
                 scrollEnabled={false}
               />
-              <TouchableOpacity onPress={() => handleVerMas(solicitudesAceptadas, "Solicitudes Aceptadas")}>
+              <TouchableOpacity onPress={() => { handleVerMas(solicitudesAceptadas, "Solicitudes Aceptadas") }}>
                 <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
               </TouchableOpacity>
             </View>
@@ -431,7 +479,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                       }
                       style={styles.imagenTrabajo}
                     />
-                    <View style={{ marginEnd: 90 }}>
+                    <View style={{ marginEnd: 50 }}>
                       <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "#50719D", fontWeight: "bold" }}>
                         {item.nombreServicio}
                       </Text>
@@ -439,12 +487,15 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                         <FontAwesome name="calendar" size={15} color="#50719D" /> {convertirFecha(item.fechaSolicitud)}
                       </Text>
                     </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <MaterialIcons name="access-time" size={20} color="#50719D" />
+                    </View>
                   </TouchableOpacity>
                 )}
                 keyExtractor={(item) => String(item.id)}
                 scrollEnabled={false}
               />
-              <TouchableOpacity onPress={() => handleVerMas(solicitudesPendientes, "Solicitudes pendientes")}>
+              <TouchableOpacity onPress={() => { setIconTime(true); handleVerMas(solicitudesPendientes, "Solicitudes pendientes"); }}>
                 <Text style={{ color: "#50719D", textAlign: "center" }}>Ver más</Text>
               </TouchableOpacity>
             </View>
@@ -477,7 +528,7 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     source={item.imagen && item.imagen != '' ? { uri: item.imagen } : require("../../assets/iconos/ImageReferencia.png")}
                     style={styles.imagenTrabajo}
                   />
-                  <View style={{ marginEnd: 90 }}>
+                  <View style={{ marginEnd: 5 }}>
                     <Text
                       numberOfLines={1}
                       ellipsizeMode="tail"
@@ -488,6 +539,21 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     <Text style={{ color: "#50719D" }}>
                       <FontAwesome name="calendar" size={15} color="#50719D" /> {" "}{convertirFecha(item.fechaSolicitud)}
                     </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.estado === 5 || item.estado === 6 ? (
+                      <MaterialIcons name="done-all" size={20} color="green" />
+                    ) : item.estado === 4 ? (
+                      <FontAwesome name="star" size={20} color="orange" />
+                    ) : item.estado === 1 && !iconTime ? (
+                      <MaterialIcons name="gavel" size={20} color="#50719D" />
+                    ) : item.estado === 1 && iconTime ? (
+                      <MaterialIcons name="access-time" size={20} color="#50719D" />
+                    ) : item.estado === 2 ? (
+                      <MaterialIcons name="play-circle-outline" size={20} color="#E3CF1B" />
+                    ) : item.estado === 3 ? (
+                      <MaterialIcons name="construction" size={20} color="#E3CF1B" />
+                    ) : null}
                   </View>
                 </TouchableOpacity>
               )}
@@ -673,6 +739,12 @@ const styles = StyleSheet.create({
     color: "#0676C6",
     fontSize: 17,
   },
+
+  textoSolicitudesCompletadas: {
+    color: "#0676C6",
+    fontSize: 17,
+    marginBottom: 8,
+  },
   numberText: {
     color: "#0676C6",
     fontWeight: "400",
@@ -693,6 +765,12 @@ const styles = StyleSheet.create({
   numberContainer: {
     width: 75,
     alignItems: "flex-end",
+  },
+  numberContainerCompleted: {
+    width: 75,
+    alignItems: "flex-end",
+    marginBottom:8,
+    marginLeft: 25
   },
   // Modal 3 puntos
   menuContenedor: {
@@ -727,10 +805,12 @@ const styles = StyleSheet.create({
   tarjetaTrabajo: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: 'space-between',
     backgroundColor: "#FCFCFC",
     padding: 16,
     marginBottom: 20,
-    elevation: 4,
+    elevation: 3,
+    borderRadius: 8,
   },
 
   imagenTrabajo: {

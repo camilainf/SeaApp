@@ -204,6 +204,28 @@ export const getServicesOfferedByUser = async (idUsuario: string): Promise<Servi
   }
 };
 
+export const getCompletedServicesCountByUser = async (idUsuario: string | undefined): Promise<number> => {
+  try {
+    const response = await fetch(`${URL}/completedServicesCount/${idUsuario}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return data.count;
+  } catch (error) {
+    console.error("Hubo un problema al obtener la cantidad de servicios terminados:", error);
+    return 0;
+  }
+};
+
 
 export const getServiceById = async (id: string): Promise<ServicioData> => {
   const response = await fetch(URL + '/' + id, {

@@ -450,8 +450,8 @@ const ServicioScreen: React.FC<Props> = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text style={{ color: "#00162D", fontSize: 17, marginBottom: 20 }}>
-                    Ya haz <Text style={{ fontWeight: "bold" }}>evaluado</Text> al usuario, Si ves necesario, <Text style={{ fontWeight: "bold" }}>comunicate</Text> con el otro usuario para la <Text style={{ fontWeight: "bold" }}>finalizacion</Text> del servicio. ✅
+                  <Text style={{ color: "#00162D", fontSize: 17, marginBottom: 20,  textAlign:"center"}}>
+                    Ya haz <Text style={{ fontWeight: "bold" }}>evaluado</Text> al usuario. Si ves necesario, <Text style={{ fontWeight: "bold" }}>comunícate</Text> con el otro usuario para que pueda <Text style={{ fontWeight: "bold" }}>valorarte</Text> y <Text style={{ fontWeight: "bold" }}>finalizar</Text> el servicio. ✅
                   </Text>
                 )}
               </>
