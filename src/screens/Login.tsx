@@ -11,6 +11,7 @@ import { HttpError } from "../resources/httpError";
 import { useAlert } from "../context/AlertContext";
 import CustomAlert from "../components/CustomAlert";
 import { ActivityIndicator } from "react-native-paper";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -26,6 +27,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { showAlert } = useAlert();
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -88,15 +90,44 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
         <Text style={styles.textoBienvenidos}>Bienvenid@!</Text>
         <Text style={styles.label}>Email:</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Ingrese su email"/>
 
         <Text style={styles.label}>Contraseña:</Text>
-        <TextInput
-          style={[styles.input, styles.passwordInput]}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
+        <View style={ {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#F3F6FF',
+  }}>
+      <TextInput
+        style={{
+          flex: 1,
+          paddingRight: 30, // Asegúrate de tener suficiente espacio para el ícono
+        }}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry={!passwordVisible}
+        placeholder="Ingrese su contraseña"
+      />
+      <TouchableOpacity
+        onPress={() => setPasswordVisible(!passwordVisible)}
+        style={{
+          position: 'absolute',
+          right: 10, // Ajusta este valor según sea necesario
+          height: '100%', // Altura del contenedor para centrar verticalmente
+          justifyContent: 'center',
+        }}
+      >
+        <FontAwesome
+          name={passwordVisible ? "eye" : "eye-slash"}
+          size={20}
+          color="grey"
         />
+      </TouchableOpacity>
+    </View>
 
         {
           loading ? (
